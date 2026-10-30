@@ -1,0 +1,447 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>シフト自動作成</title><meta name="robots" content="noindex,nofollow"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="シフト作成">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;font-size:14px;color:#222;background:#f6f7f9;padding-bottom:70px}
+header{background:#2f5d8a;color:#fff;padding:10px 12px;font-weight:bold;position:sticky;top:0;z-index:5}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid #ccc;z-index:6}
+nav button{flex:1 1 0;min-width:0;border:0;background:none;padding:9px 0;font-size:10px;letter-spacing:-.5px;white-space:nowrap;overflow:hidden;color:#555}nav button.on{color:#2f5d8a;font-weight:bold;border-top:3px solid #2f5d8a}
+#main{padding:10px;max-width:1400px;margin:auto}
+button,.btn{border:1px solid #bbb;background:#fff;border-radius:8px;padding:8px 12px;font-size:14px;cursor:pointer;display:inline-block}
+button.pri{background:#2f5d8a;color:#fff;border-color:#2f5d8a}button.danger{color:#c00;border-color:#c00}
+.bar{display:flex;align-items:center;justify-content:center;gap:14px;margin:4px 0 8px;font-size:17px}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.hint{color:#666;font-size:12px}
+.ck{padding:8px;border-radius:8px;margin:6px 0}.ck.good{background:#e3f6e5}.ck.mid{background:#fff4d6}.ck.bad{background:#fde2e2}
+.tw{overflow:auto;max-height:70vh;border:1px solid #ddd;background:#fff;-webkit-overflow-scrolling:touch}
+table.grid{border-collapse:separate;border-spacing:0;font-size:12.5px}
+.grid th,.grid td{border-right:1px solid #e3e3e3;border-bottom:1px solid #e3e3e3;padding:2px;text-align:center;min-width:40px;height:34px}
+.grid thead th{position:sticky;top:0;background:#f0f0f0;z-index:2}.grid .nm{position:sticky;left:0;background:#fff;z-index:1;min-width:86px;text-align:left}
+.grid thead .nm{z-index:3}.grid .nm small{display:block;color:#888;font-size:9px;white-space:nowrap;overflow:hidden;max-width:86px}
+.grid th.sat{color:#1f5fbf}.grid th.sun,.grid th.hol{color:#c00}.grid th.cl{background:#ddd}
+.grid td.c{cursor:pointer;white-space:nowrap}.grid td.c i{display:block;font-size:10px;color:#555;font-style:normal}
+.grid td.off{color:#888;background:#fafafa}.grid td.err{outline:2px solid #e00;outline-offset:-2px}.grid td.warn{outline:2px solid #f90;outline-offset:-2px}
+.grid td.lk{font-weight:bold}.grid td.rq{background:#ffe9a8;font-weight:bold}.grid tr.dh td{height:16px;font-size:11px;font-weight:bold}
+table.tb{border-collapse:collapse;font-size:12px}.tb th,.tb td{border:1px solid #ddd;padding:3px 6px;text-align:center;white-space:nowrap}
+.red{background:#fdd;color:#b00;font-weight:bold}.org{background:#ffe7c2}.sun{color:#c00}.sat{color:#1f5fbf}
+.ck-list{max-height:40vh;overflow:auto;padding-left:18px;font-size:12px}.ck-list .err{color:#b00}.ck-list .warn{color:#a60}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.chips button{padding:6px 10px}.chips button.on{background:#2f5d8a;color:#fff}.offb{background:#eee}
+.ck2{display:inline-flex;align-items:center;gap:4px;margin:3px 8px 3px 0}
+.form{display:grid;gap:10px}.form label{display:flex;flex-direction:column;font-size:12px;color:#555}
+input,select{font-size:15px;padding:6px;border:1px solid #bbb;border-radius:6px}input[type=number]{width:70px}
+.card{background:#fff;border-radius:8px;padding:8px;margin:8px 0;box-shadow:0 1px 2px #0001}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0}.row input:not([type]){flex:1;min-width:100px}
+.req{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0}.req label{display:flex;flex-direction:column;font-size:11px}
+.sub{border-top:1px dashed #ccc;padding:6px 0}.small{font-size:12px}
+.srow{background:#fff;padding:8px;border-bottom:1px solid #eee;cursor:pointer}.srow span{color:#555;font-size:12px}.srow small{display:block;color:#888}
+h3{font-size:14px;margin:14px 0 6px;padding:4px 6px;border-radius:4px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.cal b{text-align:center;font-size:12px}.cal button{padding:6px 2px;font-size:13px;min-height:44px}.cal button small{display:block;font-size:8px;color:#c00}.cal button.on{background:#888;color:#fff}
+#modal{display:none;position:fixed;inset:0;background:#0006;z-index:10;align-items:flex-end;justify-content:center}#modal.on{display:flex}
+.mb{background:#fff;width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:14px 14px 0 0;padding:14px}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 14px;border-radius:20px;opacity:0;transition:.3s;z-index:20;pointer-events:none}#toast.on{opacity:.95}
+@media print{header,nav,.acts,.bar button,.hint,.ck{display:none!important}body{padding:0;background:#fff}.tw{max-height:none;overflow:visible;border:0}.grid th,.grid td{min-width:0;font-size:8px;height:auto}.grid .nm{position:static}@page{size:A3 landscape;margin:6mm}}
+</style></head><body><div id="nojs" style="margin:16px;padding:20px;border:4px solid #d00;border-radius:12px;background:#fff4f4;color:#900;font-size:22px;line-height:1.6;font-weight:bold">この画面のままなら、プレビューでは動きません。<br>共有ボタンから『Safariで開く』か『ファイルに保存』してから開いてください。</div><div id="errbox" style="display:none;margin:8px;padding:10px;background:#ffe0e0;color:#900;border:2px solid #d00;font-size:13px;white-space:pre-wrap;word-break:break-all"></div><div id="memband" style="display:none;padding:8px 12px;background:#fff3b0;color:#640;font-size:14px;font-weight:bold">この開き方では保存できません。JSON書き出しで控えをとってください</div>
+<script>function showErr(m){try{var e=document.getElementById('errbox');e.style.display='block';e.textContent+='エラー: '+m+'\n';}catch(_){}}
+window.onerror=function(msg,src,l,c,err){showErr(msg+' (行'+l+':'+c+')'+(err&&err.stack?'\n'+err.stack:''));};
+window.addEventListener('unhandledrejection',function(e){showErr(String(e.reason));});</script><header>シフト自動作成</header><main id="main"></main>
+<nav><button data-t="shift">シフト表</button><button data-t="sum">集計</button><button data-t="req">希望休</button><button data-t="month">月設定</button><button data-t="dept">部署</button><button data-t="staff">スタッフ</button><button data-t="data">保存</button></nav>
+<div id="modal" onclick="if(event.target===this)closeM()"></div><div id="toast"></div>
+<script>/* 最小XLSX書き出し(無圧縮ZIP・スタイル対応) */
+const XLSX=(()=>{const col=c=>{let s='';c++;while(c>0){const m=(c-1)%26;s=String.fromCharCode(65+m)+s;c=(c-m-1)/26|0;}return s;};
+const ec=a=>col(a.c)+(a.r+1),er=g=>ec(g.s)+':'+ec(g.e);
+const x=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const T=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;T[n]=c>>>0;}
+const crc=b=>{let c=~0;for(let i=0;i<b.length;i++)c=T[(c^b[i])&255]^(c>>>8);return ~c>>>0;};
+function zip(files){const E=new TextEncoder(),parts=[],cd=[];let off=0;
+ for(const [n,s] of files){const nb=E.encode(n),d=E.encode(s),c=crc(d);const h=new DataView(new ArrayBuffer(30));
+  h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint16(6,0x800,true);h.setUint32(14,c,true);h.setUint32(18,d.length,true);h.setUint32(22,d.length,true);h.setUint16(26,nb.length,true);
+  parts.push(new Uint8Array(h.buffer),nb,d);const C=new DataView(new ArrayBuffer(46));C.setUint32(0,0x02014b50,true);C.setUint16(4,20,true);C.setUint16(6,20,true);C.setUint16(8,0x800,true);
+  C.setUint32(16,c,true);C.setUint32(20,d.length,true);C.setUint32(24,d.length,true);C.setUint16(28,nb.length,true);C.setUint32(42,off,true);cd.push(new Uint8Array(C.buffer),nb);off+=30+nb.length+d.length;}
+ const cs=cd.reduce((a,b)=>a+b.length,0),Z=new DataView(new ArrayBuffer(22));Z.setUint32(0,0x06054b50,true);Z.setUint16(8,files.length,true);Z.setUint16(10,files.length,true);Z.setUint32(12,cs,true);Z.setUint32(16,off,true);
+ const all=parts.concat(cd,[new Uint8Array(Z.buffer)]);const out=new Uint8Array(all.reduce((a,b)=>a+b.length,0));let p=0;for(const a of all){out.set(a,p);p+=a.length;}return out;}
+function write(wb){const fonts=[],fills=['<fill><patternFill patternType="none"/></fill>','<fill><patternFill patternType="gray125"/></fill>'],borders=['<border/>'],xfs=[],K={};
+ const idx=(a,v)=>{let i=a.indexOf(v);if(i<0){a.push(v);i=a.length-1;}return i;};
+ fonts.push('<font><sz val="11"/></font>');xfs.push('<xf/>');
+ const sty=s=>{if(!s)return 0;const f=s.font||{};const fo=idx(fonts,`<font>${f.bold?'<b/>':''}<sz val="${f.sz||11}"/>${f.color?`<color rgb="FF${f.color.rgb}"/>`:''}</font>`);
+  const fi=s.fill?idx(fills,`<fill><patternFill patternType="solid"><fgColor rgb="FF${s.fill.fgColor.rgb}"/></patternFill></fill>`):0;
+  const b=s.border||{};const bo=idx(borders,'<border>'+['left','right','top','bottom'].map(k=>b[k]?`<${k} style="thin"/>`:`<${k}/>`).join('')+'</border>');
+  const al=s.alignment||{};const a=`<alignment${al.horizontal?` horizontal="${al.horizontal}"`:''}${al.vertical?` vertical="${al.vertical}"`:''}${al.wrapText?' wrapText="1"':''}/>`;
+  return idx(xfs,`<xf numFmtId="0" fontId="${fo}" fillId="${fi}" borderId="${bo}" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">${a}</xf>`);};
+ const sheets=wb.SheetNames.map((nm,si)=>{const ws=wb.Sheets[nm],rows={};
+  for(const k in ws){if(k[0]==='!')continue;const m=k.match(/^([A-Z]+)(\d+)$/);(rows[m[2]]=rows[m[2]]||[]).push([k,ws[k],m[1]]);}
+  const cn=s=>[...s].reduce((a,c)=>a*26+c.charCodeAt(0)-64,0);
+  let sd='';for(const r of Object.keys(rows).map(Number).sort((a,b)=>a-b)){sd+=`<row r="${r}">`;for(const [k,c] of rows[r].sort((a,b)=>cn(a[2])-cn(b[2]))){const v=c.v??'';const s=sty(c.s);
+   sd+=v===''?`<c r="${k}" s="${s}"/>`:(typeof v==='number'?`<c r="${k}" s="${s}"><v>${v}</v></c>`:`<c r="${k}" s="${s}" t="inlineStr"><is><t xml:space="preserve">${x(v)}</t></is></c>`);}sd+='</row>';}
+  const cols=(ws['!cols']||[]).map((c,i)=>`<col min="${i+1}" max="${i+1}" width="${c.wch+0.7}" customWidth="1"/>`).join('');
+  const mg=(ws['!merges']||[]).map(g=>`<mergeCell ref="${er(g)}"/>`).join('');
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${ws['!ref']?`<dimension ref="${ws['!ref']}"/>`:''}${cols?`<cols>${cols}</cols>`:''}<sheetData>${sd}</sheetData>${mg?`<mergeCells count="${ws['!merges'].length}">${mg}</mergeCells>`:''}</worksheet>`;});
+ const N='http://schemas.openxmlformats.org/',R=N+'officeDocument/2006/relationships';
+ const f=[['[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="${N}package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`],
+  ['_rels/.rels',`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="${N}package/2006/relationships"><Relationship Id="rId1" Type="${R}/officeDocument" Target="xl/workbook.xml"/></Relationships>`],
+  ['xl/workbook.xml',`<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="${N}spreadsheetml/2006/main" xmlns:r="${R}"><sheets>${wb.SheetNames.map((n,i)=>`<sheet name="${x(n)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')}</sheets></workbook>`],
+  ['xl/_rels/workbook.xml.rels',`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="${N}package/2006/relationships">${sheets.map((_,i)=>`<Relationship Id="rId${i+1}" Type="${R}/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}<Relationship Id="rId${sheets.length+1}" Type="${R}/styles" Target="styles.xml"/></Relationships>`]];
+ sheets.forEach((s,i)=>f.push([`xl/worksheets/sheet${i+1}.xml`,s]));
+ f.push(['xl/styles.xml',`<?xml version="1.0" encoding="UTF-8"?><styleSheet xmlns="${N}spreadsheetml/2006/main"><fonts count="${fonts.length}">${fonts.join('')}</fonts><fills count="${fills.length}">${fills.join('')}</fills><borders count="${borders.length}">${borders.join('')}</borders><cellStyleXfs count="1"><xf/></cellStyleXfs><cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`]);
+ return zip(f);}
+return {version:'mini-1',utils:{encode_cell:ec,encode_range:er,book_new:()=>({SheetNames:[],Sheets:{}}),book_append_sheet:(wb,ws,n)=>{wb.SheetNames.push(n);wb.Sheets[n]=ws;}},write};})();
+</script><script>const SEED_DEPTS=[{"id": "seiho", "name": "生ホ", "color": "#f6d7e6", "req": {"sun": 0, "mon": 2, "tue": 2, "wed": 3, "thu": 3, "fri": 3, "sat": 0, "hol": 3}, "subs": [{"code": "中A", "req": {"sun": 0, "mon": 0, "tue": 0, "wed": 0, "thu": 0, "fri": 0, "sat": 0, "hol": 0}, "note": ""}, {"code": "中B", "req": {"sun": 0, "mon": 1, "tue": 1, "wed": 1, "thu": 1, "fri": 1, "sat": 0, "hol": 1}, "note": ""}], "closedDow": []}, {"id": "job", "name": "ジョブ", "color": "#d4e8fb", "req": {"sun": 0, "mon": 7, "tue": 8, "wed": 8, "thu": 8, "fri": 7, "sat": 0, "hol": 6}, "subs": [], "closedDow": []}, {"id": "juku", "name": "塾", "color": "#e2d9f7", "req": {"sun": 0, "mon": 4, "tue": 3, "wed": 4, "thu": 4, "fri": 4, "sat": 4, "hol": 3}, "subs": [{"code": "塾A", "req": {"sun": 0, "mon": 2, "tue": 1, "wed": 2, "thu": 0, "fri": 2, "sat": 0, "hol": 0}, "note": ""}, {"code": "塾B", "req": {"sun": 0, "mon": 1, "tue": 0, "wed": 1, "thu": 1, "fri": 1, "sat": 0, "hol": 0}, "note": ""}, {"code": "塾C", "req": {"sun": 0, "mon": 0, "tue": 0, "wed": 0, "thu": 0, "fri": 0, "sat": 3, "hol": 3}, "note": ""}, {"code": "塾D", "req": {"sun": 0, "mon": 0, "tue": 0, "wed": 0, "thu": 0, "fri": 0, "sat": 1, "hol": 0}, "note": ""}], "closedDow": []}, {"id": "cafe", "name": "カフェ", "color": "#d8f2dc", "req": {"sun": 0, "mon": 7, "tue": 6, "wed": 7, "thu": 7, "fri": 7, "sat": 3, "hol": 6}, "subs": [], "closedDow": []}, {"id": "sausage", "name": "ソーセージ", "color": "#efe6d2", "req": {"sun": 0, "mon": 1, "tue": 1, "wed": 1, "thu": 1, "fri": 1, "sat": 0, "hol": 1}, "subs": [], "closedDow": []}, {"id": "seikatsu", "name": "生活", "color": "#fde2c4", "req": {"sun": 0, "mon": 6, "tue": 6, "wed": 7, "thu": 7, "fri": 7, "sat": 0, "hol": 6}, "subs": [{"code": "生活A", "req": {"sun": 0, "mon": 2, "tue": 2, "wed": 2, "thu": 2, "fri": 2, "sat": 0, "hol": 2}, "note": ""}, {"code": "生活B", "req": {"sun": 0, "mon": 2, "tue": 2, "wed": 2, "thu": 2, "fri": 2, "sat": 0, "hol": 2}, "note": ""}], "closedDow": []}, {"id": "flat", "name": "ふらっと", "color": "#cdeff0", "req": {"sun": 0, "mon": 0, "tue": 2, "wed": 3, "thu": 2, "fri": 2, "sat": 2, "hol": 0}, "subs": [], "closedDow": [1]}, {"id": "king", "name": "キング", "color": "#fff3b0", "req": {"sun": 0, "mon": 5, "tue": 6, "wed": 5, "thu": 6, "fri": 6, "sat": 0, "hol": 5}, "subs": [], "closedDow": []}, {"id": "chimane", "name": "地マネ", "color": "#e6e6e6", "req": {"sun": 0, "mon": 2, "tue": 2, "wed": 2, "thu": 2, "fri": 2, "sat": 0, "hol": 1}, "subs": [], "closedDow": []}];
+const SEED_STAFF=[];
+const HOL={"2025-01-01": "元日", "2025-01-13": "成人の日", "2025-02-11": "建国記念の日", "2025-02-23": "天皇誕生日", "2025-02-24": "天皇誕生日 振替休日", "2025-03-20": "春分の日", "2025-04-29": "昭和の日", "2025-05-03": "憲法記念日", "2025-05-04": "みどりの日", "2025-05-05": "こどもの日", "2025-05-06": "みどりの日 振替休日", "2025-07-21": "海の日", "2025-08-11": "山の日", "2025-09-15": "敬老の日", "2025-09-23": "秋分の日", "2025-10-13": "スポーツの日", "2025-11-03": "文化の日", "2025-11-23": "勤労感謝の日", "2025-11-24": "勤労感謝の日 振替休日", "2026-01-01": "元日", "2026-01-12": "成人の日", "2026-02-11": "建国記念の日", "2026-02-23": "天皇誕生日", "2026-03-20": "春分の日", "2026-04-29": "昭和の日", "2026-05-03": "憲法記念日", "2026-05-04": "みどりの日", "2026-05-05": "こどもの日", "2026-05-06": "憲法記念日 振替休日", "2026-07-20": "海の日", "2026-08-11": "山の日", "2026-09-21": "敬老の日", "2026-09-22": "国民の休日", "2026-09-23": "秋分の日", "2026-10-12": "スポーツの日", "2026-11-03": "文化の日", "2026-11-23": "勤労感謝の日", "2027-01-01": "元日", "2027-01-11": "成人の日", "2027-02-11": "建国記念の日", "2027-02-23": "天皇誕生日", "2027-03-21": "春分の日", "2027-03-22": "春分の日 振替休日", "2027-04-29": "昭和の日", "2027-05-03": "憲法記念日", "2027-05-04": "みどりの日", "2027-05-05": "こどもの日", "2027-07-19": "海の日", "2027-08-11": "山の日", "2027-09-20": "敬老の日", "2027-09-23": "秋分の日", "2027-10-11": "スポーツの日", "2027-11-03": "文化の日", "2027-11-23": "勤労感謝の日", "2028-01-01": "元日", "2028-01-10": "成人の日", "2028-02-11": "建国記念の日", "2028-02-23": "天皇誕生日", "2028-03-20": "春分の日", "2028-04-29": "昭和の日", "2028-05-03": "憲法記念日", "2028-05-04": "みどりの日", "2028-05-05": "こどもの日", "2028-07-17": "海の日", "2028-08-11": "山の日", "2028-09-18": "敬老の日", "2028-09-22": "秋分の日", "2028-10-09": "スポーツの日", "2028-11-03": "文化の日", "2028-11-23": "勤労感謝の日"}
+;
+'use strict';
+/* ===== 定数・初期データ ===== */
+const LS_KEY='shiftMaker.public.v1';
+const OFF_CODES=['休','希休','有給','特休','夏季','リフ','代休','休所'];
+const KOUKYU=['休','希休'];
+const WD='日月火水木金土';
+const KINDS=[['mon','月'],['tue','火'],['wed','水'],['thu','木'],['fri','金'],['sat','土'],['sun','日'],['hol','祝']];
+function D(id,name,color,req,subs,extra){return Object.assign({id,name,color,req,subs:subs||[],closedDow:[]},extra||{});}
+function sub(code,req,note){return {code,req,note:note||''};}
+function defaultDepts(){return JSON.parse(JSON.stringify(SEED_DEPTS));}
+let _sid=0;
+function S(kind,title,dept,o){_sid++;return Object.assign({id:'s'+_sid,name:'S'+String(_sid).padStart(2,'0'),kind,title,dept,subs:[],fixed:[],help:[],satOK:false,carry:0},o||{});}
+function defaultStaff(){return JSON.parse(JSON.stringify(SEED_STAFF));}
+function defaultMeetings(){return [
+ {name:'業務会議',week:'2',dow:3,target:'施設長'},{name:'運営会議',week:'1',dow:3,target:'施設長'},
+ {name:'連絡会議',week:'1',dow:4,target:'施設長'},{name:'施設長会議',week:'last',dow:4,target:'施設長'},
+ {name:'ジョブ会議',week:'2',dow:3,target:'job'},{name:'ジョブ会議',week:'4',dow:3,target:'job'},
+ {name:'塾会議',week:'3',dow:4,target:'juku'}];}
+function defaultState(){const t=new Date();let y=t.getFullYear(),m=t.getMonth()+2;if(m>12){m=1;y++;}
+ return {ver:1,corp:'',depts:defaultDepts(),staff:defaultStaff(),meetings:defaultMeetings(),
+  rules:{maxRun:5,satCap:3,trials:40,closeNewYear:true,closeObon:true,closeGW:true},cur:{y,m},months:{}};}
+
+/* ===== 状態 ===== */
+let ST;
+let LS_OK=true,MEM={};
+function lsGet(k){try{return window.localStorage.getItem(k);}catch(e){LS_OK=false;return MEM[k]??null;}}
+function lsSet(k,v){MEM[k]=v;try{window.localStorage.setItem(k,v);}catch(e){LS_OK=false;}}
+function load(){let s=null;try{s=JSON.parse(lsGet(LS_KEY));}catch(e){}if(s&&s.ver===1){ST=s;}else ST=defaultState();try{window.localStorage.setItem(LS_KEY+'.t','1');window.localStorage.removeItem(LS_KEY+'.t');}catch(e){LS_OK=false;}}
+function save(){try{lsSet(LS_KEY,JSON.stringify(ST));}catch(e){LS_OK=false;}if(!LS_OK){const b=document.getElementById('memband');if(b)b.style.display='block';}}
+const key=(y,m)=>y+'-'+String(m).padStart(2,'0');
+function monthObj(y,m){const k=key(y,m);if(!ST.months[k])ST.months[k]={closed:null,req:{},res:null};const o=ST.months[k];if(o.closed===null)o.closed=defaultClosed(y,m);return o;}
+function dim(y,m){return new Date(y,m,0).getDate();}
+function dowOf(y,m,d){return new Date(y,m-1,d).getDay();}
+function holName(y,m,d){return HOL[key(y,m)+'-'+String(d).padStart(2,'0')]||null;}
+function defaultClosed(y,m){const r=[],R=ST.rules;const n=dim(y,m);
+ for(let d=1;d<=n;d++){
+  if(R.closeNewYear&&((m===12&&d>=29)||(m===1&&d<=3)))r.push(d);
+  if(R.closeObon&&m===8&&d>=13&&d<=16)r.push(d);
+  if(R.closeGW&&m===5&&d>=3&&d<=6&&holName(y,m,d))r.push(d);}
+ return r;}
+function deptById(id){return ST.depts.find(x=>x.id===id);}
+const KW=[['塾','juku'],['ジョブ','job'],['カフェ','cafe'],['キッチン','cafe'],['ソーセージ','sausage'],['キング','king'],['ふらっと','flat'],['地マネ','chimane'],['中A','seiho'],['中B','seiho'],['生ホ','seiho'],['ホ生','seiho'],['ホーム','seiho'],['GH','seiho'],['生活','seikatsu'],['送迎','seikatsu'],['生','seikatsu']];
+function kwDept(c){for(const [k,id] of KW)if(c.includes(k)){const d=deptById(id);if(d)return d;}return null;}
+function cellDept(v,s){if(!v||!isWork(v.c))return null;if(v.dp)return deptById(v.dp);return codeDept(v.c)||(s?deptById(s.dept):null);}
+function codeDept(code){if(!code)return null;for(const d of ST.depts){if(d.name===code)return d;if(d.subs.some(s=>s.code===code))return d;}
+ for(const d of ST.depts){if(code.startsWith(d.name))return d;}return kwDept(code);}
+function isOff(c){return OFF_CODES.includes(c);}
+function isWork(c){return !!c&&!isOff(c);}
+
+/* ===== 日情報 ===== */
+function dayInfos(y,m){const mo=monthObj(y,m),n=dim(y,m),a=[];
+ for(let d=1;d<=n;d++){const w=dowOf(y,m,d),h=holName(y,m,d);const closed=mo.closed.includes(d);
+  let kind=h&&w!==0?'hol':['sun','mon','tue','wed','thu','fri','sat'][w];a.push({d,w,h,closed,kind});}
+ return a;}
+function deptReq(dep,di){if(di.closed)return 0;if(dep.closedDow.includes(di.w))return 0;return +dep.req[di.kind]||0;}
+function subReq(sb,dep,di){if(di.closed||dep.closedDow.includes(di.w))return 0;return +sb.req[di.kind]||0;}
+function deptOpen(dep,di){return deptReq(dep,di)>0;}
+function nthWeek(y,m,d){return Math.floor((d-1)/7)+1;}
+function meetingDays(y,m){const n=dim(y,m),out={};
+ for(const mt of ST.meetings){let ds=[];for(let d=1;d<=n;d++)if(dowOf(y,m,d)===+mt.dow)ds.push(d);
+  let d=mt.week==='last'?ds[ds.length-1]:ds[+mt.week-1];if(!d)continue;
+  // 休所日・祝日なら翌営業日へ
+  const mo=monthObj(y,m);let g=0;while(d<=n&&(mo.closed.includes(d)||holName(y,m,d)||dowOf(y,m,d)===0||dowOf(y,m,d)===6)&&g<7){d++;g++;}
+  if(d>n)continue;(out[d]=out[d]||[]).push(mt);}
+ return out;}
+function attends(s,mt){return (mt.target==='施設長'?s.title.includes('施設長'):s.dept===mt.target)||(s.meet||[]).includes(mt.name);}
+function satCountTarget(y,m){return dayInfos(y,m).filter(x=>x.w===0||x.w===6).length;}
+function prevCarry(y,m){let py=y,pm=m-1;if(pm<1){pm=12;py--;}const po=ST.months[key(py,pm)];const out={};
+ for(const s of ST.staff){let c=+s.carry||0;if(po&&po.res&&po.res[s.id]){const n=dim(py,pm);let r=0;for(let d=n;d>=1;d--){const v=po.res[s.id][d];if(v&&isWork(v.c))r++;else break;}c=r;}out[s.id]=c;}
+ return out;}
+
+/* ===== 自動作成 ===== */
+function rnd(seed){let x=seed>>>0||1;return()=>{x^=x<<13;x>>>=0;x^=x>>17;x^=x<<5;x>>>=0;return x/4294967296;};}
+function shuffle(a,R){for(let i=a.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function labsOf(s,g){const L=s.lab||{};const a=(L[g]&&L[g].length?L[g]:(L.wd&&L.wd.length?L.wd:L.we))||[];return a.length?a:[{c:s.subs[0]||deptById(s.dept).name,w:1}];}
+function primaryCode(s){return labsOf(s,'wd')[0].c;}
+function pickW(a,R){const t=a.reduce((x,y)=>x+y.w,0);let r=R()*t;for(const x of a){r-=x.w;if(r<=0)return x;}return a[0];}
+function generate(y,m){const t0=performance.now();let best=null;
+ for(let t=0;t<ST.rules.trials;t++){const r=oneTrial(y,m,rnd(1234567+t*7919));const ck=checks(y,m,r);
+  const sc=ck.err*1000+ck.warn*10+ck.balance;if(!best||sc<best.sc)best={sc,r,ck};if(best.ck.err===0&&best.ck.warn===0)break;}
+ return {res:best.r,ck:best.ck,ms:Math.round(performance.now()-t0)};}
+function oneTrial(y,m,R){
+ const days=dayInfos(y,m),n=days.length,mo=monthObj(y,m),reqs=mo.req||{},mdays=meetingDays(y,m),T=satCountTarget(y,m),carry=prevCarry(y,m);
+ const res={};const staff=ST.staff;
+ const cnt=(depId,d)=>{let c=0;const dep=deptById(depId);for(const s of staff){const v=res[s.id][d];if(v&&isWork(v.c)&&cellDept(v,s)===dep)c++;}return c;};
+ const surplus=(depId,d)=>{const dep=deptById(depId);return cnt(depId,d)-deptReq(dep,days[d-1]);};
+ const attendDay=(s,d)=>(mdays[d]||[]).some(mt=>attends(s,mt));
+ // 1 初期化
+ for(const s of staff){res[s.id]={};const rq=reqs[s.id]||{};const dep=deptById(s.dept);
+  for(const di of days){const d=di.d;
+   if(rq[d]){res[s.id][d]={c:rq[d]==='出勤'?primaryCode(s):rq[d],n:'',lock:true};continue;}
+   if(s.kind==='常勤'){
+    if(di.closed&&di.w!==0&&di.w!==6)res[s.id][d]={c:'休所',n:''};
+    else if(di.w===0)res[s.id][d]={c:'休',n:''};
+    else if(di.w===6)res[s.id][d]={c:'休',n:''};
+    else if(!deptOpen(dep,di)&&di.kind==='hol'){res[s.id][d]={c:'休所',n:''};}
+    else if(dep.closedDow.includes(di.w))res[s.id][d]={c:'休',n:''}; // 部署定休(例:ふらっと月曜)
+    else res[s.id][d]={c:primaryCode(s),n:''};
+   }else{
+    res[s.id][d]=(s.fixed.includes(di.w)&&deptOpen(dep,di))?{c:primaryCode(s),n:''}:{c:'',n:''};
+   }}}
+ // 2 土曜(常勤)
+ const satC={};staff.forEach(s=>satC[s.id]=0);
+ for(const di of days){if(di.w!==6||di.closed||di.h)continue;
+  for(const dep of shuffle(ST.depts.slice(),R)){let need=deptReq(dep,di)-cnt(dep.id,di.d);if(need<=0)continue;
+   const cands=shuffle(staff.filter(s=>s.kind==='常勤'&&s.satOK&&(s.dept===dep.id||s.help.includes(dep.id))&&!res[s.id][di.d].lock&&satC[s.id]<(s.satCap||ST.rules.satCap)),R)
+    .sort((a,b)=>(a.dept===dep.id?0:1)-(b.dept===dep.id?0:1)||satC[a.id]/Math.max(a.satRate||0.3,0.2)-satC[b.id]/Math.max(b.satRate||0.3,0.2)||((b.helpW||{})[dep.id]||0)-((a.helpW||{})[dep.id]||0));
+   for(const s of cands){if(need<=0)break;res[s.id][di.d]=s.dept===dep.id?{c:primaryCode(s),n:''}:{c:dep.name,n:'ヘルプ',dp:dep.id};satC[s.id]++;need--;}}}
+ // 3 平日公休の配置(常勤)
+ const offCount=s=>Object.values(res[s.id]).filter(v=>KOUKYU.includes(v.c)).length;
+ const canRest=(s,d)=>{const v=res[s.id][d],di=days[d-1];return v&&!v.lock&&isWork(v.c)&&di.w!==6&&di.w!==0&&!attendDay(s,d);};
+ const runAt=(s,d)=>{let a=0,b=0;for(let i=d-1;i>=1&&isWork(res[s.id][i].c);i--)a++;if(d-1-a<1)a+=carry[s.id];for(let i=d+1;i<=n&&isWork(res[s.id][i].c);i++)b++;return a+b+1;};
+ const restScore=(s,d)=>{const v=res[s.id][d];const dep=cellDept(v,s)||deptById(s.dept);return surplus(dep.id,days[d-1].d)*3+Math.min(runAt(s,d),9)+((s.restW||[])[days[d-1].w]||0)*6+R()*1.5;};
+ for(const s of shuffle(staff.filter(s=>s.kind==='常勤'),R)){
+  // 土曜出勤の代休(同週の平日)
+  for(const di of days){if(di.w!==6||!isWork(res[s.id][di.d].c)||offCount(s)>=T)continue;
+   let c=[];for(let d=di.d-5;d<di.d;d++)if(d>=1&&canRest(s,d))c.push(d);
+   if(!c.length)for(let d=di.d+2;d<=Math.min(n,di.d+6);d++)if(canRest(s,d))c.push(d);
+   if(c.length){const cw=x=>((s.compW||[])[days[x-1].w]||0)*6;c.sort((a,b)=>restScore(s,b)+cw(b)-restScore(s,a)-cw(a));res[s.id][c[0]]={c:'休',n:''};}}
+  let need=T-offCount(s),g=0;
+  while(need>0&&g++<40){const c=[];for(let d=1;d<=n;d++)if(canRest(s,d))c.push(d);if(!c.length)break;
+   c.sort((a,b)=>restScore(s,b)-restScore(s,a));res[s.id][c[0]]={c:'休',n:''};need--;}
+  // 多すぎる場合(土曜を休にしている等)→ 休を出勤に戻す(平日の非ロック)
+  g=0;while(offCount(s)>T&&g++<40){const c=[];for(let d=1;d<=n;d++){const v=res[s.id][d],di=days[d-1];if(v.c==='休'&&!v.lock&&di.w!==0&&di.w!==6&&!deptById(s.dept).closedDow.includes(di.w))c.push(d);}if(!c.length)break;res[s.id][c[Math.floor(R()*c.length)]]={c:primaryCode(s),n:''};}
+ }
+ // 4 連勤修正(休の移動)
+ for(let it=0;it<3;it++)for(const s of staff.filter(s=>s.kind==='常勤')){
+  for(let d=1;d<=n;d++){if(!isWork(res[s.id][d].c))continue;if(runAt(s,d)<=ST.rules.maxRun)continue;
+   // 連続区間を求め中央付近に休を入れ、他の休を出勤へ
+   let a=d;while(a>1&&isWork(res[s.id][a-1].c))a--;let b=d;while(b<n&&isWork(res[s.id][b+1].c))b++;
+   const ins=[];for(let x=a;x<=b;x++)if(canRest(s,x))ins.push(x);if(!ins.length)continue;
+   ins.sort((p,q)=>Math.abs((p-a)-(b-p))-Math.abs((q-a)-(b-q))||restScore(s,q)-restScore(s,p));
+   const x=ins[0];const outs=[];for(let z=1;z<=n;z++){const v=res[s.id][z],di=days[z-1];if(v.c==='休'&&!v.lock&&di.w>=1&&di.w<=5&&(z<a-1||z>b+1))outs.push(z);}
+   let done=false;
+   for(const z of shuffle(outs,R)){res[s.id][x]={c:'休',n:''};res[s.id][z]={c:primaryCode(s),n:''};
+    if(runAt(s,z)<=ST.rules.maxRun){done=true;break;}res[s.id][z]={c:'休',n:''};res[s.id][x]={c:primaryCode(s),n:''};}
+   if(done)d=b;}}
+ // 5 人数不足の修正(ヘルプ / 休の交換)
+ for(const di of days){const d=di.d;if(di.closed||di.w===0)continue;
+  for(const dep of ST.depts){let need=deptReq(dep,di)-cnt(dep.id,d);if(need<=0)continue;
+   // 休の入替(同部署の常勤で別日に余裕がある)
+   for(const s of shuffle(staff.filter(s=>s.kind==='常勤'&&s.dept===dep.id&&res[s.id][d].c==='休'&&!res[s.id][d].lock&&di.w!==6),R)){if(need<=0)break;
+    let ok=false;for(let z=1;z<=n&&!ok;z++){if(z===d||!canRest(s,z))continue;if(surplus(dep.id,z)<=0)continue;
+     res[s.id][d]={c:primaryCode(s),n:''};res[s.id][z]={c:'休',n:''};
+     if(runAt(s,d)<=ST.rules.maxRun&&runAt(s,Math.max(1,z-1))<=ST.rules.maxRun&&runAt(s,Math.min(n,z+1))<=ST.rules.maxRun){ok=true;need--;}
+     else{res[s.id][d]={c:'休',n:''};res[s.id][z]={c:primaryCode(s),n:''};}}}
+   // ヘルプ
+   for(const s of shuffle(staff.filter(s=>s.help.includes(dep.id)),R).sort((a,b)=>((b.helpW||{})[dep.id]||0)-((a.helpW||{})[dep.id]||0))){if(need<=0)break;const v=res[s.id][d];if(!isWork(v.c)||v.lock)continue;
+    const hd=cellDept(v,s);if(!hd||hd.id===dep.id)continue;if(surplus(hd.id,d)<=0)continue;res[s.id][d]={c:dep.name,n:'ヘルプ',dp:dep.id};need--;}}}
+ // 6 サブ区分・個人の表記(実績傾向で重み付け)
+ const N=x=>x.replace(/[Ａ-Ｚ]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248));
+ for(const di of days){const d=di.d,g=(di.w===0||di.w===6||di.h)?'we':'wd';for(const dep of ST.depts){
+  const ws=staff.filter(s=>{const v=res[s.id][d];return isWork(v.c)&&!v.lock&&s.dept===dep.id&&cellDept(v,s)===dep&&v.n!=='ヘルプ';});
+  const used=new Set();
+  for(const sb of dep.subs){let need=subReq(sb,dep,di);if(need<=0)continue;
+   const el=[];for(const s of ws){if(used.has(s.id))continue;const all=labsOf(s,g).concat(labsOf(s,g==='wd'?'we':'wd'));const l=all.find(x=>N(x.c).includes(sb.code));if(l||s.subs.includes(sb.code))el.push([s,l?l.c:sb.code,(l?l.w:0.05)+R()*0.2]);}
+   el.sort((p,q)=>q[2]-p[2]);for(const [s,c] of el){if(need<=0)break;res[s.id][d].c=c;res[s.id][d].dp=dep.id;used.add(s.id);need--;}}
+  for(const s of ws)if(!used.has(s.id)){const L=labsOf(s,g).filter(x=>{const sb=dep.subs.find(q=>N(x.c).includes(q.code));return !sb||subReq(sb,dep,di)>0;});const pick=L.length?pickW(L,R):labsOf(s,g)[0];res[s.id][d].c=pick.c;res[s.id][d].dp=dep.id;}
+ }}
+ // 7 会議注記
+ for(const d in mdays)for(const s of staff){const v=res[s.id][d];const ms=mdays[d].filter(mt=>attends(s,mt));if(ms.length&&isWork(v.c))v.n=ms.map(x=>x.name).join('・');}
+ return res;}
+
+/* ===== チェック ===== */
+function checks(y,m,res){const days=dayInfos(y,m),n=days.length,T=satCountTarget(y,m),carry=prevCarry(y,m),mdays=meetingDays(y,m);
+ const list=[];let err=0,warn=0;const E=(msg,sid,d)=>{list.push({lv:'err',msg,sid,d});err++;};const W=(msg,sid,d)=>{list.push({lv:'warn',msg,sid,d});warn++;};
+ const per={};const sats=[];
+ for(const s of ST.staff){const r=res[s.id];if(!r)continue;let off=0,yu=0,work=0,run=carry[s.id],mx=run,sat=0;
+  for(const di of days){const v=r[di.d]||{c:''};if(KOUKYU.includes(v.c))off++;if(['有給','特休','夏季','リフ','代休'].includes(v.c))yu++;
+   if(isWork(v.c)){work++;run++;if(run>mx)mx=run;if(di.w===6)sat++;
+    if(run===ST.rules.maxRun+1)W(`${s.name}: ${ST.rules.maxRun+1}連勤`,s.id,di.d);
+    if(run===ST.rules.maxRun+2)E(`${s.name}: ${ST.rules.maxRun+2}連勤以上(禁止)`,s.id,di.d);
+    if(s.kind==='常勤'&&di.w===0)E(`${s.name}: 日曜出勤`,s.id,di.d);
+    if(s.kind==='非常勤'&&!s.fixed.includes(di.w)&&!v.lock)W(`${s.name}: 固定曜日外の出勤`,s.id,di.d);
+    if(di.closed)W(`${s.name}: 休所日に出勤`,s.id,di.d);
+   }else run=0;}
+  if(s.kind==='常勤'){const lk=days.filter(di=>{const v=r[di.d]||{};return v.lock&&KOUKYU.includes(v.c)&&di.w>=1&&di.w<=6;}).length;if(off<T||(off>T&&off-lk>T))E(`${s.name}: 公休 ${off}/${T}日`,s.id,null);else if(off>T)W(`${s.name}: 公休 ${off}/${T}日（希休入力により超過）`,s.id,null);if(s.satOK)sats.push(sat);if(sat>(s.satCap||ST.rules.satCap))W(`${s.name}: 土曜出勤 ${sat}回(上限${s.satCap||ST.rules.satCap})`,s.id,null);}
+  per[s.id]={off,yu,work,mx,sat};}
+ const daily={};
+ for(const di of days){const d=di.d;daily[d]={};
+  for(const dep of ST.depts){let c=0;const sc={};for(const s of ST.staff){const v=(res[s.id]||{})[d];if(v&&isWork(v.c)&&cellDept(v,s)===dep){c++;const sb=dep.subs.find(q=>String(v.c).replace(/[Ａ-Ｚ]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248)).includes(q.code));if(sb)sc[sb.code]=(sc[sb.code]||0)+1;}}
+   const rq=deptReq(dep,di);daily[d][dep.id]={c,rq};
+   if(c<rq)E(`${d}日 ${dep.name}: ${c}/${rq}人 不足`,null,d);
+   if(rq===0&&c>0&&!di.closed&&di.w===6)W(`${d}日(土) ${dep.name}: 土曜対象外部署に出勤`,null,d);
+   for(const sb of dep.subs){const q=subReq(sb,dep,di);if(q>0&&(sc[sb.code]||0)<q)W(`${d}日 ${sb.code}: ${sc[sb.code]||0}/${q}人`,null,d);}}
+  for(const mt of (mdays[d]||[]))for(const s of ST.staff)if(attends(s,mt)&&res[s.id]&&!isWork((res[s.id][d]||{}).c)&&mt.target==='施設長')W(`${d}日 ${mt.name}: ${s.name}が不在`,s.id,d);
+ }
+ const mean=sats.reduce((a,b)=>a+b,0)/(sats.length||1);const balance=sats.reduce((a,b)=>a+(b-mean)**2,0);
+ return {err,warn,list,per,daily,balance,T};}
+
+/* ===== UI ===== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TAB='shift',BRUSH='希休',REQ_STAFF=null;
+function curMo(){return monthObj(ST.cur.y,ST.cur.m);}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2200);}
+function setTab(t){TAB=t;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));render();}
+function deptColor(code){const d=codeDept(code);return d?d.color:'';}
+function staffOrdered(){return ST.staff.slice();}
+function numbered(res,s,y,m){const out={};let k=0;for(let d=1;d<=dim(y,m);d++){const v=res[s.id][d]||{c:''};let c=v.c;if(s.kind==='常勤'&&KOUKYU.includes(c)){k++;c=c+'①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮'[k-1];}out[d]=c;}return out;}
+function monthBar(){return `<div class="bar"><button onclick="mv(-1)">◀</button><b>${ST.cur.y}年${ST.cur.m}月</b><button onclick="mv(1)">▶</button></div>`;}
+function mv(k){let{y,m}=ST.cur;m+=k;if(m<1){m=12;y--;}if(m>12){m=1;y++;}ST.cur={y,m};save();render();}
+function render(){const el=$('#main');const f={shift:rShift,sum:rSum,req:rReq,month:rMonth,dept:rDept,staff:rStaff,data:rData}[TAB];el.innerHTML=f();}
+
+/* --- シフト表 --- */
+function rShift(){if(!ST.staff.length)return `<div style="margin:20px 8px;padding:22px;border:3px solid #2f5d8a;border-radius:12px;background:#eef4fb;text-align:center;font-size:18px;line-height:1.6"><b>職員データがまだありません</b><br>保存タブの『データ読み込み』でデータファイルを選んでください<br><label class="btn pri" style="display:inline-block;margin-top:14px;padding:14px 22px;font-size:18px">データ読み込み<input type="file" onchange="importJson(this)" hidden></label></div>`;const{y,m}=ST.cur,mo=curMo(),days=dayInfos(y,m);
+ let h=monthBar()+`<div class="acts"><button class="pri" onclick="runGen()">⚙ 自動作成</button><button onclick="exportXlsx()">Excel出力</button><button onclick="window.print()">印刷</button>${mo.res?'<button onclick="clearRes()">結果を消去</button>':''}</div>`;
+ if(!mo.res)return h+`<p class="hint">「自動作成」を押すと、この月のシフトを作成します（希休などは「希望休」タブで先に入力）。</p>`;
+ const ck=checks(y,m,mo.res);
+ h+=`<div class="ck ${ck.err?'bad':ck.warn?'mid':'good'}">必須違反 <b>${ck.err}</b> ／ 警告 <b>${ck.warn}</b>（公休目標 ${ck.T}日） <a href="#" onclick="setTab('sum');return false">詳細</a></div>`;
+ const bad={};ck.list.forEach(x=>{if(x.sid&&x.d)bad[x.sid+'_'+x.d]=x.lv;});
+ h+=`<div class="tw"><table class="grid"><thead><tr><th class="nm">名前</th>${days.map(di=>`<th class="${di.w===0?'sun':di.w===6?'sat':''}${di.h?' hol':''}${di.closed?' cl':''}">${di.d}<br><small>${WD[di.w]}${di.h?'祝':''}</small></th>`).join('')}</tr></thead><tbody>`;
+ let lastDep=null;
+ for(const s of staffOrdered()){const dep=deptById(s.dept);if(dep!==lastDep){lastDep=dep;h+=`<tr class="dh"><td class="nm" style="background:${dep?dep.color:'#eee'}">${esc(dep?dep.name:'未所属')}</td><td colspan="${days.length}" style="background:${dep?dep.color:'#eee'}"></td></tr>`;}
+  const num=numbered(mo.res,s,y,m);
+  h+=`<tr><td class="nm"><b>${esc(s.name)}</b><small>${s.kind==='常勤'?'常':'非'} ${esc(s.title)}</small></td>`;
+  for(const di of days){const v=mo.res[s.id][di.d]||{c:''};const c=num[di.d];const b=bad[s.id+'_'+di.d];
+   h+=`<td class="c ${isOff(v.c)?'off':''} ${b||''} ${v.lock?'lk':''}" style="${isWork(v.c)?'background:'+((cellDept(v,s)||{}).color||''):''}" onclick="editCell('${s.id}',${di.d})">${esc(c)}${v.n?`<i>${esc(v.n)}</i>`:''}</td>`;}
+  h+='</tr>';}
+ h+='</tbody></table></div><p class="hint">セルをタップで手修正（再作成時に残すか選べます）。赤枠=違反、橙枠=警告。</p>';
+ return h;}
+function manCount(mo){let k=0;if(mo.res)for(const sid in mo.res)for(const d in mo.res[sid])if(mo.res[sid][d]&&mo.res[sid][d].man)k++;return k;}
+function runGen(){const mo=curMo();const k=manCount(mo);if(!k)return doGen(false);
+ $('#modal').innerHTML=`<div class="mb"><h3>手動変更を上書きしますか？</h3><p>この月には手動で変更したセルが${k}か所あります。</p><div class="acts" style="flex-direction:column"><button class="pri" onclick="closeM();doGen(true)">手動変更を固定して残し、再作成</button><button class="danger" onclick="closeM();doGen(false)">上書きして再作成</button><button onclick="closeM()">キャンセル</button></div></div>`;$('#modal').classList.add('on');}
+function doGen(keep){const{y,m}=ST.cur;const mo=curMo();const bak=JSON.parse(JSON.stringify(mo.req||{}));const man=[];
+ if(keep&&mo.res){mo.req=mo.req||{};for(const sid in mo.res)for(const d in mo.res[sid]){const v=mo.res[sid][d];if(v&&v.man){man.push([sid,d,JSON.parse(JSON.stringify(v))]);(mo.req[sid]=mo.req[sid]||{})[d]=v.c;}}}
+ let g;try{g=generate(y,m);}finally{mo.req=bak;}
+ for(const [sid,d,v] of man)if(g.res[sid])g.res[sid][d]=v;
+ mo.res=g.res;save();render();toast(`作成完了 ${g.ms}ms：違反${g.ck.err}／警告${g.ck.warn}`);}
+function runGenOld(){const{y,m}=ST.cur;const mo=curMo();const g=generate(y,m);mo.res=g.res;save();render();toast(`作成完了 ${g.ms}ms：違反${g.ck.err}／警告${g.ck.warn}`);}
+function clearRes(){if(confirm('この月の結果を消去しますか？')){curMo().res=null;save();render();}}
+function editCell(sid,d){const s=ST.staff.find(x=>x.id===sid),v=curMo().res[sid][d];
+ const codes=[];for(const dep of ST.depts){codes.push(dep.name);dep.subs.forEach(x=>codes.push(x.code));}
+ $('#modal').innerHTML=`<div class="mb"><h3>${esc(s.name)} ${ST.cur.m}/${d}</h3><div class="chips">${codes.map(c=>`<button style="background:${deptColor(c)}" onclick="setCell('${sid}',${d},'${esc(c)}')">${esc(c)}</button>`).join('')}</div>
+ <div class="chips">${OFF_CODES.map(c=>`<button class="offb" onclick="setCell('${sid}',${d},'${c}')">${c}</button>`).join('')}<button onclick="setCell('${sid}',${d},'')">空欄</button></div>
+ <label>下段メモ（会議・時間など）<input id="note" value="${esc(v.n)}"></label><div class="acts"><button class="pri" onclick="setNote('${sid}',${d})">メモ保存</button><button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');}
+function setCell(sid,d,c){const v=curMo().res[sid][d];v.c=c;delete v.dp;v.lock=true;v.man=true;v.n=$('#note').value;save();closeM();render();}
+function setNote(sid,d){curMo().res[sid][d].n=$('#note').value;save();closeM();render();}
+function closeM(){$('#modal').classList.remove('on');$('#modal').innerHTML='';}
+
+/* --- 集計 --- */
+function rSum(){const{y,m}=ST.cur,mo=curMo(),days=dayInfos(y,m);let h=monthBar();if(!mo.res)return h+'<p class="hint">まだ作成されていません。</p>';
+ const ck=checks(y,m,mo.res);
+ h+=`<h3>警告・違反（${ck.err}／${ck.warn}）</h3><ul class="ck-list">${ck.list.length?ck.list.map(x=>`<li class="${x.lv}">${x.lv==='err'?'⛔':'⚠'} ${esc(x.msg)}</li>`).join(''):'<li>問題はありません</li>'}</ul>`;
+ h+=`<h3>個人集計</h3><div class="tw"><table class="tb"><tr><th>名前</th><th>区分</th><th>公休</th><th>休暇</th><th>出勤</th><th>最大連勤</th><th>土曜</th></tr>${staffOrdered().map(s=>{const p=ck.per[s.id]||{};return `<tr><td>${esc(s.name)}</td><td>${s.kind}</td><td class="${s.kind==='常勤'&&p.off!==ck.T?'red':''}">${p.off}</td><td>${p.yu}</td><td>${p.work}</td><td class="${p.mx>ST.rules.maxRun+1?'red':p.mx>ST.rules.maxRun?'org':''}">${p.mx}</td><td>${p.sat}</td></tr>`;}).join('')}</table></div>`;
+ h+=`<h3>日ごと部署別人数（実数/必要）</h3><div class="tw"><table class="tb"><tr><th>日</th>${ST.depts.map(d=>`<th style="background:${d.color}">${esc(d.name)}</th>`).join('')}</tr>${days.map(di=>`<tr><td class="${di.w===0?'sun':di.w===6?'sat':''}">${di.d}${WD[di.w]}${di.h?'祝':''}${di.closed?'休所':''}</td>${ST.depts.map(d=>{const x=ck.daily[di.d][d.id];return `<td class="${x.c<x.rq?'red':''}">${x.c}/${x.rq}</td>`;}).join('')}</tr>`).join('')}</table></div>`;
+ return h;}
+
+/* --- 希望休 --- */
+function rReq(){const{y,m}=ST.cur,mo=curMo(),days=dayInfos(y,m);const BR=['希休','有給','特休','夏季','リフ','代休','休','出勤','消去'];
+ let h=monthBar()+`<p class="hint" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">種類を選び、マスをタップ（入力日は固定）</p><div class="chips">${BR.map(b=>`<button class="${b===BRUSH?'on':''}" onclick="BRUSH='${b}';render()">${b}</button>`).join('')}</div>`;
+ h+=`<div class="tw"><table class="grid"><thead><tr><th class="nm">名前</th>${days.map(di=>`<th class="${di.w===0?'sun':di.w===6?'sat':''}${di.h?' hol':''}">${di.d}<br><small>${WD[di.w]}</small></th>`).join('')}</tr></thead><tbody>`;
+ for(const s of staffOrdered()){const r=mo.req[s.id]||{};h+=`<tr><td class="nm"><b>${esc(s.name)}</b><small>${esc(deptById(s.dept)?.name||'')}</small></td>${days.map(di=>`<td class="c ${r[di.d]?'rq':''}" onclick="tapReq('${s.id}',${di.d})">${esc(r[di.d]||'')}</td>`).join('')}</tr>`;}
+ return h+'</tbody></table></div>';}
+function tapReq(sid,d){const mo=curMo();mo.req[sid]=mo.req[sid]||{};if(BRUSH==='消去'||mo.req[sid][d]===BRUSH)delete mo.req[sid][d];else mo.req[sid][d]=BRUSH;save();render();}
+
+/* --- 月設定 --- */
+function rMonth(){const{y,m}=ST.cur,mo=curMo(),days=dayInfos(y,m);const R=ST.rules;
+ let h=monthBar()+`<h3>休所日（タップで切替）</h3><div class="cal">${'日月火水木金土'.split('').map(w=>`<b>${w}</b>`).join('')}${'<span></span>'.repeat(days[0].w)}${days.map(di=>`<button class="${di.closed?'on':''} ${di.w===0?'sun':''}" onclick="togClosed(${di.d})">${di.d}${di.h?`<small>${esc(di.h)}</small>`:''}</button>`).join('')}</div>
+ <p class="hint">祝日は自動反映（2025〜2028年内蔵）。祝日は原則「祝日」人数で開所、休所にする日だけタップ。</p>
+ <div class="acts"><button onclick="resetClosed()">休所日を初期値に戻す</button></div>
+ <h3>初期休所の既定</h3><label class="ck2"><input type="checkbox" ${R.closeNewYear?'checked':''} onchange="ST.rules.closeNewYear=this.checked;save()">年末年始 12/29〜1/3</label><label class="ck2"><input type="checkbox" ${R.closeObon?'checked':''} onchange="ST.rules.closeObon=this.checked;save()">お盆 8/13〜16</label><label class="ck2"><input type="checkbox" ${R.closeGW?'checked':''} onchange="ST.rules.closeGW=this.checked;save()">GW 5/3〜5/6の祝日</label>
+ <h3>ルール</h3><div class="form">
+ <label>連勤上限（これ+1は警告、+2以上は違反）<input type="number" value="${R.maxRun}" onchange="ST.rules.maxRun=+this.value;save()"></label>
+ <label>土曜出勤 一人あたり月上限<input type="number" value="${R.satCap}" onchange="ST.rules.satCap=+this.value;save()"></label>
+ <label>試行回数（多いほど良い案、遅くなる）<input type="number" value="${R.trials}" onchange="ST.rules.trials=+this.value;save()"></label>
+ <label>法人名（Excelタイトル）<input value="${esc(ST.corp)}" onchange="ST.corp=this.value;save()"></label></div>
+ <h3>会議の自動配置</h3><p class="hint">指定日の対象者は休みにしません（祝日・休所なら翌営業日）。</p>
+ ${ST.meetings.map((mt,i)=>`<div class="row"><input value="${esc(mt.name)}" onchange="ST.meetings[${i}].name=this.value;save()"><select onchange="ST.meetings[${i}].week=this.value;save()">${['1','2','3','4','last'].map(w=>`<option value="${w}" ${mt.week===w?'selected':''}>${w==='last'?'最終':'第'+w}</option>`).join('')}</select><select onchange="ST.meetings[${i}].dow=+this.value;save()">${[1,2,3,4,5].map(w=>`<option value="${w}" ${+mt.dow===w?'selected':''}>${WD[w]}曜</option>`).join('')}</select><select onchange="ST.meetings[${i}].target=this.value;save()"><option value="施設長" ${mt.target==='施設長'?'selected':''}>施設長全員</option>${ST.depts.map(d=>`<option value="${d.id}" ${mt.target===d.id?'selected':''}>${esc(d.name)}全員</option>`).join('')}</select><button onclick="ST.meetings.splice(${i},1);save();render()">✕</button></div>`).join('')}
+ <div class="acts"><button onclick="ST.meetings.push({name:'会議',week:'1',dow:3,target:'施設長'});save();render()">＋会議を追加</button></div>
+ <h3>前月末からの連勤（繰越）</h3><p class="hint">前月をこのアプリで作成済みなら自動計算。未作成の場合はスタッフ編集の「前月末連勤」を使用。</p>`;
+ return h;}
+function togClosed(d){const mo=curMo();const i=mo.closed.indexOf(d);if(i>=0)mo.closed.splice(i,1);else mo.closed.push(d);save();render();}
+function resetClosed(){const mo=curMo();mo.closed=defaultClosed(ST.cur.y,ST.cur.m);save();render();}
+
+/* --- 部署 --- */
+function rDept(){let h=`<p class="hint">最低必要人数（初期値は令和7〜8年度実績の最頻値）。0の曜日区分はその部署は休み。</p>`;
+ ST.depts.forEach((d,i)=>{h+=`<div class="card" style="border-left:8px solid ${d.color}"><div class="row"><input value="${esc(d.name)}" onchange="ST.depts[${i}].name=this.value;save()"><input type="color" value="${d.color}" onchange="ST.depts[${i}].color=this.value;save();render()"><button onclick="delDept(${i})">✕</button></div>
+ <div class="req">${KINDS.map(([k,l])=>`<label>${l}<input type="number" min="0" value="${d.req[k]}" onchange="ST.depts[${i}].req.${k}=+this.value;save()"></label>`).join('')}</div>
+ <div class="row small">定休曜日：${[1,2,3,4,5,6].map(w=>`<label class="ck2"><input type="checkbox" ${d.closedDow.includes(w)?'checked':''} onchange="togDow(${i},${w},this.checked)">${WD[w]}</label>`).join('')}</div>
+ <details><summary>サブ区分 ${d.subs.length}件</summary>${d.subs.map((s,j)=>`<div class="sub"><input value="${esc(s.code)}" onchange="ST.depts[${i}].subs[${j}].code=this.value;save()"><small>${esc(s.note)}</small><div class="req">${KINDS.map(([k,l])=>`<label>${l}<input type="number" min="0" value="${s.req[k]}" onchange="ST.depts[${i}].subs[${j}].req.${k}=+this.value;save()"></label>`).join('')}</div><button onclick="ST.depts[${i}].subs.splice(${j},1);save();render()">削除</button></div>`).join('')}
+ <button onclick="ST.depts[${i}].subs.push({code:'新区分',req:{wd:0,sat:0,sun:0,hol:0},note:''});save();render()">＋サブ区分</button></details></div>`;});
+ return h+`<div class="acts"><button onclick="addDept()">＋部署を追加</button></div>`;}
+function togDow(i,w,on){const a=ST.depts[i].closedDow;const k=a.indexOf(w);if(on&&k<0)a.push(w);if(!on&&k>=0)a.splice(k,1);save();}
+function addDept(){ST.depts.push({id:'d'+Date.now(),name:'新部署',color:'#dddddd',req:{wd:1,sat:0,sun:0,hol:0},subs:[],closedDow:[]});save();render();}
+function delDept(i){if(ST.staff.some(s=>s.dept===ST.depts[i].id))return alert('所属スタッフがいるため削除できません');if(confirm('削除しますか？')){ST.depts.splice(i,1);save();render();}}
+
+/* --- スタッフ --- */
+function rStaff(){let h=`<p class="hint">名前は端末内（このブラウザ）にのみ保存されます。初期値は仮名です。</p><div class="acts"><button class="pri" onclick="editStaff(null)">＋スタッフ追加</button></div>`;
+ for(const d of ST.depts){const ss=ST.staff.filter(s=>s.dept===d.id);h+=`<h3 style="background:${d.color}">${esc(d.name)}（${ss.length}人）</h3>`+ss.map(s=>`<div class="srow" onclick="editStaff('${s.id}')"><b>${esc(s.name)}</b> <span>${s.kind} / ${esc(s.title)}</span><small>${s.kind==='非常勤'?'固定:'+s.fixed.map(w=>WD[w]).join(''):''}${s.subs.length?' 区分:'+esc(s.subs.join(',')):''}${s.help.length?' ヘルプ:'+s.help.map(x=>esc(deptById(x)?.name)).join(','):''}${s.satOK?' 土曜可':''}</small></div>`).join('');}
+ return h;}
+function editStaff(id){const s=id?ST.staff.find(x=>x.id===id):{id:'s'+Date.now(),name:'',kind:'常勤',title:'',dept:ST.depts[0].id,subs:[],fixed:[],help:[],satOK:false,carry:0};
+ const codes=[];ST.depts.forEach(d=>d.subs.forEach(x=>codes.push(x.code)));
+ $('#modal').innerHTML=`<div class="mb"><h3>${id?'スタッフ編集':'スタッフ追加'}</h3><div class="form">
+ <label>名前<input id="f_name" value="${esc(s.name)}"></label>
+ <label>区分<select id="f_kind"><option ${s.kind==='常勤'?'selected':''}>常勤</option><option ${s.kind==='非常勤'?'selected':''}>非常勤</option></select></label>
+ <label>役職<input id="f_title" value="${esc(s.title)}"></label>
+ <label>所属部署<select id="f_dept">${ST.depts.map(d=>`<option value="${d.id}" ${s.dept===d.id?'selected':''}>${esc(d.name)}</option>`).join('')}</select></label>
+ <div>非常勤の固定曜日<div class="chips">${[1,2,3,4,5,6,0].map(w=>`<label class="ck2"><input type="checkbox" class="f_fx" value="${w}" ${s.fixed.includes(w)?'checked':''}>${WD[w]}</label>`).join('')}</div></div>
+ <div>入れるサブ区分（先頭が基本）<div class="chips">${codes.map(c=>`<label class="ck2"><input type="checkbox" class="f_sb" value="${esc(c)}" ${s.subs.includes(c)?'checked':''}>${esc(c)}</label>`).join('')}</div></div>
+ <div>ヘルプ可能な部署<div class="chips">${ST.depts.map(d=>`<label class="ck2"><input type="checkbox" class="f_hp" value="${d.id}" ${s.help.includes(d.id)?'checked':''}>${esc(d.name)}</label>`).join('')}</div></div>
+ <label class="ck2"><input type="checkbox" id="f_sat" ${s.satOK?'checked':''}>常勤の土曜出勤ローテーションに入れる</label>
+ <label>土曜上限（空欄=全体設定）<input type="number" id="f_satcap" value="${s.satCap||''}"></label>
+ ${s.lab?`<div class="hint">【実績傾向(直近12か月)】平日: ${esc((s.lab.wd||[]).map(x=>x.c+' '+Math.round(x.w*100)+'%').join(' / '))}<br>土祝: ${esc((s.lab.we||[]).map(x=>x.c+' '+Math.round(x.w*100)+'%').join(' / '))}<br>土曜 月平均${s.satRate}回 ／ 休みやすい曜日: ${(s.restW||[]).map((x,i)=>[x,i]).filter(x=>x[0]>=0.2).map(x=>WD[x[1]]).join('')||'-'} ／ 土曜後の代休: ${(s.compW||[]).map((x,i)=>[x,i]).filter(x=>x[0]>=0.2).map(x=>WD[x[1]]).join('')||'-'}<br>ヘルプ: ${esc(Object.entries(s.helpW||{}).map(([k,v])=>(deptById(k)||{}).name+' 月'+v+'回').join(', ')||'-')} ／ 会議: ${esc((s.meet||[]).join('・')||'-')}</div>`:''}
+ <label>前月末の連勤日数（前月未作成時）<input type="number" id="f_carry" value="${s.carry||0}"></label></div>
+ <div class="acts"><button class="pri" onclick="saveStaff('${s.id}',${!!id})">保存</button>${id?`<button class="danger" onclick="delStaff('${s.id}')">削除</button>`:''}<button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');}
+function saveStaff(id,exists){let s=exists?ST.staff.find(x=>x.id===id):{id};const g=c=>[...document.querySelectorAll(c)].filter(x=>x.checked).map(x=>x.value);
+ Object.assign(s,{name:$('#f_name').value.trim()||'未設定',kind:$('#f_kind').value,title:$('#f_title').value,dept:$('#f_dept').value,fixed:g('.f_fx').map(Number),subs:g('.f_sb'),help:g('.f_hp'),satOK:$('#f_sat').checked,satCap:+$('#f_satcap').value||0,carry:+$('#f_carry').value||0});
+ if(!exists)ST.staff.push(s);save();closeM();render();}
+function delStaff(id){if(!confirm('削除しますか？'))return;ST.staff=ST.staff.filter(s=>s.id!==id);save();closeM();render();}
+
+/* --- データ --- */
+function rData(){return `<h3>バックアップ</h3><p class="hint">データはこの端末のブラウザ内（localStorage）に保存。外部には送信しません。</p><div class="acts"><button class="pri" onclick="exportJson()">JSON書き出し</button><label class="btn">データ読み込み<input type="file" onchange="importJson(this)" hidden></label></div>
+ <h3>初期化</h3><div class="acts"><button class="danger" onclick="if(confirm('全データを初期サンプルに戻します。よろしいですか？')){ST=defaultState();save();render();}">初期サンプルに戻す</button></div>
+ <h3>このツールのルール（実績から推定）</h3><ul class="hint"><li>個人ごとの傾向（主な勤務表記と割合、土曜頻度、休みやすい曜日、土曜後の代休曜日、ヘルプ先、会議）を重みとして使用</li><li>常勤の公休＝その月の土日数（希休を含む）</li><li>連勤5日まで（6日は警告、7日以上は違反）</li><li>日曜は常勤休み（部署の日曜人数で非常勤のみ）</li><li>非常勤は固定曜日のみ</li><li>土曜は土曜人数が設定された部署のみ。常勤は上限内で均等に、代休は同じ週の平日</li><li>会議日は対象者を出勤に</li><li>ヘルプは登録された組合せのみ、不足時だけ</li></ul>`;}
+function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
+function exportJson(){download('shift_backup_'+new Date().toISOString().slice(0,10)+'.json',new Blob([JSON.stringify(ST)],{type:'application/json'}));}
+function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const s=JSON.parse(r.result);if(s.ver!==1)throw 0;const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur});if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;save();render();toast(ST.staff.length+'人を読み込みました');alert(ST.staff.length+'人を読み込みました');}catch(e){alert('読み込めませんでした');}};r.readAsText(f);}
+
+/* --- Excel --- */
+function buildWorkbook(y,m){const mo=monthObj(y,m),res=mo.res,days=dayInfos(y,m),n=days.length;
+ const ws={},merges=[];const A=(r,c)=>XLSX.utils.encode_cell({r,c});
+ const bd={top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}};
+ const put=(r,c,v,st)=>{ws[A(r,c)]={v:v??'',t:'s',s:Object.assign({border:bd,alignment:{horizontal:'center',vertical:'center',wrapText:true},font:{sz:9}},st||{})};};
+ const fy=m>=4?y:y-1;
+ put(0,10,`令和　${fy-2018}年度　　${ST.corp}　　シフト表`,{border:{},font:{sz:14,bold:true},alignment:{horizontal:'left'}});put(0,33,m,{border:{},font:{sz:14,bold:true}});put(0,35,'月',{border:{},font:{sz:14,bold:true}});
+ const blocks=[[1,Math.min(15,n)],[16,n]];let r0=1;const staff=staffOrdered();
+ for(const [a,b] of blocks){put(r0,0,'常勤/非常勤');put(r0,1,'役職');put(r0,2,'日付');merges.push({s:{r:r0,c:2},e:{r:r0,c:5}});
+  for(let c=3;c<=5;c++)put(r0,c,'');put(r0+1,0,'');put(r0+1,1,'');put(r0+1,2,'');merges.push({s:{r:r0+1,c:2},e:{r:r0+1,c:5}});
+  for(let d=a;d<=b;d++){const c=6+3*(d-a),di=days[d-1];const col=di.w===0||di.h?'FFD9D9':di.w===6?'D9E7FF':'FFFFFF';
+   put(r0,c,d+'日',{fill:{fgColor:{rgb:col}}});put(r0+1,c,WD[di.w]+(di.h?'祝':''),{fill:{fgColor:{rgb:col}}});for(let k=1;k<3;k++){put(r0,c+k,'');put(r0+1,c+k,'');}
+   merges.push({s:{r:r0,c},e:{r:r0,c:c+2}},{s:{r:r0+1,c},e:{r:r0+1,c:c+2}});}
+  let r=r0+2;
+  for(const s of staff){const num=numbered(res,s,y,m);put(r,0,s.kind);put(r,1,s.title);put(r,2,s.name);put(r+1,0,'');put(r+1,1,'');for(let c=3;c<=5;c++){put(r,c,'');put(r+1,c,'');}put(r+1,2,'');
+   merges.push({s:{r,c:0},e:{r:r+1,c:0}},{s:{r,c:1},e:{r:r+1,c:1}},{s:{r,c:2},e:{r:r+1,c:5}});
+   for(let d=a;d<=b;d++){const c=6+3*(d-a),v=res[s.id][d]||{c:''};const dep=cellDept(v,s);const fill=dep?{fill:{fgColor:{rgb:dep.color.replace('#','').toUpperCase()}}}:{};
+    put(r,c,num[d],Object.assign({font:{sz:9,color:{rgb:v.lock&&isOff(v.c)?'FF0000':'000000'}}},fill));put(r+1,c,v.n||'',Object.assign({font:{sz:8}},fill));
+    for(let k=1;k<3;k++){put(r,c+k,'',fill);put(r+1,c+k,'',fill);}merges.push({s:{r,c},e:{r,c:c+2}},{s:{r:r+1,c},e:{r:r+1,c:c+2}});}
+   r+=2;}
+  r0=r+1;}
+ ws['!ref']=XLSX.utils.encode_range({s:{r:0,c:0},e:{r:r0,c:6+3*15}});ws['!merges']=merges;
+ ws['!cols']=[{wch:7},{wch:10},{wch:3},{wch:3},{wch:3},{wch:3}].concat(Array(48).fill({wch:3.2}));
+ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,m+'月');return wb;}
+function exportXlsx(){const{y,m}=ST.cur;if(!curMo().res)return alert('先に自動作成してください');const wb=buildWorkbook(y,m);
+ const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});const name=`シフト表_${y}年${m}月.xlsx`,blob=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});deliver(name,blob,y,m);}
+async function deliver(name,blob,y,m){
+ try{if(window.File&&navigator.canShare){const f=new File([blob],name,{type:blob.type});if(navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:name});return;}catch(e){if(e&&e.name==='AbortError')return;}}}}catch(e){}
+ try{download(name,blob);return;}catch(e){}
+ fallbackOut(blob,y,m);}
+function toCSV(y,m){const res=curMo().res,n=dim(y,m);const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const rows=[['区分','役職','氏名'].concat(Array.from({length:n},(_,i)=>(i+1)+'日'))];
+ for(const s of staffOrdered()){const num=numbered(res,s,y,m);rows.push([s.kind,s.title,s.name].concat(Array.from({length:n},(_,i)=>num[i+1])));}return rows.map(r=>r.map(q).join(',')).join('\n');}
+function fallbackOut(blob,y,m){let url='';try{url=URL.createObjectURL(blob);}catch(e){}
+ $('#modal').innerHTML=`<div class="mb"><h3>Excel出力</h3><p class="hint">自動で保存できませんでした。</p><div class="acts">${url?`<a class="btn" href="${url}" target="_blank" rel="noopener">新しいタブで開く</a>`:''}<button class="pri" onclick="copyCSV(${y},${m})">CSVをコピー</button><button onclick="closeM()">閉じる</button></div><textarea id="csvbox" style="width:100%;height:120px;display:none"></textarea></div>`;$('#modal').classList.add('on');}
+async function copyCSV(y,m){const t=toCSV(y,m);try{await navigator.clipboard.writeText(t);toast('CSVをコピーしました');}catch(e){const a=$('#csvbox');a.style.display='block';a.value=t;a.select();try{document.execCommand('copy');toast('CSVをコピーしました');}catch(_){toast('表示されたCSVを長押ししてコピーしてください');}}}
+
+/* 起動 */
+function boot(){const nj=document.getElementById('nojs');if(nj)nj.style.display='none';
+ setTimeout(()=>{try{load();document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));setTab('shift');if(!LS_OK)document.getElementById('memband').style.display='block';}catch(e){showErr((e&&e.message||e)+(e&&e.stack?'\n'+e.stack:''));}},30);}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+</script></body></html>
