@@ -455,7 +455,7 @@ async function copyCSV(y,m){const t=toCSV(y,m);try{await navigator.clipboard.wri
 function deptAbbr(dep){const used={};for(const d of ST.depts){let a=d.short||d.name[0];if(Object.values(used).includes(a))a=d.name.slice(0,2);used[d.id]=a;}return used[dep.id]||dep.name[0];}
 function abbrLegend(){return ST.depts.map(d=>deptAbbr(d)+'＝'+d.name).join('、');}
 function ownMark(v,dep){const N=String(v.c).replace(/[Ａ-Ｚ]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248));const sb=dep.subs.find(q=>N.includes(q.code));return sb?sb.code.slice(-1):'○';}
-function printOpts(){return `<select id="psel" style="padding:6px;font-size:14px"><option value="">全事業所（事業所ごとに改ページ）</option>${ST.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}</select><button onclick="doPrint($('#psel').value)">🖨 印刷</button><button class="pri" onclick="doPdf($('#psel').value)">📄 PDFを作成</button>${IS_IOS?'<small style="width:100%;color:#555">iPhoneは『PDFを作成』が確実です</small>':''}<div id="pdfst" style="width:100%;font-size:13px"></div>`;}
+function printOpts(){return `<select id="psel" style="padding:6px;font-size:14px"><option value="">全事業所（事業所ごとに改ページ）</option>${ST.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}</select><button onclick="doPrint($('#psel').value)">🖨 印刷</button><button class="pri" onclick="doPdf($('#psel').value)">📄 PDFを作成</button><small style="width:100%;color:#555">${IS_IOS?'iPhone：『PDFを作成』→『共有・保存』→プリント／ファイルに保存が確実です':IS_AND?'Android：『PDFを作成』→『共有・保存』で印刷やドライブ保存が確実です（印刷ボタンは横向きにならない場合あり）':'パソコン：『🖨 印刷』でA4横に印刷。『PDFを作成』はダウンロード保存'}</small><div id="pdfst" style="width:100%;font-size:13px"></div>`;}
 function buildPrint(y,m,only){const mo=curMo(),res=mo.res,days=dayInfos(y,m),n=days.length;
  const cls=di=>di.w===0||di.h?'sun':di.w===6?'sat':'';let H='';
  for(const dep of ST.depts){if(only&&dep.id!==only)continue;
@@ -482,6 +482,7 @@ function doPrint(only){if(IS_IOS&&IS_SA){if(confirm('ホーム画面から開い
  window.addEventListener('afterprint',done);setTimeout(()=>{try{window.print();}catch(e){showErr(e.message);}setTimeout(()=>{if(!matchMedia('print').matches)done();},1500);},60);}
 
 const IS_IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const IS_AND=/Android/i.test(navigator.userAgent);const IS_MOB=IS_IOS||IS_AND;
 const IS_SA=!!(window.navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches));
 function printModel(y,m,dep){const res=curMo().res,days=dayInfos(y,m),n=days.length;
  const home=ST.staff.filter(s=>s.dept===dep.id);const hp=ST.staff.filter(s=>s.dept!==dep.id&&res&&days.some(di=>{const v=res[s.id][di.d];return v&&cellDept(v,s)===dep;}));
@@ -544,9 +545,9 @@ async function makePdfFile(only){const{y,m}=ST.cur;const deps=ST.depts.filter(d=
 async function doPdf(only){if(!curMo().res&&!confirm('まだ自動作成していません。空の表でPDFを作りますか？'))return;
  const st=$('#pdfst');if(st)st.innerHTML='PDFを作成中…';
  try{const f=await makePdfFile(only);PDF_READY=f;const mb=(f.blob.size/1048576).toFixed(1);
-  if(st)st.innerHTML=`PDFができました（${f.pages}ページ・${mb}MB）　<button class="pri" onclick="sharePdf()">共有・保存</button>`;}
+  if(st)st.innerHTML=`PDFができました（${f.pages}ページ・${mb}MB）　<button class="pri" onclick="sharePdf()">${IS_MOB?'共有・保存':'ダウンロード'}</button>`;}
  catch(e){if(st)st.textContent='PDF作成に失敗: '+e.message;showErr(e.message);}}
-async function sharePdf(){const f=PDF_READY;if(!f)return;
+async function sharePdf(){const f=PDF_READY;if(!f)return;if(!IS_MOB){download(f.name,f.blob);return;}
  try{if(window.File&&navigator.canShare){const file=new File([f.blob],f.name,{type:'application/pdf'});if(navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:f.name});return;}catch(e){if(e&&e.name==='AbortError')return;}}}}catch(e){}
  download(f.name,f.blob);}
 /* 起動 */
