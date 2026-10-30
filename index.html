@@ -54,6 +54,7 @@ body:not(.printing) header,body:not(.printing) nav,body:not(.printing) .acts{dis
 header{padding-top:calc(10px + env(safe-area-inset-top));padding-left:calc(12px + env(safe-area-inset-left));padding-right:calc(12px + env(safe-area-inset-right))}nav{padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}body{padding-bottom:calc(70px + env(safe-area-inset-bottom))}
 #inst{display:none;position:fixed;left:8px;right:8px;bottom:calc(64px + env(safe-area-inset-bottom));z-index:7;background:#fff;border:1px solid #2f5d8a;border-radius:10px;padding:8px 10px;box-shadow:0 2px 8px rgba(0,0,0,.15);font-size:13px;align-items:center;gap:8px}#inst.on{display:flex}#inst span{flex:1}#inst button{min-height:44px;border-radius:8px;border:1px solid #2f5d8a;background:#2f5d8a;color:#fff;padding:0 12px;font-size:14px}#inst button.x{background:#fff;color:#2f5d8a;min-width:44px;padding:0}
 @media print{#inst{display:none!important}}
+.srow2{display:flex;gap:6px;align-items:stretch}.srow2 .srow{flex:1;min-width:0}.srow2>button,.effbox input,#main button.danger{min-height:44px;min-width:44px}.effbox{border:1px dashed #c90;border-radius:8px;padding:6px 8px;margin:6px 0;background:#fffbea}button.danger{color:#b00}
 </style></head><body><div id="nojs" style="margin:16px;padding:20px;border:4px solid #d00;border-radius:12px;background:#fff4f4;color:#900;font-size:22px;line-height:1.6;font-weight:bold">この画面のままなら、プレビューでは動きません。<br>共有ボタンから『Safariで開く』か『ファイルに保存』してから開いてください。</div><div id="errbox" style="display:none;margin:8px;padding:10px;background:#ffe0e0;color:#900;border:2px solid #d00;font-size:13px;white-space:pre-wrap;word-break:break-all"></div><div id="memband" style="display:none;padding:8px 12px;background:#fff3b0;color:#640;font-size:14px;font-weight:bold">この開き方では保存できません。JSON書き出しで控えをとってください</div>
 <script>function showErr(m){if(String(m).includes('印刷する職員がいません')){try{closeM();}catch(e){}toast('印刷する職員がいません');return;}try{var e=document.getElementById('errbox');e.style.display='block';e.textContent+='エラー: '+m+'\n';}catch(_){}}
 window.onerror=function(msg,src,l,c,err){showErr(msg+' (行'+l+':'+c+')'+(err&&err.stack?'\n'+err.stack:''));};
@@ -424,7 +425,7 @@ function delStaff(id){if(!confirm('削除しますか？'))return;ST.staff=ST.st
 /* --- データ --- */
 function rData(){return `<h3>バックアップ</h3><p class="hint">データはこの端末のブラウザ内（localStorage）に保存。外部には送信しません。</p><div class="acts"><button class="pri" onclick="exportJson()">JSON書き出し</button><label class="btn">データ読み込み<input type="file" onchange="importJson(this)" hidden></label><button onclick="restoreBeforeImport()">読み込み前のデータに戻す</button></div><p class="hint">最後のJSON書き出し：${ST.lastBackup?fmtT(ST.lastBackup):'まだありません'}。読み込み時は確認のうえ、今のデータの控えを自動で残します。</p>
  <h3>初期化</h3><div class="acts"><button class="danger" onclick="if(confirm('全データを初期サンプルに戻します。よろしいですか？')){ST=defaultState();save();render();}">初期サンプルに戻す</button></div>
- <h3>このツールのルール（実績から推定）</h3><ul class="hint"><li>個人ごとの傾向（主な勤務表記と割合、土曜頻度、休みやすい曜日、土曜後の代休曜日、ヘルプ先、会議）を重みとして使用</li><li>常勤の公休の目標＝在籍中の土日の数と「在籍中の日曜＋定休日の数」の多いほう（希休を含む。定休日が休所と重なった日は休所として扱い、定休日に数えない）</li><li>連勤5日まで（6日は警告、7日以上は違反）</li><li>日曜は常勤休み（部署の日曜人数で非常勤のみ）</li><li>非常勤は固定曜日のみ</li><li>土曜は土曜人数が設定された部署のみ。常勤は上限内で均等に</li><li>振替の代休は、日曜の出勤とひもづける</li><li>会議日は対象者を出勤に</li><li>ヘルプは登録された組合せのみ、不足時だけ</li></ul>`;}
+ <h3>このツールのルール（実績から推定）</h3><ul class="hint"><li>個人ごとの傾向（主な勤務表記と割合、土曜頻度、休みやすい曜日、土曜後の代休曜日、ヘルプ先、会議）を重みとして使用</li><li>常勤の公休の目標＝在籍中の土日の数と「在籍中の日曜＋定休日の数」の多いほう（希休を含む。定休日が休所と重なった日は休所として扱い、定休日に数えない）</li><li>連勤5日まで（6日は警告、7日以上は違反）</li><li>日曜は常勤休み（部署の日曜人数で非常勤のみ）</li><li>非常勤は固定曜日のみ</li><li>土曜は土曜人数が設定された部署のみ。常勤は上限内で均等に</li><li>振替の代休は、日曜の出勤とひもづける</li><li>会議日は対象者を出勤に</li><li>ヘルプは登録された組合せのみ、不足時だけ</li><li>途中変更：スタッフの異動・区分変更や部署の人数変更は「適用日」から。その前の日は元の設定で数えます。退職・廃止はその日まで表に残ります。「✂ 途中から作り直す」は前の日と手で直したマスを残します</li></ul>`;}
 function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
 function exportJson(){download('shift_backup_'+new Date().toISOString().slice(0,10)+'.json',new Blob([JSON.stringify(ST)],{type:'application/json'}));}
 function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const s=JSON.parse(r.result);if(s.ver!==1)throw 0;const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur,meetings:Array.isArray(s.meetings)?s.meetings:[]});if(!s.sample)delete ST.sample;if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;save();render();toast(ST.staff.length+'人を読み込みました');}catch(e){alert('読み込めませんでした');}};r.readAsText(f);}
@@ -470,7 +471,7 @@ function deptAbbr(dep){const used={};for(const d of ST.depts){let a=d.short||d.n
 function abbrLegend(){return ST.depts.map(d=>deptAbbr(d)+'＝'+d.name).join('、');}
 function ownMark(v,dep){const N=String(v.c).replace(/[Ａ-Ｚ]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248));const sb=dep.subs.find(q=>N.includes(q.code));return sb?sb.code.slice(-1):'○';}
 function printOpts(){return `<select id="psel" style="padding:6px;font-size:14px"><option value="">全事業所（事業所ごとに改ページ）</option>${ST.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}<option value="__person">個人別（配布用・1枚に4人）</option></select><button onclick="$('#psel').value==='__person'?printPersons():doPrint($('#psel').value)">🖨 印刷</button><button class="pri" onclick="doPdf($('#psel').value)">📄 PDFを作成</button><small class="phint" style="width:100%;color:#555">${IS_IOS?'iPhone：『PDFを作成』→『共有・保存』→プリント／ファイルに保存が確実です':IS_AND?'Android：『PDFを作成』→『共有・保存』で印刷やドライブ保存が確実です（印刷ボタンは横向きにならない場合あり。そのときは📄 PDFを作成を使ってください）':'パソコン：『🖨 印刷』でA4横に印刷。『PDFを作成』はダウンロード保存'}</small><div id="pdfst" style="width:100%;font-size:13px"></div>`;}
-const LEGEND='凡例：○＝出勤（A・B等＝班）　研＝研修・張＝出張（人数に数えない）　灰色・斜体＝休み（休①②…＝公休、休職＝産休・育休など、－＝在籍外、定＝定休日、希＝希望休、有＝有給、特＝特休、夏＝夏季、リ＝リフレッシュ、代＝代休、所＝休所）　【応援】行・点線枠・応＝他事業所からの応援　青・下線＝土曜　赤・二重下線＝日曜・祝日';
+const LEGEND='凡例：○＝出勤（A・B等＝班）　研＝研修・張＝出張（人数に数えない）　灰色・斜体＝休み（休①②…＝公休、休職＝産休・育休など、－＝在籍外、定＝定休日、希＝希望休、有＝有給、特＝特休、夏＝夏季、リ＝リフレッシュ、代＝代休、所＝休所）　【応援】行・点線枠・応＝他事業所からの応援　【異動】＝月の途中で所属が変わった人　青・下線＝土曜　赤・二重下線＝日曜・祝日';
 function buildPrint(y,m,only){const mo=curMo(),res=mo.res,days=dayInfos(y,m),n=days.length;
  const cls=di=>di.w===0||di.h?'sun':di.w===6?'sat':'';let H='';
  for(const dep of ST.depts){if(only&&dep.id!==only)continue;
@@ -481,7 +482,7 @@ function buildPrint(y,m,only){const mo=curMo(),res=mo.res,days=dayInfos(y,m),n=d
   <tr><th class="pn" rowspan="2">氏名</th><th class="pk" rowspan="2">区分</th>${days.map(di=>`<th class="${cls(di)}">${di.d}</th>`).join('')}</tr>
   <tr>${days.map(di=>`<th class="${cls(di)}">${WD[di.w]}${di.h?'<br>祝':''}</th>`).join('')}</tr>`;
   const cnt=Array(n+1).fill(0);
-  const row=(s,isHelp)=>{const num=res?numbered(res,s,y,m):{};let r=`<tr><td class="pn">${isHelp?'【応援】':''}${esc(s.name)}</td><td class="pk">${esc(s.kind==='常勤'?'常':'非')}</td>`;
+  const row=(s,isHelp)=>{const num=res?numbered(res,s,y,m):{};let r=`<tr><td class="pn">${isHelp?(movedTo(s,dep)?'【異動】':'【応援】'):''}${esc(s.name)}</td><td class="pk">${esc(s.kind==='常勤'?'常':'非')}</td>`;
    for(const di of days){const v=res?(res[s.id][di.d]||{c:''}):{c:''};const cd=cellDept(v,s);let t='',c='';
     if(isHelp){if(cd===dep){t='応'+(isWork(v.c)?(ownMark(v,dep)==='○'?'':ownMark(v,dep)):'');c='hp';cnt[di.d]++;}else{c='ou';}}
     else if(AWAY.includes(v.c)){t=v.c==='研修'?'研':'張';}else if(isWork(v.c)){if(cd&&cd!==dep){t='→'+deptAbbr(cd);c='ou';}else{t=ownMark(v,dep);cnt[di.d]++;if(v.n==='ヘルプ')c='hp';}}
@@ -489,7 +490,7 @@ function buildPrint(y,m,only){const mo=curMo(),res=mo.res,days=dayInfos(y,m),n=d
     r+=`<td class="${c}"${c!=='off'&&t.length>=2?' style="font-size:.78em;letter-spacing:-.5px"':''}>${esc(t)}</td>`;}return r+'</tr>';};
   for(const s of home)H+=row(s,false);for(const s of hp)H+=row(s,true);
   H+=`<tr class="sum"><td class="pn" colspan="2">出勤人数</td>${days.map(di=>`<td>${cnt[di.d]}</td>`).join('')}</tr></table>
-  <div class="lg">凡例：○＝出勤（A・B等＝班）　研＝研修・張＝出張（人数に数えない）　灰色・斜体＝休み（休①②…＝公休、休職＝産休・育休など、－＝在籍外、定＝定休日、希＝希望休、有＝有給、特＝特休、夏＝夏季、リ＝リフレッシュ、代＝代休、所＝休所）　【応援】行・点線枠・応＝他事業所からの応援　→略称＝他事業所へ応援（${esc(abbrLegend())}）　青・下線＝土曜　赤・二重下線＝日曜・祝日</div></section>`;}
+  <div class="lg">凡例：○＝出勤（A・B等＝班）　研＝研修・張＝出張（人数に数えない）　灰色・斜体＝休み（休①②…＝公休、休職＝産休・育休など、－＝在籍外、定＝定休日、希＝希望休、有＝有給、特＝特休、夏＝夏季、リ＝リフレッシュ、代＝代休、所＝休所）　【応援】行・点線枠・応＝他事業所からの応援　【異動】＝月の途中で所属が変わった人　→略称＝他事業所へ応援（${esc(abbrLegend())}）　青・下線＝土曜　赤・二重下線＝日曜・祝日</div></section>`;}
  return H||'<p>印刷する職員がいません</p>';}
 function doPrint(only){if(IS_IOS&&IS_SA){if(confirm('ホーム画面から開いたアプリでは印刷画面が開かないことがあります。PDFを作成しますか？'))doPdf(only);return;}const{y,m}=ST.cur;if(!curMo().res&&!confirm('まだ自動作成していません。空の表を印刷しますか？'))return;
  const pv=$('#printview');pv.innerHTML=buildPrint(y,m,only);document.body.classList.add('printing');
@@ -507,7 +508,7 @@ function printModel(y,m,dep){const res=curMo().res,days=dayInfos(y,m),n=days.len
    if(isHelp){if(cd===dep){t='応'+(isWork(v.c)?(ownMark(v,dep)==='○'?'':ownMark(v,dep)):'');c='hp';cnt[di.d]++;}else c='ou';}
    else if(AWAY.includes(v.c)){t=v.c==='研修'?'研':'張';}else if(isWork(v.c)){if(cd&&cd!==dep){t='→'+deptAbbr(cd);c='ou';}else{t=ownMark(v,dep);cnt[di.d]++;if(v.n==='ヘルプ')c='hp';}}
    else{t=shortOff(num[di.d]||'');c=v.c?'off':'';}cells.push({t:String(t??''),c});}
-  rows.push({name:(isHelp?'【応援】':'')+s.name,kind:s.kind==='常勤'?'常':'非',cells});};
+  rows.push({name:(isHelp?(movedTo(s,dep)?'【異動】':'【応援】'):'')+s.name,kind:s.kind==='常勤'?'常':'非',cells});};
  home.forEach(s=>row(s,false));hp.forEach(s=>row(s,true));
  return {title:`${ST.corp?ST.corp+'　':''}${dep.name}　${y}年${m}月 シフト表`,days,rows,cnt};}
 function drawPage(md){const W=2400,H=1697,M=60,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
@@ -825,6 +826,153 @@ function busy(on,txt){if(on){GEN_STOP=false;$('#modal').innerHTML=`<div class="m
 function clearRes(){const mo=curMo();if(confirm('この月の結果を消去しますか？（消去前の表は🕘履歴に残ります）')){pushHist(mo,'結果を消去の前');mo.res=null;save();render();toast('消去しました（🕘履歴から戻せます）');}}
 function guideOpen(){return ST.guideOpen!==undefined?ST.guideOpen:window.innerWidth>=700;}
 function toggleGuide(el){ST.guideOpen=el.open;document.body.classList.toggle('gclosed',!el.open);try{persist();}catch(e){}}
+
+/* ===== v8: 途中変更（新規登録・変更・削除を日付つきで） ===== */
+const ST_T=['dept','kind','title','fixed','subs','help','satOK','lab'];
+function fitDept(s){const d=deptById(s.dept);if(!d)return;const okC=c=>{const x=codeDept(c);return !x||x===d;};s.subs=(s.subs||[]).filter(okC);if(s.lab)for(const g in s.lab)if(Array.isArray(s.lab[g]))s.lab[g]=s.lab[g].filter(e=>okC(e.c));}
+const DP_T=['req','closedDow'];
+let SNAP_ORIG=null,PARTIAL_START=0;
+function ymdStr(k){return `${Math.floor(k/10000)}-${String(Math.floor(k/100)%100).padStart(2,'0')}-${String(k%100).padStart(2,'0')}`;}
+function kSplit(k){return [Math.floor(k/10000),Math.floor(k/100)%100,k%100];}
+function kNext(k){const [y,m,d]=kSplit(k);if(d<dim(y,m))return k+1;return m===12?ymdN(y+1,1,1):ymdN(y,m+1,1);}
+function pickF(o,F){const r={};for(const f of F)r[f]=Array.isArray(o[f])?o[f].slice():(o[f]&&typeof o[f]==='object'?JSON.parse(JSON.stringify(o[f])):o[f]);return r;}
+function sameF(a,b,F){const n=x=>JSON.stringify(F.map(f=>Array.isArray(x[f])?x[f].slice().map(String).sort():x[f]));return n(a)===n(b);}
+function hasDated(){return ST.staff.some(s=>(s.hist||[]).length)||ST.depts.some(d=>(d.hist||[]).length||d.end);}
+function atK(o,k,F){const b=o._base||o;const r=Object.assign({},b);if(b.hist&&b.hist.length){const hs=b.hist.slice().sort((x,y)=>pd(y.from)-pd(x.from));for(const h of hs)if(k<pd(h.from))Object.assign(r,JSON.parse(JSON.stringify(h.prev)));}r._base=b;return r;}
+function staffAtK(s,k){return atK(s,k,ST_T);}
+function deptAtK(d,k){return atK(d,k,DP_T);}
+function snapArrays(k){const b=SNAP_ORIG||{staff:ST.staff,depts:ST.depts};
+ return {staff:b.staff.map(s=>(s.hist&&s.hist.length)?staffAtK(s,k):s),depts:b.depts.filter(d=>!(d.end&&k>pd(d.end))).map(d=>(d.hist&&d.hist.length)?deptAtK(d,k):d),b};}
+function withSnap(k,fn){if(SNAP_ORIG||!hasDated())return fn();const a=ST.staff,c=ST.depts,x=snapArrays(k);SNAP_ORIG=x.b;ST.staff=x.staff;ST.depts=x.depts;try{return fn();}finally{ST.staff=a;ST.depts=c;SNAP_ORIG=null;}}
+async function withSnapA(k,fn){if(SNAP_ORIG||!hasDated())return await fn();const a=ST.staff,c=ST.depts,x=snapArrays(k);SNAP_ORIG=x.b;ST.staff=x.staff;ST.depts=x.depts;try{return await fn();}finally{ST.staff=a;ST.depts=c;SNAP_ORIG=null;}}
+function changeDays(y,m){const n=dim(y,m),s=new Set();const add=t=>{const p=pd(t);if(p&&p>ymdN(y,m,1)&&p<=ymdN(y,m,n))s.add(p%100);};
+ for(const x of ST.staff)for(const h of (x.hist||[]))add(h.from);for(const d of ST.depts)for(const h of (d.hist||[]))add(h.from);return [...s].sort((a,b)=>a-b);}
+/* 日ごとの部署設定（必要人数・定休日・廃止日） */
+const _dayInfos=dayInfos;dayInfos=function(y,m){const a=_dayInfos(y,m);for(const di of a)di.k=ymdN(y,m,di.d);return a;};
+const _deptReq=deptReq;deptReq=function(dep,di){if(dep&&di&&di.k){const b=dep._base||dep;if(b.end&&di.k>pd(b.end))return 0;if(b.hist&&b.hist.length)dep=deptAtK(b,di.k);}return _deptReq(dep,di);};
+const _subReq=subReq;subReq=function(sb,dep,di){if(dep&&di&&di.k){const b=dep._base||dep;if(b.end&&di.k>pd(b.end))return 0;if(b.hist&&b.hist.length)dep=deptAtK(b,di.k);}return _subReq(sb,dep,di);};
+/* 異動した人のマスに、その日の所属部署を記録（過去の日は元の部署で数える） */
+function movedTo(s,dep){const b=s._base||s;return !!(b.hist&&b.hist.length&&dep&&(b.dept===dep.id||b.hist.some(x=>x.prev&&x.prev.dept===dep.id)));}
+function stampDp(res,y,m,staff){if(!res)return;for(const s of (staff||ST.staff)){if(!(s.hist||[]).some(h=>h.prev&&h.prev.dept!==undefined))continue;const r=res[s.id];if(!r)continue;
+ for(const d in r){const v=r[d];if(!v||v.dp||!isWork(v.c)||AWAY.includes(v.c)||codeDept(v.c))continue;v.dp=staffAtK(s,ymdN(y,m,+d)).dept;}}}
+function stampAll(staff){for(const key in ST.months){const mo=ST.months[key];if(!mo||!mo.res)continue;const [y,m]=key.split('-').map(Number);stampDp(mo.res,y,m,staff);}}
+const _save=save;save=function(){if(SNAP_ORIG){const a=ST.staff,c=ST.depts;ST.staff=SNAP_ORIG.staff;ST.depts=SNAP_ORIG.depts;try{stampAll();_save();}finally{ST.staff=a;ST.depts=c;}}else{stampAll();_save();}};
+/* 表示・印刷・集計はその月の設定で */
+const curK=()=>ymdN(ST.cur.y,ST.cur.m,1);
+for(const nm of ['rShift','rSum','rReq','buildPrint','printModel','buildWorkbook']){const f=window[nm];if(typeof f!=='function')continue;window[nm]=function(...a){return withSnap(curK(),()=>f.apply(this,a));};}
+{const f=personPages;personPages=async function(...a){return await withSnapA(curK(),()=>f.apply(this,a));};}
+{const f=checks;checks=function(y,m,res){return withSnap(ymdN(y,m,1),()=>f(y,m,res));};}
+/* 自動作成：月の途中に変更日があれば、その日で区切って作る／途中から作り直す */
+{const f=genAsync;genAsync=async function(y,m){const s0=PARTIAL_START||1;if(!hasDated()&&s0===1)return await f(y,m);
+ const segs=[s0,...changeDays(y,m).filter(d=>d>s0)];const mo=monthObj(y,m);const bak=JSON.parse(JSON.stringify(mo.req||{}));let res=null,ms=0;
+ try{for(const D of segs){if(res){for(const sid in res)for(let d=1;d<D;d++){const v=res[sid][d];if(v)(mo.req[sid]=mo.req[sid]||{})[d]=v.c||'休';}}
+   const g=await withSnapA(ymdN(y,m,D),()=>f(y,m));ms+=g.ms;
+   if(res){for(const sid in g.res)for(let d=1;d<D;d++)if(res[sid]&&res[sid][d])g.res[sid][d]=res[sid][d];}res=g.res;}}
+ finally{mo.req=bak;}
+ stampDp(res,y,m);return {res,ck:checks(y,m,res),ms};};}
+async function regenFrom(d0,onlySid){const{y,m}=ST.cur,mo=curMo(),n=dim(y,m);if(!mo.res){alert('この月はまだ自動作成していません。「⚙ 自動作成」を押してください。');return;}
+ d0=Math.max(1,Math.min(n,+d0||1));const orig=JSON.parse(JSON.stringify(mo.res)),bak=JSON.parse(JSON.stringify(mo.req||{})),keep={};
+ for(const sid in orig){const r=orig[sid];for(const d in r){const v=r[d];if(!v)continue;const lockIt=(onlySid?(sid!==onlySid||+d<d0):+d<d0)||v.man;
+  if(lockIt){(keep[sid]=keep[sid]||{})[d]=v;(mo.req[sid]=mo.req[sid]||{})[d]=v.c||'休';}}}
+ if(onlySid&&!orig[onlySid])for(let d=1;d<d0;d++)(mo.req[onlySid]=mo.req[onlySid]||{})[d]='休';
+ GEN_STOP=false;busy(true,'0%');let g;PARTIAL_START=onlySid?1:d0;
+ try{g=await genAsync(y,m);}catch(e){busy(false);if(e.message==='__stop'){toast('中止しました（表は変わっていません）');return;}showErr(e.message);return;}finally{mo.req=bak;PARTIAL_START=0;}
+ for(const sid in keep)for(const d in keep[sid])if(g.res[sid])g.res[sid][d]=keep[sid][d];
+ if(onlySid&&!orig[onlySid]&&g.res[onlySid])for(let d=1;d<d0;d++)g.res[onlySid][d]={c:'対象外',n:'',lock:true};
+ pushHist(mo,onlySid?'途中から入れる前':`${d0}日以降を作り直す前`);mo.res=g.res;save();busy(false);render();
+ const ck=checks(y,m,mo.res);toast(`${onlySid?'追加しました':d0+'日以降を作り直しました'}：違反${ck.err}／警告${ck.warn}`);return ck;}
+function askRegen(){const{y,m}=ST.cur,n=dim(y,m);const t=new Date();const def=(t.getFullYear()===y&&t.getMonth()+1===m)?t.getDate():1;
+ $('#modal').innerHTML=`<div class="mb"><h3>途中から作り直す</h3><p class="hint">選んだ日より前の日と、手で直したマスはそのまま残ります。前の日からの連勤も引き継いで作ります。</p>
+ <label>何日以降を作り直しますか<select id="rg_d" style="min-height:44px">${Array.from({length:n},(_,i)=>`<option value="${i+1}" ${i+1===def?'selected':''}>${m}月${i+1}日以降</option>`).join('')}</select></label>
+ <div class="acts"><button class="pri" onclick="const d=+$('#rg_d').value;closeM();regenFrom(d)">この日以降だけ作り直す</button><button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');}
+function offerRegen(k,why){const [y,m,d]=kSplit(k);const mo=ST.months[key(y,m)];const later=Object.keys(ST.months).filter(x=>{const [yy,mm]=x.split('-').map(Number);return yy*12+mm>y*12+m&&ST.months[x]&&ST.months[x].res;}).length;
+ if(!mo||!mo.res){if(later)toast('作成済みの月は、その月を開いて「✂ 途中から作り直す」で直せます');return false;}
+ if(!confirm(`${why?why+'：':''}${y}年${m}月${d}日以降だけ作り直しますか？\n（それより前の日と、手で直したマスはそのまま残ります）${later?`\n※翌月以降の作成済みの表（${later}か月）は、その月を開いて作り直してください。`:''}`))return false;
+ ST.cur={y,m};TAB='shift';document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==='shift'));regenFrom(d);return true;}
+function offerFillNew(s){let y=ST.cur.y,m=ST.cur.m,d0=1;const st=pd(s.start);if(st){const [sy,sm,sd]=kSplit(st);const mo=ST.months[key(sy,sm)];if(mo&&mo.res){y=sy;m=sm;d0=sd;}else if(st>ymdN(y,m,dim(y,m)))return;else if(st>ymdN(y,m,1))d0=st%100;}
+ const mo=ST.months[key(y,m)];if(!mo||!mo.res)return;if(!confirm(`${s.name}さんのシフトを ${y}年${m}月${d0}日から入れますか？\n（ほかの人の表はそのまま）`))return;
+ ST.cur={y,m};TAB='shift';document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==='shift'));regenFrom(d0,s.id);}
+/* スタッフ：編集（適用日つき）・新規登録 */
+{const f=editStaff;editStaff=function(id){f(id);if(!$('#modal').classList.contains('on'))return;const h=$('#modal h3');if(h&&!id)h.textContent='スタッフ新規登録';
+ const fd=$('#f_dept');if(id&&fd){const lb=fd.closest('label');const el=document.createElement('div');el.className='effbox';
+  el.innerHTML=`<label>変更の適用日（所属部署・区分・役職・固定曜日・サブ区分・ヘルプ・土曜を途中から変えるとき）<input type="date" id="f_eff"></label><small class="hint">空欄＝最初から変更（作成済みの表も今の設定で数えます）。日付を入れると、その前の日は元の設定のままです。</small>${staffHistHtml(ST.staff.find(x=>x.id===id))}`;lb.parentNode.insertBefore(el,lb.nextSibling);}};}
+function staffHistHtml(s){const hs=(s&&s.hist)||[];if(!hs.length)return '';return `<details><summary>変更の記録 ${hs.length}件</summary>${hs.slice().sort((a,b)=>pd(a.from)-pd(b.from)).map(h=>`<div class="small">${esc(h.from)}から変更（前：${esc((deptById(h.prev.dept)||{}).name||'')} ${esc(h.prev.kind||'')}）</div>`).join('')}</details>`;}
+{const f=saveStaff;saveStaff=function(id,exists){let ent=0,nm='';
+ if(exists){const s=ST.staff.find(x=>x.id===id);const eff=$('#f_eff')?$('#f_eff').value:'';
+  if(s&&eff){const k=pd(eff);const last=(s.hist||[]).reduce((a,h)=>Math.max(a,pd(h.from)||0),0);if(!k)return alert('適用日が読めません');if(k<=last)return alert(`適用日は前回の変更（${ymdStr(last)}）より後の日にしてください`);
+   const g=c=>[...document.querySelectorAll(c)].filter(x=>x.checked).map(x=>x.value);
+   const nw={dept:$('#f_dept').value,kind:$('#f_kind').value,title:$('#f_title').value,fixed:g('.f_fx').map(Number),subs:g('.f_sb'),help:g('.f_hp'),satOK:$('#f_sat').checked};
+   if(!sameF(s,nw,ST_T)){s.hist=s.hist||[];s.hist.push({from:ymdStr(k),prev:pickF(s,ST_T)});ent=k;nm=s.name;}}}
+ const n0=ST.staff.length;f(id,exists);{const s=ST.staff.find(x=>x.id===id);if(s){fitDept(s);save();}}
+ if(ent){toast(`${ymdStr(ent)}から変更しました（それより前は元の設定）`);offerRegen(ent,`${nm}さんの変更`);}
+ else if(!exists&&ST.staff.length>n0)offerFillNew(ST.staff[ST.staff.length-1]);};}
+/* スタッフ：削除（退職／完全に削除） */
+function monthsWith(id){return Object.keys(ST.months).filter(k=>{const mo=ST.months[k];return mo&&mo.res&&mo.res[id]&&Object.values(mo.res[id]).some(v=>v&&v.c&&v.c!=='対象外');});}
+function retireStaff(id,date,silent){const s=ST.staff.find(x=>x.id===id);const k=pd(date);if(!s||!k){alert('日付が読めません（例：2027-03-31）');return false;}
+ s.end=ymdStr(k);for(const key in ST.months){const mo=ST.months[key];if(!mo||!mo.res||!mo.res[id])continue;const [y,m]=key.split('-').map(Number);for(const d in mo.res[id])if(ymdN(y,m,+d)>k)mo.res[id][d]={c:'対象外',n:'',lock:true};}
+ save();closeM();render();toast(`${s.name}さんを ${s.end} 付けで退職にしました（それまでの表は残ります。↶で戻せます）`);if(!silent)offerRegen(kNext(k),`${s.name}さんの退職`);return true;}
+function purgeStaff(id){const s=ST.staff.find(x=>x.id===id);if(!s)return;ST.staff=ST.staff.filter(x=>x.id!==id);
+ for(const key in ST.months){const mo=ST.months[key];if(!mo)continue;if(mo.res)delete mo.res[id];if(mo.req)delete mo.req[id];if(mo.furi)delete mo.furi[id];}
+ save();closeM();render();toast(`${s.name}さんを完全に削除しました（↶で戻せます）`);}
+delStaff=function(id){const s=ST.staff.find(x=>x.id===id);if(!s)return;const ms=monthsWith(id);const t=new Date();const def=s.end||ymdLocal();
+ $('#modal').innerHTML=`<div class="mb"><h3>${esc(s.name)}さんを削除</h3>
+ <label class="ck2"><input type="radio" name="dm" value="ret" checked>退職にする（おすすめ）</label>
+ <label style="margin-left:30px">退職日（この日まで在籍）<input type="date" id="f_ret" value="${esc(def)}"></label>
+ <p class="hint" style="margin-left:30px">それまでの表と記録は残ります。退職日の翌日からは表に出ません。</p>
+ <label class="ck2"><input type="radio" name="dm" value="all">完全に削除する</label>
+ <p class="hint" style="margin-left:30px;color:#b00">${ms.length?`作成済みの ${ms.length}か月分の表（${ms.slice(0,4).join('、')}${ms.length>4?'…':''}）からも消えます。`:'作成済みの表には載っていません。'}</p>
+ <div class="acts"><button class="pri" onclick="doDelStaff('${id}')">実行</button><button onclick="editStaff('${id}')">戻る</button><button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');};
+function doDelStaff(id){const mode=(document.querySelector('input[name=dm]:checked')||{}).value;const s=ST.staff.find(x=>x.id===id);
+ if(mode==='all'){const ms=monthsWith(id);if(!confirm(`⚠ 本当に${s.name}さんを完全に削除しますか？\n${ms.length?`作成済みの${ms.length}か月分の表からも消えます。`:''}\n（間違えたときは ↶ で戻せます）`))return;purgeStaff(id);}
+ else retireStaff(id,$('#f_ret').value);}
+/* 部署：途中から変更・廃止・削除 */
+function editDeptDated(i){const d=ST.depts[i];const t=new Date();
+ $('#modal').innerHTML=`<div class="mb"><h3>${esc(d.name)}：日付を決めて変更</h3><p class="hint">適用日より前の日は、今までの必要人数・定休日のままです。</p>
+ <label>適用日<input type="date" id="dd_from" value="${ymdLocal()}"></label>
+ <div class="req">${KINDS.map(([k,l])=>`<label>${l}<input type="number" min="0" class="dd_r" data-k="${k}" value="${+d.req[k]||0}"></label>`).join('')}</div>
+ <div class="row small">定休曜日：${[1,2,3,4,5,6].map(w=>`<label class="ck2"><input type="checkbox" class="dd_w" value="${w}" ${d.closedDow.includes(w)?'checked':''}>${WD[w]}</label>`).join('')}</div>
+ ${deptHistHtml(d)}<div class="acts"><button class="pri" onclick="saveDeptDated(${i})">保存</button><button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');}
+function deptHistHtml(d){const hs=d.hist||[];if(!hs.length)return '';return `<details><summary>変更の記録 ${hs.length}件</summary>${hs.slice().sort((a,b)=>pd(a.from)-pd(b.from)).map(h=>`<div class="small">${esc(h.from)}から変更</div>`).join('')}</details>`;}
+function saveDeptDated(i,from,req,dow){const d=ST.depts[i];const k=pd(from||$('#dd_from').value);if(!k)return alert('適用日を入れてください');const last=(d.hist||[]).reduce((a,h)=>Math.max(a,pd(h.from)||0),0);if(k<=last)return alert(`適用日は前回の変更（${ymdStr(last)}）より後の日にしてください`);
+ const nr=req||Object.assign({},d.req);if(!req)document.querySelectorAll('.dd_r').forEach(x=>{nr[x.dataset.k]=+x.value||0;});const nw=dow||[...document.querySelectorAll('.dd_w')].filter(x=>x.checked).map(x=>+x.value);
+ const nv={req:nr,closedDow:nw};if(sameF({req:JSON.stringify(d.req),closedDow:d.closedDow},{req:JSON.stringify(nr),closedDow:nw},DP_T)){closeM();return toast('変更はありません');}
+ d.hist=d.hist||[];d.hist.push({from:ymdStr(k),prev:pickF(d,DP_T)});d.req=normReq(nr);d.closedDow=nw;save();closeM();render();toast(`${ymdStr(k)}から変更しました（それより前は元の設定）`);if(!from)offerRegen(k,`${d.name}の変更`);return true;}
+function transferStaff(s,k,to){if(!s.hist)s.hist=[];const last=s.hist.reduce((a,h)=>Math.max(a,pd(h.from)||0),0);if(k<=last)return false;s.hist.push({from:ymdStr(k),prev:pickF(s,ST_T)});
+ s.dept=to;fitDept(s);s.help=(s.help||[]).filter(x=>x!==to);return true;}
+function abolishDept(i,date,to,silent){const d=ST.depts[i];const k=pd(date);if(!k)return alert('廃止日を入れてください');const ss=ST.staff.filter(s=>s.dept===d.id&&!(s.end&&pd(s.end)<=k));
+ if(ss.length&&(!to||to===d.id||!deptById(to)))return alert(`所属スタッフが${ss.length}人います。移動先の部署を選んでください`);
+ for(const s of ss)transferStaff(s,kNext(k),to);d.end=ymdStr(k);save();closeM();render();toast(`${d.name}を ${d.end} で廃止にしました${ss.length?`（${ss.length}人を移動）`:''}。↶で戻せます`);if(!silent)offerRegen(kNext(k),`${d.name}の廃止`);return true;}
+function purgeDept(i,to){const d=ST.depts[i],id=d.id;const ss=ST.staff.filter(s=>s.dept===id);if(ss.length&&(!to||to===id||!deptById(to)))return alert(`所属スタッフが${ss.length}人います。移動先の部署を選んでください`);
+ for(const s of ST.staff){if(s.dept===id){s.dept=to;fitDept(s);}for(const h of (s.hist||[]))if(h.prev&&h.prev.dept===id)h.prev.dept=to;s.help=(s.help||[]).filter(x=>x!==id);if(s.helpW)delete s.helpW[id];}
+ for(const key in ST.months){const mo=ST.months[key];if(mo&&mo.res)for(const sid in mo.res)for(const dd in mo.res[sid]){const v=mo.res[sid][dd];if(v&&v.dp===id)delete v.dp;}}
+ ST.depts.splice(i,1);ST.meetings=ST.meetings.filter(mt=>mt.target!==id);save();closeM();render();toast(`${d.name}を削除しました（↶で戻せます）`);}
+function deptUsedMonths(id){return Object.keys(ST.months).filter(k=>{const mo=ST.months[k];if(!mo||!mo.res)return false;const [y,m]=k.split('-').map(Number);return ST.staff.some(s=>mo.res[s.id]&&Object.values(mo.res[s.id]).some(v=>v&&isWork(v.c)&&(v.dp===id||(!v.dp&&(codeDept(v.c)||{}).id===id)||(!v.dp&&!codeDept(v.c)&&s.dept===id))));});}
+{const f=delDept;delDept=function(i){if(ST.depts.length<=1)return alert('最後の1部署は削除できません');const d=ST.depts[i];const ss=ST.staff.filter(s=>s.dept===d.id);const ms=deptUsedMonths(d.id);
+ if(!ss.length&&!ms.length)return f(i);
+ const opts=ST.depts.filter(x=>x.id!==d.id&&!x.end).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');
+ $('#modal').innerHTML=`<div class="mb"><h3>${esc(d.name)}を削除</h3>
+ ${ss.length?`<label>所属スタッフ ${ss.length}人の移動先<select id="dl_to" style="min-height:44px">${opts}</select></label>`:''}
+ <label class="ck2"><input type="radio" name="dl" value="end" checked>廃止にする（おすすめ）</label>
+ <label style="margin-left:30px">廃止日（この日まで営業）<input type="date" id="dl_date" value="${ymdLocal()}"></label>
+ <p class="hint" style="margin-left:30px">それまでの表はそのまま残ります。翌日から部署は表に出ず、スタッフは移動先の所属になります。</p>
+ <label class="ck2"><input type="radio" name="dl" value="all">完全に削除する</label>
+ <p class="hint" style="margin-left:30px;color:#b00">${ms.length?`作成済みの ${ms.length}か月分の表でこの部署として数えた分も、移動先の部署として数え直されます。`:''}過去の月もすべて移動先の所属になります。</p>
+ <div class="acts"><button class="pri" onclick="doDelDept(${i})">実行</button><button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');};}
+function doDelDept(i){const mode=(document.querySelector('input[name=dl]:checked')||{}).value,to=$('#dl_to')?$('#dl_to').value:'';
+ if(mode==='all'){if(!confirm(`⚠ 本当に「${ST.depts[i].name}」を完全に削除しますか？\n（間違えたときは ↶ で戻せます）`))return;purgeDept(i,to);}else abolishDept(i,$('#dl_date').value,to);}
+function restoreDept(i){const d=ST.depts[i];delete d.end;save();render();toast(`${d.name}の廃止を取り消しました`);}
+/* 画面：スタッフ・部署タブ */
+rStaff=function(){let h=`<p class="hint">名前は端末内（このブラウザ）にのみ保存されます。途中から変えるときは「編集」で<b>変更の適用日</b>を入れます。</p><div class="acts"><button class="pri" onclick="editStaff(null)">＋ 新規登録</button></div>`;
+ const row=s=>`<div class="srow2"><div class="srow" onclick="editStaff('${s.id}')"><b>${esc(s.name)}</b> <span>${s.kind} / ${esc(s.title)}${staffBadge(s)}</span><small>${s.kind==='非常勤'?'固定:'+s.fixed.map(w=>WD[w]).join(''):''}${s.subs.length?' 区分:'+esc(s.subs.join(',')):''}${s.help.length?' ヘルプ:'+s.help.map(x=>esc(deptById(x)?.name)).join(','):''}${s.satOK?' 土曜可':''}</small></div><button onclick="editStaff('${s.id}')">編集</button><button class="danger" onclick="delStaff('${s.id}')">削除</button></div>`;
+ for(const d of ST.depts){const ss=ST.staff.filter(s=>s.dept===d.id);h+=`<h3 style="background:${d.color}">${esc(d.name)}（${ss.length}人）${d.end?`<small> 廃止 ${esc(d.end)}</small>`:''}</h3>`+ss.map(row).join('');}
+ const lost=ST.staff.filter(s=>!deptById(s.dept));if(lost.length)h+=`<h3>所属部署なし（${lost.length}人）</h3>`+lost.map(row).join('');return h;};
+{const f=staffBadge;staffBadge=function(s){let b=f(s);const hs=(s.hist||[]).slice().sort((a,c)=>pd(c.from)-pd(a.from));if(hs.length){const h=hs[0];const pre=deptById(h.prev.dept);const today=pd(ymdLocal());
+ b+=` <b class="bdg">${pd(h.from)>today?'変更予定':'変更'} ${esc(h.from)}〜${h.prev.dept!==s.dept&&pre?`（前：${esc(pre.name)}）`:''}</b>`;}return b;};}
+{const f=rDept;rDept=function(){let h=f();h=h.replace('<p class="hint">','<p class="hint">ここで数字や定休日を直すと、過去の月にも反映されます。途中の日から変えるときは「📅 日付を決めて変更」を使います。');
+ h=h.replace(/<button onclick="delDept\((\d+)\)">✕<\/button>/g,(_,i)=>`<button onclick="editDeptDated(${i})">📅 日付を決めて変更</button><button class="danger" onclick="delDept(${i})">削除</button>${ST.depts[i].end?`<span class="bdg">廃止 ${esc(ST.depts[i].end)}</span><button onclick="restoreDept(${i})">廃止を取り消す</button>`:''}`);
+ return h.replace('>＋部署を追加</button>','>＋ 新規登録（部署）</button>');};}
+/* シフト表：途中から作り直すボタン・異動の印 */
+{const f=rShift;rShift=function(){let h=f();if(curMo().res)h=h.replace('<button onclick="showHist()">🕘 履歴</button>','<button onclick="askRegen()">✂ 途中から作り直す</button><button onclick="showHist()">🕘 履歴</button>');return h;};}
 
 /* ===== PWA（アプリとして追加） ===== */
 let _bip=null;
