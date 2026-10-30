@@ -190,7 +190,7 @@ function oneTrial(y,m,R){
   for(const di of days){const d=di.d;const dst=dayStat(s,y,m,d);if(dst){res[s.id][d]={c:dst==='out'?'対象外':'休職',n:dst==='leave'?leaveName(s,y,m,d):'',lock:true};continue;}
    if(rq[d]){res[s.id][d]={c:rq[d]==='出勤'?primaryCode(s):rq[d],n:'',lock:true};continue;}
    if(s.kind==='常勤'){
-    if(di.closed&&di.w!==0&&di.w!==6)res[s.id][d]={c:'休所',n:''};
+    if(di.closed&&di.w!==0&&(di.w!==6||(dep&&inclDow(dep)&&dep.closedDow.length)))res[s.id][d]={c:'休所',n:''};
     else if(di.w===0)res[s.id][d]={c:'休',n:''};
     else if(di.w===6)res[s.id][d]={c:'休',n:''};
     else if(!deptOpen(dep,di)&&di.kind==='hol'){res[s.id][d]={c:'休所',n:''};}
@@ -420,10 +420,10 @@ function delStaff(id){if(!confirm('削除しますか？'))return;ST.staff=ST.st
 /* --- データ --- */
 function rData(){return `<h3>バックアップ</h3><p class="hint">データはこの端末のブラウザ内（localStorage）に保存。外部には送信しません。</p><div class="acts"><button class="pri" onclick="exportJson()">JSON書き出し</button><label class="btn">データ読み込み<input type="file" onchange="importJson(this)" hidden></label><button onclick="restoreBeforeImport()">読み込み前のデータに戻す</button></div><p class="hint">最後のJSON書き出し：${ST.lastBackup?fmtT(ST.lastBackup):'まだありません'}。読み込み時は確認のうえ、今のデータの控えを自動で残します。</p>
  <h3>初期化</h3><div class="acts"><button class="danger" onclick="if(confirm('全データを初期サンプルに戻します。よろしいですか？')){ST=defaultState();save();render();}">初期サンプルに戻す</button></div>
- <h3>このツールのルール（実績から推定）</h3><ul class="hint"><li>個人ごとの傾向（主な勤務表記と割合、土曜頻度、休みやすい曜日、土曜後の代休曜日、ヘルプ先、会議）を重みとして使用</li><li>常勤の公休＝その月の土日数（希休を含む）</li><li>連勤5日まで（6日は警告、7日以上は違反）</li><li>日曜は常勤休み（部署の日曜人数で非常勤のみ）</li><li>非常勤は固定曜日のみ</li><li>土曜は土曜人数が設定された部署のみ。常勤は上限内で均等に、代休は同じ週の平日</li><li>会議日は対象者を出勤に</li><li>ヘルプは登録された組合せのみ、不足時だけ</li></ul>`;}
+ <h3>このツールのルール（実績から推定）</h3><ul class="hint"><li>個人ごとの傾向（主な勤務表記と割合、土曜頻度、休みやすい曜日、土曜後の代休曜日、ヘルプ先、会議）を重みとして使用</li><li>常勤の公休の目標＝在籍中の土日の数と「在籍中の日曜＋定休日の数」の多いほう（希休を含む。定休日が休所と重なった日は休所として扱い、定休日に数えない）</li><li>連勤5日まで（6日は警告、7日以上は違反）</li><li>日曜は常勤休み（部署の日曜人数で非常勤のみ）</li><li>非常勤は固定曜日のみ</li><li>土曜は土曜人数が設定された部署のみ。常勤は上限内で均等に</li><li>振替の代休は、日曜の出勤とひもづける</li><li>会議日は対象者を出勤に</li><li>ヘルプは登録された組合せのみ、不足時だけ</li></ul>`;}
 function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
 function exportJson(){download('shift_backup_'+new Date().toISOString().slice(0,10)+'.json',new Blob([JSON.stringify(ST)],{type:'application/json'}));}
-function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const s=JSON.parse(r.result);if(s.ver!==1)throw 0;const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur});if(!s.sample)delete ST.sample;if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;save();render();toast(ST.staff.length+'人を読み込みました');}catch(e){alert('読み込めませんでした');}};r.readAsText(f);}
+function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const s=JSON.parse(r.result);if(s.ver!==1)throw 0;const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur,meetings:Array.isArray(s.meetings)?s.meetings:[]});if(!s.sample)delete ST.sample;if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;save();render();toast(ST.staff.length+'人を読み込みました');}catch(e){alert('読み込めませんでした');}};r.readAsText(f);}
 
 /* --- Excel --- */
 function buildWorkbook(y,m){const mo=monthObj(y,m),res=mo.res,days=dayInfos(y,m),n=days.length;
@@ -677,7 +677,7 @@ function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReade
  if(errs.length){inp.value='';return alert('読み込めませんでした：\n'+errs.join('\n'));}
  if(ST.staff.length&&!confirm(`今のデータ（${ST.staff.length}人）を、読み込むデータ（${s.staff.length}人）で置き換えます。\n置き換える前の今のデータは、自動で控えを残します。よろしいですか？`)){inp.value='';return;}
  try{lsSet(LS_KEY+'.before_import',JSON.stringify(ST));}catch(e){}if(ST.staff.length)try{exportJson('自動控え_読み込み前_');}catch(e){}
- const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur});if(!s.sample)delete ST.sample;if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;migrate();save();render();toast(ST.staff.length+'人を読み込みました');inp.value='';};r.readAsText(f);}
+ const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur,meetings:Array.isArray(s.meetings)?s.meetings:[]});if(!s.sample)delete ST.sample;if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;migrate();save();render();toast(ST.staff.length+'人を読み込みました');inp.value='';};r.readAsText(f);}
 function restoreBeforeImport(){const t=lsGet(LS_KEY+'.before_import');if(!t)return alert('読み込み前の控えはありません');if(!confirm('読み込み前のデータに戻しますか？'))return;ST=JSON.parse(t);migrate();save();render();toast('読み込み前のデータに戻しました');}
 function backupBand(){const lb=ST.lastBackup;const days=lb?Math.floor((Date.now()-lb)/864e5):null;if(lb&&days<14)return '';
  return `<div class="bk">💾 ${lb?`最後のバックアップから${days}日たっています`:'まだバックアップ（JSON書き出し）をしていません'}。端末の故障や機種変更に備えて、<button onclick="exportJson()">今すぐ書き出す</button></div>`;}
@@ -746,7 +746,7 @@ function empIn(s,y,m){const st=pd(s.start),en=pd(s.end);return !((st&&st>ymdN(y,
 function inclDow(dep){return !dep||dep.dowKoukyu!==false;}
 function koukyuT(s,y,m){const days=dayInfos(y,m),dep=deptById(s.dept);const act=days.filter(di=>!dayStat(s,y,m,di.d));
  const base=act.filter(di=>di.w===0||di.w===6).length;
- const forced=act.filter(di=>di.w===0||(di.w===6&&di.closed)||(dep&&inclDow(dep)&&di.w>=1&&di.w<=5&&dep.closedDow.includes(di.w)&&!di.closed&&di.kind!=='hol')).length;
+ const forced=act.filter(di=>di.w===0||(dep&&inclDow(dep)&&di.w>=1&&di.w<=5&&dep.closedDow.includes(di.w)&&!di.closed&&di.kind!=='hol')).length;
  return Math.max(base,forced);}
 function migrate2(){if(!Array.isArray(ST.quals))ST.quals=['サビ管','看護師','運転者'];
  for(const d of ST.depts){if(!Array.isArray(d.qreq))d.qreq=[];for(const q of d.qreq)q.req=normReq(q.req);}
