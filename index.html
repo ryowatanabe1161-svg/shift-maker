@@ -2,7 +2,7 @@
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;font-size:14px;color:#222;background:#f6f7f9;padding-bottom:70px}
 header{background:#2f5d8a;color:#fff;padding:10px 12px;font-weight:bold;position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between}.ur button{background:#fff;color:#2f5d8a;border:0;border-radius:8px;font-size:20px;min-width:44px;min-height:36px;margin-left:6px}.ur button:disabled{opacity:.4}.steps{display:flex;gap:4px;margin:6px 0;flex-wrap:wrap}.steps button{flex:1;min-width:70px;padding:8px 4px;border:1px solid #2f5d8a;background:#fff;border-radius:8px;font-size:13px}.steps button.ok{background:#e3f1e3;border-color:#3a8a3a}.bdg{background:#fde2c4;border-radius:6px;padding:0 4px;font-size:12px}.furi{margin-top:8px;padding:6px;border:1px dashed #999;border-radius:8px}.lnk{border:1px solid #2f5d8a;border-radius:8px;background:#fff;color:#2f5d8a;padding:4px 12px;min-height:36px;margin-left:6px}details.guide{margin:4px 0}details.guide>summary{padding:8px 4px;min-height:32px;cursor:pointer;color:#2f5d8a}body.gclosed .phint{display:none}
-@media(max-width:700px){nav button{min-height:52px;font-size:11px}.sug{min-height:44px}.acts button,.pri,.lnk,.chips button{min-height:44px}details.guide>summary{min-height:44px;line-height:28px}}
+@media(max-width:700px){body nav button{min-height:52px;font-size:12px}button,select,input[type=text],input[type=number],input:not([type]){min-height:44px}.nm small{font-size:10px}.sug{min-height:44px}.acts button,.pri,.lnk,.chips button{min-height:44px}details.guide>summary{min-height:44px;line-height:28px}}
 #main{padding-bottom:110px}.bk{background:#fff4d6;border:1px solid #e0b040;border-radius:8px;padding:8px;margin:6px 0;font-size:14px}.grp{border:1px solid #e0a0a0;border-radius:8px;margin:6px 0;padding:6px;background:#fff8f8}.grp summary{font-weight:bold;cursor:pointer}.why{margin:6px 0;padding:6px;border-top:1px dashed #ddd;font-size:14px}.sugs{display:flex;flex-direction:column;gap:4px;margin-top:4px}.sug{text-align:left;padding:8px;border:1px solid #2f5d8a;border-radius:8px;background:#eef4fb;font-size:14px}
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid #ccc;z-index:6}
 nav button{flex:1 1 0;min-width:0;border:0;background:none;padding:9px 0;font-size:10px;letter-spacing:-.5px;white-space:nowrap;overflow:hidden;color:#555}nav button.on{color:#2f5d8a;font-weight:bold;border-top:3px solid #2f5d8a}
@@ -12,7 +12,7 @@ button.pri{background:#2f5d8a;color:#fff;border-color:#2f5d8a}button.danger{colo
 .bar{display:flex;align-items:center;justify-content:center;gap:14px;margin:4px 0 8px;font-size:17px}
 .acts{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.hint{color:#666;font-size:12px}
 .ck{padding:8px;border-radius:8px;margin:6px 0}.ck.good{background:#e3f6e5}.ck.mid{background:#fff4d6}.ck.bad{background:#fde2e2}
-.tw{overflow:auto;max-height:70vh;border:1px solid #ddd;background:#fff;-webkit-overflow-scrolling:touch}
+.tw{overflow:auto;max-height:calc(100vh - 140px);max-height:calc(100dvh - 140px);border:1px solid #ddd;background:#fff;-webkit-overflow-scrolling:touch}
 table.grid{border-collapse:separate;border-spacing:0;font-size:12.5px}
 .grid th,.grid td{border-right:1px solid #e3e3e3;border-bottom:1px solid #e3e3e3;padding:2px;text-align:center;min-width:40px;height:34px}
 .grid thead th{position:sticky;top:0;background:#f0f0f0;z-index:2}.grid .nm{position:sticky;left:0;background:#fff;z-index:1;min-width:86px;text-align:left}
@@ -50,6 +50,7 @@ body:not(.printing) header,body:not(.printing) nav,body:not(.printing) .acts{dis
 .pp td.off{background:#e6e6e6;font-style:italic;letter-spacing:-.6px;padding:0}.pp td.ou{background:repeating-linear-gradient(45deg,#fff 0 2px,#ddd 2px 4px)}.pp td.hp{font-weight:bold;border:1.2pt dashed #000}
 .pp td{height:var(--rh,5mm)}.pp tr.sum td{font-weight:bold;border-top:1.5pt solid #000}.pp .lg{font-size:7pt;margin-top:1.5mm;white-space:normal;overflow-wrap:anywhere}
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@media(orientation:landscape) and (max-height:430px){header{position:static}body nav button{min-height:44px;padding:4px 0}.tw{max-height:calc(100vh - 70px);max-height:calc(100dvh - 70px)}}
 </style></head><body><div id="nojs" style="margin:16px;padding:20px;border:4px solid #d00;border-radius:12px;background:#fff4f4;color:#900;font-size:22px;line-height:1.6;font-weight:bold">この画面のままなら、プレビューでは動きません。<br>共有ボタンから『Safariで開く』か『ファイルに保存』してから開いてください。</div><div id="errbox" style="display:none;margin:8px;padding:10px;background:#ffe0e0;color:#900;border:2px solid #d00;font-size:13px;white-space:pre-wrap;word-break:break-all"></div><div id="memband" style="display:none;padding:8px 12px;background:#fff3b0;color:#640;font-size:14px;font-weight:bold">この開き方では保存できません。JSON書き出しで控えをとってください</div>
 <script>function showErr(m){if(String(m).includes('印刷する職員がいません')){try{closeM();}catch(e){}toast('印刷する職員がいません');return;}try{var e=document.getElementById('errbox');e.style.display='block';e.textContent+='エラー: '+m+'\n';}catch(_){}}
 window.onerror=function(msg,src,l,c,err){showErr(msg+' (行'+l+':'+c+')'+(err&&err.stack?'\n'+err.stack:''));};
@@ -207,14 +208,14 @@ function oneTrial(y,m,R){
    const cands=shuffle(staff.filter(s=>s.kind==='常勤'&&s.satOK&&(s.dept===dep.id||s.help.includes(dep.id))&&!res[s.id][di.d].lock&&satC[s.id]<satCapOf(s,days)),R)
     .sort((a,b)=>(a.dept===dep.id?0:1)-(b.dept===dep.id?0:1)||satC[a.id]/Math.max(a.satRate||0.3,0.2)-satC[b.id]/Math.max(b.satRate||0.3,0.2)||((b.helpW||{})[dep.id]||0)-((a.helpW||{})[dep.id]||0));
    for(const s of cands){if(need<=0)break;res[s.id][di.d]=s.dept===dep.id?{c:primaryCode(s),n:''}:{c:dep.name,n:'ヘルプ',dp:dep.id};satC[s.id]++;need--;}}}
- // 2b 前月末からの連勤：月初めの上限内に休みを確保
- for(const s of staff){const c=carry[s.id]||0;if(!c)continue;const k=Math.min(n,Math.max(1,ST.rules.maxRun-c+1));let has=false;for(let d=1;d<=k;d++)if(!isWork(res[s.id][d].c)){has=true;break;}if(has)continue;
-  const cand=[];for(let d=1;d<=k;d++)if(!res[s.id][d].lock)cand.push(d);if(!cand.length)continue;cand.sort((p,q)=>restScore(s,q)-restScore(s,p));res[s.id][cand[0]]={c:s.kind==='常勤'?'休':'',n:'',lock:true,cr:1};}
  // 3 平日公休の配置(常勤)
  const offCount=s=>Object.values(res[s.id]).filter(v=>KOUKYU.includes(v.c)||(v.c==='代休'&&v.furiOf)).length;
  const canRest=(s,d)=>{const v=res[s.id][d],di=days[d-1];return v&&!v.lock&&isWork(v.c)&&di.w!==6&&di.w!==0&&!attendDay(s,d);};
  const runAt=(s,d)=>{let a=0,b=0;for(let i=d-1;i>=1&&isWork(res[s.id][i].c);i--)a++;if(d-1-a<1)a+=carry[s.id];for(let i=d+1;i<=n&&isWork(res[s.id][i].c);i++)b++;return a+b+1;};
  const restScore=(s,d)=>{const v=res[s.id][d];const dep=cellDept(v,s)||deptById(s.dept);return surplus(dep.id,days[d-1].d)*3+Math.min(runAt(s,d),9)+((s.restW||[])[days[d-1].w]||0)*6+R()*1.5;};
+ // 2b 前月末からの連勤：月初めの上限内に休みを確保
+ for(const s of staff){const c=carry[s.id]||0;if(!c)continue;const k=Math.min(n,Math.max(1,ST.rules.maxRun-c+1));let has=false;for(let d=1;d<=k;d++)if(!isWork(res[s.id][d].c)){has=true;break;}if(has)continue;
+  const cand=[];for(let d=1;d<=k;d++)if(!res[s.id][d].lock)cand.push(d);if(!cand.length)continue;cand.sort((p,q)=>restScore(s,q)-restScore(s,p));res[s.id][cand[0]]={c:s.kind==='常勤'?'休':'',n:'',lock:true,cr:1};}
  for(const s of shuffle(staff.filter(s=>s.kind==='常勤'),R)){const Ts=koukyuT(s,y,m);
   // 土曜出勤の代休(同週の平日)
   for(const di of days){if(di.w!==6||!isWork(res[s.id][di.d].c)||offCount(s)>=Ts)continue;
@@ -271,7 +272,7 @@ function oneTrial(y,m,R){
 function checks(y,m,res){const days=dayInfos(y,m),n=days.length,T=satCountTarget(y,m),carry=prevCarry(y,m),mdays=meetingDays(y,m);
  const list=[];let err=0,warn=0;const E=(msg,sid,d)=>{list.push({lv:'err',msg,sid,d});err++;};const W=(msg,sid,d)=>{list.push({lv:'warn',msg,sid,d});warn++;};const I=(msg,sid,d)=>{list.push({lv:'info',msg,sid,d});};
  const per={};const sats=[];
- for(const s of ST.staff){const r=res[s.id];if(!r)continue;if(!empIn(s,y,m))continue;const Ts=koukyuT(s,y,m),fu=(monthObj(y,m).furi||{})[s.id]||{};let e7=0,off=0,yu=0,work=0,run=carry[s.id],mx=run,sat=0;
+ for(const s of ST.staff){const r=res[s.id];if(!r)continue;if(!empIn(s,y,m))continue;const Ts=koukyuT(s,y,m),fu=(monthObj(y,m).furi||{})[s.id]||{};let e7=0,off=0,yu=0,work=0,run=carry[s.id],mx=run,sat=0;if(run>=ST.rules.maxRun+1)W(`${s.name}: 前月から含めて${run}連勤（前月末までの分）`,s.id,1);
   for(const di of days){const v=r[di.d]||{c:''};if(KOUKYU.includes(v.c)||(v.c==='代休'&&v.furiOf))off++;if(['有給','特休','夏季','リフ','代休'].includes(v.c)&&!v.furiOf)yu++;
    if(isWork(v.c)){work++;run++;if(run>mx)mx=run;if(di.w===6)sat++;
     if(run===ST.rules.maxRun+1)W(`${s.name}: ${ST.rules.maxRun+1}連勤`,s.id,di.d);
@@ -281,7 +282,7 @@ function checks(y,m,res){const days=dayInfos(y,m),n=days.length,T=satCountTarget
     if(di.closed)W(`${s.name}: 休所日に出勤`,s.id,di.d);
    }else run=0;}
   if(s.kind==='常勤'){const lk=days.filter(di=>{const v=r[di.d]||{};return v.lock&&KOUKYU.includes(v.c)&&di.w>=1&&di.w<=6;}).length;if(Ts!==T&&off===Ts)I(`${s.name}: 公休目標 ${Ts}日（定休日・入退職・休職を反映。月の標準は${T}日）`,s.id,null);const cyx=(carry[s.id]||0)?(()=>{const k=Math.min(n,Math.max(1,ST.rules.maxRun-carry[s.id]+1));for(let d=1;d<=k;d++){const v=r[d]||{};if(!isWork(v.c))return KOUKYU.includes(v.c)&&days[d-1].w>=1&&days[d-1].w<=5?1:0;}return 0;})():0;
-  if(off<Ts||(off>Ts&&off-lk-cyx>Ts))E(`${s.name}: 公休 ${off}/${Ts}日`,s.id,null);else if(off>Ts)I(`${s.name}: 公休 ${off}/${Ts}日（${cyx&&off-lk<=Ts+1&&off-lk>Ts?'前月末からの連勤のため月初めに休み':'希休入力'}により目標より多い）`,s.id,null);if(s.satOK)sats.push(sat);if(sat>satCapOf(s,days))W(`${s.name}: 土曜出勤 ${sat}回(上限${satCapOf(s,days)})`,s.id,null);}
+  if(off<Ts||(off>Ts&&off-lk-cyx>Ts))E(`${s.name}: 公休 ${off}/${Ts}日`,s.id,null);else if(off>Ts)I(`${s.name}: 公休 ${off}/${Ts}日（${cyx&&off-lk<=Ts+1&&off-lk>Ts?'前月末からの連勤を防ぐため、月初めに休みを1日足しました':'希休入力により目標より多い'}）`,s.id,null);if(s.satOK)sats.push(sat);if(sat>satCapOf(s,days))W(`${s.name}: 土曜出勤 ${sat}回(上限${satCapOf(s,days)})`,s.id,null);}
   per[s.id]={off,yu,work,mx,sat};}
  const daily={};
  for(const di of days){const d=di.d;daily[d]={};
@@ -350,7 +351,7 @@ function closeM(){$('#modal').classList.remove('on');$('#modal').innerHTML='';}
 function rSum(){const{y,m}=ST.cur,mo=curMo(),days=dayInfos(y,m);let h=monthBar();if(!mo.res)return h+'<p class="hint">まだ作成されていません。</p>';
  const ck=checks(y,m,mo.res);
  h+=`<h3>警告・違反（${ck.err}／${ck.warn}）</h3><ul class="ck-list">${ck.list.length?ck.list.map(x=>`<li class="${x.lv}">${x.lv==='err'?'⛔':'⚠'} ${esc(x.msg)}</li>`).join(''):'<li>問題はありません</li>'}</ul>`;
- h+=`<h3>個人集計</h3><div class="tw"><table class="tb"><tr><th>名前</th><th>区分</th><th>公休</th><th>休暇</th><th>出勤</th><th>最大連勤</th><th>土曜</th></tr>${staffOrdered().map(s=>{const p=ck.per[s.id]||{};return `<tr><td>${esc(s.name)}</td><td>${s.kind}</td><td class="${s.kind==='常勤'&&p.off!==koukyuT(s,ST.cur.y,ST.cur.m)?'red':''}">${p.off}</td><td>${p.yu}</td><td>${p.work}</td><td class="${p.mx>ST.rules.maxRun+1?'red':p.mx>ST.rules.maxRun?'org':''}">${p.mx}</td><td>${p.sat}</td></tr>`;}).join('')}</table></div>`;
+ h+=`<h3>個人集計</h3><div class="tw"><table class="tb"><tr><th>名前</th><th>区分</th><th>公休</th><th>休暇</th><th>出勤</th><th>最大連勤</th><th>土曜</th></tr>${staffOrdered().map(s=>{const p=ck.per[s.id]||{};return `<tr><td>${esc(s.name)}</td><td>${s.kind}</td><td class="${s.kind==='常勤'&&ck.list.some(x=>x.lv==='err'&&x.sid===s.id&&x.msg.includes(': 公休 '))?'red':''}">${p.off}</td><td>${p.yu}</td><td>${p.work}</td><td class="${p.mx>ST.rules.maxRun+1?'red':p.mx>ST.rules.maxRun?'org':''}">${p.mx}</td><td>${p.sat}</td></tr>`;}).join('')}</table></div>`;
  h+=`<h3>日ごと部署別人数（実数/必要）</h3><div class="tw"><table class="tb"><tr><th>日</th>${ST.depts.map(d=>`<th style="background:${d.color}">${esc(d.name)}</th>`).join('')}</tr>${days.map(di=>`<tr><td class="${di.w===0?'sun':di.w===6?'sat':''}">${di.d}${WD[di.w]}${di.h?'祝':''}${di.closed?'休所':''}</td>${ST.depts.map(d=>{const x=ck.daily[di.d][d.id];return `<td class="${x.c<x.rq?'red':''}">${x.c}/${x.rq}</td>`;}).join('')}</tr>`).join('')}</table></div>`;
  return h;}
 
@@ -614,6 +615,8 @@ function whyShort(y,m,d,dep,res){const di=dayInfos(y,m)[d-1],mo=curMo(),rq=deptR
  const able=ST.staff.filter(s=>(s.dept===dep.id||s.help.includes(dep.id))&&!reqOff(s)&&(s.kind==='常勤'?di.w!==0:s.fixed.includes(di.w)));
  const ro=ST.staff.filter(s=>s.dept===dep.id&&reqOff(s)).length;
  if(able.length<rq)return `この日に出勤できる人が${able.length}人しかいないため（希望休など${ro}人）。必要人数を下げるか、ヘルプ可能な人を登録してください`;
+ const aw=ST.staff.filter(s=>{const v=(res[s.id]||{})[d];return v&&AWAY.includes(v.c)&&(v.dp?deptById(v.dp)===dep:s.dept===dep.id);});
+ if(aw.length)return `研修・出張で${aw.length}人が抜けたため（研修・出張は人数に数えません）。下の候補で他の日の休みと入れ替えられます`;
  return `公休（月${satCountTarget(y,m)}日）の配置で足りなくなりました。下の候補で他の日の休みと入れ替えられます`;}
 let SUG=[];
 function suggestFor(y,m,d,dep){const res=curMo().res,days=dayInfos(y,m),di=days[d-1],out=[];
@@ -644,7 +647,7 @@ function rSum(){const{y,m}=ST.cur,mo=curMo(),days=dayInfos(y,m);let h=monthBar()
  if(!ck.list.length)h+='<p>問題はありません 👍</p>';
  const fair=fairness(y,m,mo.res);
  h+=`<h3>公平性（常勤）</h3><p class="hint">土曜出勤 ${fair.satMin}〜${fair.satMax}回 ／ 応援 ${fair.helpMin}〜${fair.helpMax}回 ／ 最大連勤 ${fair.runMax}日</p>`;
- h+=`<h3>個人集計</h3><div class="tw"><table class="tb"><tr><th>名前</th><th>区分</th><th>公休</th><th>休暇</th><th>出勤</th><th>最大連勤</th><th>土曜</th><th>応援</th></tr>${staffOrdered().map(s=>{const p=ck.per[s.id]||{};return `<tr><td>${esc(s.name)}</td><td>${s.kind}</td><td class="${s.kind==='常勤'&&p.off!==koukyuT(s,ST.cur.y,ST.cur.m)?'red':''}">${p.off}</td><td>${p.yu}</td><td>${p.work}</td><td class="${p.mx>ST.rules.maxRun+1?'red':p.mx>ST.rules.maxRun?'org':''}">${p.mx}</td><td>${p.sat}</td><td>${fair.help[s.id]||0}</td></tr>`;}).join('')}</table></div>`;
+ h+=`<h3>個人集計</h3><div class="tw"><table class="tb"><tr><th>名前</th><th>区分</th><th>公休</th><th>休暇</th><th>出勤</th><th>最大連勤</th><th>土曜</th><th>応援</th></tr>${staffOrdered().map(s=>{const p=ck.per[s.id]||{};return `<tr><td>${esc(s.name)}</td><td>${s.kind}</td><td class="${s.kind==='常勤'&&ck.list.some(x=>x.lv==='err'&&x.sid===s.id&&x.msg.includes(': 公休 '))?'red':''}">${p.off}</td><td>${p.yu}</td><td>${p.work}</td><td class="${p.mx>ST.rules.maxRun+1?'red':p.mx>ST.rules.maxRun?'org':''}">${p.mx}</td><td>${p.sat}</td><td>${fair.help[s.id]||0}</td></tr>`;}).join('')}</table></div>`;
  h+=`<h3>日ごと部署別人数（実数/必要）</h3><div class="tw"><table class="tb"><tr><th>日</th>${ST.depts.map(d=>`<th style="background:${d.color}">${esc(d.name)}</th>`).join('')}</tr>${days.map(di=>`<tr><td class="${di.w===0?'sun':di.w===6?'sat':''}">${di.d}${WD[di.w]}${di.h?'祝':''}${di.closed?'休所':''}</td>${ST.depts.map(d=>{const x=ck.daily[di.d][d.id];return `<td class="${x.c<x.rq?'red':''}">${x.c}/${x.rq}</td>`;}).join('')}</tr>`).join('')}</table></div>`;
  return h;}
 function fairness(y,m,res){const days=dayInfos(y,m);const help={};const sats=[],hs=[];let runMax=0;
@@ -669,7 +672,7 @@ function bulkReq(){const BR=['希休','有給','特休','夏季','リフ','代�
 function applyBulk(next){const{y,m}=ST.cur,n=dim(y,m),mo=curMo();const sid=$('#b_s').value,t=$('#b_t').value;const ds=new Set(parseDays($('#b_d').value,n));
  const ws=[...document.querySelectorAll('.b_w')].filter(x=>x.checked).map(x=>+x.value);dayInfos(y,m).forEach(di=>{if(ws.includes(di.w))ds.add(di.d);});
  if(!ds.size)return alert('日付か曜日を入力してください');mo.req[sid]=mo.req[sid]||{};for(const d of ds){if(t==='消去')delete mo.req[sid][d];else mo.req[sid][d]=t;}save();render();toast(`${ds.size}日を入力しました`);
- if(next){const i=staffOrdered().findIndex(s=>s.id===sid);bulkReq();const nx=staffOrdered()[i+1];if(nx)$('#b_s').value=nx.id;$('#b_t').value=t;}else closeM();}
+ if(next){const i=staffOrdered().findIndex(s=>s.id===sid),pd=$('#b_d').value,pw=ws;bulkReq();$('#b_d').value=pd;document.querySelectorAll('.b_w').forEach(x=>{x.checked=pw.includes(+x.value)});const nx=staffOrdered()[i+1];if(nx)$('#b_s').value=nx.id;$('#b_t').value=t;}else closeM();}
 /* バックアップ */
 function exportJson(prefix){download((prefix||'shift_backup_')+ymdLocal()+'.json',new Blob([JSON.stringify(ST)],{type:'application/json'}));if(!prefix){ST.lastBackup=Date.now();save();render();}}
 function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{let s;try{s=JSON.parse(r.result);}catch(e){inp.value='';return alert('JSONとして読めませんでした。ファイルを確認してください');}
@@ -721,7 +724,7 @@ async function makePdfFile(only){const{y,m}=ST.cur;const imgs=[];let cvs=[];
  for(const cv of cvs){imgs.push({w:cv.width,h:cv.height,d:await jpegOf(cv)});await new Promise(r=>setTimeout(r,0));}
  if(!imgs.length)throw new Error('印刷する職員がいません');const dn=only==='__person'?'個人別':only?(deptById(only)||{}).name:'全事業所';
  return {name:`シフト表_${y}年${m}月_${dn}.pdf`,blob:new Blob([makePdf(imgs)],{type:'application/pdf'}),pages:imgs.length};}
-async function printPersons(){const{y,m}=ST.cur;const cvs=await personPages(y,m);const pv=$('#printview');pv.innerHTML=cvs.map(cv=>`<section class="pp"><img src="${cv.toDataURL('image/jpeg',0.85)}" style="width:283mm;height:auto;display:block"></section>`).join('');
+async function printPersons(){const{y,m}=ST.cur;const cvs=await personPages(y,m);const pv=$('#printview');pv.innerHTML=cvs.map(cv=>`<section class="pp"><img src="${cv.toDataURL('image/jpeg',0.85)}" style="width:auto;height:auto;max-width:283mm;max-height:195mm;display:block;margin:0 auto"></section>`).join('');
  document.body.classList.add('printing');const done=()=>{document.body.classList.remove('printing');pv.innerHTML='';window.removeEventListener('afterprint',done);};window.addEventListener('afterprint',done);
  setTimeout(()=>{try{window.print();}catch(e){showErr(e.message);}setTimeout(()=>{if(!matchMedia('print').matches)done();},1500);},120);}
 function shortOff(t){return String(t).replace(/^対象外$/,'－').replace(/^定休$/,'定').replace(/^希休/,'希').replace(/^有給/,'有').replace(/^特休/,'特').replace(/^夏季/,'夏').replace(/^リフ/,'リ').replace(/^代休/,'代').replace(/^休所/,'所');}
