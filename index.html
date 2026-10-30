@@ -36,11 +36,22 @@ h3{font-size:14px;margin:14px 0 6px;padding:4px 6px;border-radius:4px}
 #modal{display:none;position:fixed;inset:0;background:#0006;z-index:10;align-items:flex-end;justify-content:center}#modal.on{display:flex}
 .mb{background:#fff;width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:14px 14px 0 0;padding:14px}
 #toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 14px;border-radius:20px;opacity:0;transition:.3s;z-index:20;pointer-events:none}#toast.on{opacity:.95}
-@media print{header,nav,.acts,.bar button,.hint,.ck{display:none!important}body{padding:0;background:#fff}.tw{max-height:none;overflow:visible;border:0}.grid th,.grid td{min-width:0;font-size:8px;height:auto}.grid .nm{position:static}@page{size:A3 landscape;margin:6mm}}
+#printview{display:none}
+@page{size:A4 landscape;margin:7mm}
+@media print{body.printing>*:not(#printview){display:none!important}body.printing{padding:0!important;margin:0;background:#fff}body.printing #printview{display:block}
+body:not(.printing) header,body:not(.printing) nav,body:not(.printing) .acts{display:none!important}}
+.pp{page-break-after:always;break-after:page;width:283mm;font-family:sans-serif;color:#000}.pp:last-child{page-break-after:auto;break-after:auto}
+.pp h2{font-size:13pt;margin:0 0 2mm}.pp table{width:100%;border-collapse:collapse;table-layout:fixed}
+.pp th,.pp td{border:.5pt solid #000;padding:0 1px;text-align:center;overflow:hidden;white-space:nowrap;line-height:1.25;font-size:var(--pf,7.5pt)}
+.pp .pn{width:26mm;text-align:left;font-size:var(--pn,7.5pt)}.pp .pk{width:9mm}
+.pp th{font-weight:bold;background:#fff}.pp .sat{color:#0645ad;background:#e4ecfa;text-decoration:underline}.pp .sun{color:#c00;background:#fbe3e3;font-weight:900;text-decoration:underline double}
+.pp td.off{background:#e6e6e6;font-style:italic}.pp td.ou{background:repeating-linear-gradient(45deg,#fff 0 2px,#ddd 2px 4px)}.pp td.hp{font-weight:bold;border:1.2pt dashed #000}
+.pp td{height:var(--rh,5mm)}.pp tr.sum td{font-weight:bold;border-top:1.5pt solid #000}.pp .lg{font-size:7pt;margin-top:1.5mm}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 </style></head><body><div id="nojs" style="margin:16px;padding:20px;border:4px solid #d00;border-radius:12px;background:#fff4f4;color:#900;font-size:22px;line-height:1.6;font-weight:bold">この画面のままなら、プレビューでは動きません。<br>共有ボタンから『Safariで開く』か『ファイルに保存』してから開いてください。</div><div id="errbox" style="display:none;margin:8px;padding:10px;background:#ffe0e0;color:#900;border:2px solid #d00;font-size:13px;white-space:pre-wrap;word-break:break-all"></div><div id="memband" style="display:none;padding:8px 12px;background:#fff3b0;color:#640;font-size:14px;font-weight:bold">この開き方では保存できません。JSON書き出しで控えをとってください</div>
 <script>function showErr(m){try{var e=document.getElementById('errbox');e.style.display='block';e.textContent+='エラー: '+m+'\n';}catch(_){}}
 window.onerror=function(msg,src,l,c,err){showErr(msg+' (行'+l+':'+c+')'+(err&&err.stack?'\n'+err.stack:''));};
-window.addEventListener('unhandledrejection',function(e){showErr(String(e.reason));});</script><header>シフト自動作成</header><main id="main"></main>
+window.addEventListener('unhandledrejection',function(e){showErr(String(e.reason));});</script><header>シフト自動作成</header><main id="main"></main><div id="printview"></div>
 <nav><button data-t="shift">シフト表</button><button data-t="sum">集計</button><button data-t="req">希望休</button><button data-t="month">月設定</button><button data-t="dept">部署</button><button data-t="staff">スタッフ</button><button data-t="data">保存</button></nav>
 <div id="modal" onclick="if(event.target===this)closeM()"></div><div id="toast"></div>
 <script>/* 最小XLSX書き出し(無圧縮ZIP・スタイル対応) */
@@ -291,7 +302,7 @@ function render(){const el=$('#main');const f={shift:rShift,sum:rSum,req:rReq,mo
 
 /* --- シフト表 --- */
 function rShift(){if(!ST.staff.length)return `<div style="margin:20px 8px;padding:22px;border:3px solid #2f5d8a;border-radius:12px;background:#eef4fb;text-align:center;font-size:18px;line-height:1.6"><b>職員データがまだありません</b><br>保存タブの『データ読み込み』でデータファイルを選んでください<br><label class="btn pri" style="display:inline-block;margin-top:14px;padding:14px 22px;font-size:18px">データ読み込み<input type="file" onchange="importJson(this)" hidden></label></div>`;const{y,m}=ST.cur,mo=curMo(),days=dayInfos(y,m);
- let h=monthBar()+`<div class="acts"><button class="pri" onclick="runGen()">⚙ 自動作成</button><button onclick="exportXlsx()">Excel出力</button><button onclick="window.print()">印刷</button>${mo.res?'<button onclick="clearRes()">結果を消去</button>':''}</div>`;
+ let h=monthBar()+`<div class="acts"><button class="pri" onclick="runGen()">⚙ 自動作成</button><button onclick="exportXlsx()">Excel出力</button></div><div class="acts">${printOpts()}${mo.res?'<button onclick="clearRes()">結果を消去</button>':''}</div>`;
  if(!mo.res)return h+`<p class="hint">「自動作成」を押すと、この月のシフトを作成します（希休などは「希望休」タブで先に入力）。</p>`;
  const ck=checks(y,m,mo.res);
  h+=`<div class="ck ${ck.err?'bad':ck.warn?'mid':'good'}">必須違反 <b>${ck.err}</b> ／ 警告 <b>${ck.warn}</b>（公休目標 ${ck.T}日） <a href="#" onclick="setTab('sum');return false">詳細</a></div>`;
@@ -440,6 +451,32 @@ function fallbackOut(blob,y,m){let url='';try{url=URL.createObjectURL(blob);}cat
  $('#modal').innerHTML=`<div class="mb"><h3>Excel出力</h3><p class="hint">自動で保存できませんでした。</p><div class="acts">${url?`<a class="btn" href="${url}" target="_blank" rel="noopener">新しいタブで開く</a>`:''}<button class="pri" onclick="copyCSV(${y},${m})">CSVをコピー</button><button onclick="closeM()">閉じる</button></div><textarea id="csvbox" style="width:100%;height:120px;display:none"></textarea></div>`;$('#modal').classList.add('on');}
 async function copyCSV(y,m){const t=toCSV(y,m);try{await navigator.clipboard.writeText(t);toast('CSVをコピーしました');}catch(e){const a=$('#csvbox');a.style.display='block';a.value=t;a.select();try{document.execCommand('copy');toast('CSVをコピーしました');}catch(_){toast('表示されたCSVを長押ししてコピーしてください');}}}
 
+
+function printOpts(){return `<select id="psel" style="padding:6px;font-size:14px"><option value="">全事業所（事業所ごとに改ページ）</option>${ST.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}</select><button class="pri" onclick="doPrint($('#psel').value)">🖨 印刷</button>`;}
+function buildPrint(y,m,only){const mo=curMo(),res=mo.res,days=dayInfos(y,m),n=days.length;
+ const cls=di=>di.w===0||di.h?'sun':di.w===6?'sat':'';let H='';
+ for(const dep of ST.depts){if(only&&dep.id!==only)continue;
+  const home=ST.staff.filter(s=>s.dept===dep.id);const hp=ST.staff.filter(s=>s.dept!==dep.id&&res&&days.some(di=>{const v=res[s.id][di.d];return v&&cellDept(v,s)===dep;}));
+  if(!home.length&&!hp.length)continue;const rows=home.length+hp.length;
+  const pf=rows>24?'6pt':rows>18?'6.8pt':'7.5pt';
+  H+=`<section class="pp" style="--pf:${pf};--pn:${pf};--rh:${Math.min(9,Math.floor(150/(rows+3)*10)/10)}mm"><h2>${ST.corp?esc(ST.corp)+'　':''}${esc(dep.name)}　${y}年${m}月 シフト表</h2><table><colgroup><col class="pn" style="width:26mm"><col style="width:9mm">${days.map(()=>'<col>').join('')}</colgroup>
+  <tr><th class="pn" rowspan="2">氏名</th><th class="pk" rowspan="2">区分</th>${days.map(di=>`<th class="${cls(di)}">${di.d}</th>`).join('')}</tr>
+  <tr>${days.map(di=>`<th class="${cls(di)}">${WD[di.w]}${di.h?'<br>祝':''}</th>`).join('')}</tr>`;
+  const cnt=Array(n+1).fill(0);
+  const row=(s,isHelp)=>{const num=res?numbered(res,s,y,m):{};let r=`<tr><td class="pn">${isHelp?'【応援】':''}${esc(s.name)}</td><td class="pk">${esc(s.kind==='常勤'?'常':'非')}</td>`;
+   for(const di of days){const v=res?(res[s.id][di.d]||{c:''}):{c:''};const cd=cellDept(v,s);let t='',c='';
+    if(isHelp){if(cd===dep){t='応'+(v.c===dep.name?'':v.c);c='hp';cnt[di.d]++;}else{c='ou';}}
+    else if(isWork(v.c)){if(cd&&cd!==dep){t='→'+cd.name;c='ou';}else{t=num[di.d];cnt[di.d]++;if(v.n==='ヘルプ')c='hp';}}
+    else{t=num[di.d]||'';c=v.c?'off':'';}
+    r+=`<td class="${c}">${esc(t)}</td>`;}return r+'</tr>';};
+  for(const s of home)H+=row(s,false);for(const s of hp)H+=row(s,true);
+  H+=`<tr class="sum"><td class="pn" colspan="2">出勤人数</td>${days.map(di=>`<td>${cnt[di.d]}</td>`).join('')}</tr></table>
+  <div class="lg">凡例：灰色・斜体＝休み（公休①②…／有給／希休など）　【応援】行・点線枠＝他事業所からの応援　→○○＝他事業所へ応援　青・下線＝土曜　赤・二重下線＝日曜・祝日</div></section>`;}
+ return H||'<p>印刷する職員がいません</p>';}
+function doPrint(only){const{y,m}=ST.cur;if(!curMo().res&&!confirm('まだ自動作成していません。空の表を印刷しますか？'))return;
+ const pv=$('#printview');pv.innerHTML=buildPrint(y,m,only);document.body.classList.add('printing');
+ const done=()=>{document.body.classList.remove('printing');pv.innerHTML='';window.removeEventListener('afterprint',done);};
+ window.addEventListener('afterprint',done);setTimeout(()=>{try{window.print();}catch(e){showErr(e.message);}setTimeout(()=>{if(!matchMedia('print').matches)done();},1500);},60);}
 /* 起動 */
 function boot(){const nj=document.getElementById('nojs');if(nj)nj.style.display='none';
  setTimeout(()=>{try{load();document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));setTab('shift');if(!LS_OK)document.getElementById('memband').style.display='block';}catch(e){showErr((e&&e.message||e)+(e&&e.stack?'\n'+e.stack:''));}},30);}
