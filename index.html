@@ -40,7 +40,7 @@ h3{font-size:14px;margin:14px 0 6px;padding:4px 6px;border-radius:4px}
 @page{size:A4 landscape;margin:7mm}
 @media print{body.printing>*:not(#printview){display:none!important}body.printing{padding:0!important;margin:0;background:#fff}body.printing #printview{display:block}
 body:not(.printing) header,body:not(.printing) nav,body:not(.printing) .acts{display:none!important}}
-.pp{page-break-after:always;break-after:page;width:283mm;font-family:sans-serif;color:#000}.pp:last-child{page-break-after:auto;break-after:auto}
+.pp{page-break-before:always;break-before:page;width:283mm;font-family:sans-serif;color:#000}.pp:first-child{page-break-before:auto;break-before:auto}
 .pp h2{font-size:13pt;margin:0 0 2mm}.pp table{width:100%;border-collapse:collapse;table-layout:fixed}
 .pp th,.pp td{border:.5pt solid #000;padding:0 1px;text-align:center;overflow:hidden;white-space:nowrap;line-height:1.25;font-size:var(--pf,7.5pt)}
 .pp .pn{width:26mm;text-align:left;font-size:var(--pn,7.5pt)}.pp .pk{width:9mm}
@@ -413,7 +413,7 @@ function rData(){return `<h3>バックアップ</h3><p class="hint">データは
  <h3>このツールのルール（実績から推定）</h3><ul class="hint"><li>個人ごとの傾向（主な勤務表記と割合、土曜頻度、休みやすい曜日、土曜後の代休曜日、ヘルプ先、会議）を重みとして使用</li><li>常勤の公休＝その月の土日数（希休を含む）</li><li>連勤5日まで（6日は警告、7日以上は違反）</li><li>日曜は常勤休み（部署の日曜人数で非常勤のみ）</li><li>非常勤は固定曜日のみ</li><li>土曜は土曜人数が設定された部署のみ。常勤は上限内で均等に、代休は同じ週の平日</li><li>会議日は対象者を出勤に</li><li>ヘルプは登録された組合せのみ、不足時だけ</li></ul>`;}
 function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
 function exportJson(){download('shift_backup_'+new Date().toISOString().slice(0,10)+'.json',new Blob([JSON.stringify(ST)],{type:'application/json'}));}
-function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const s=JSON.parse(r.result);if(s.ver!==1)throw 0;const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur});if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;save();render();toast(ST.staff.length+'人を読み込みました');alert(ST.staff.length+'人を読み込みました');}catch(e){alert('読み込めませんでした');}};r.readAsText(f);}
+function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const s=JSON.parse(r.result);if(s.ver!==1)throw 0;const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur});if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;save();render();toast(ST.staff.length+'人を読み込みました');}catch(e){alert('読み込めませんでした');}};r.readAsText(f);}
 
 /* --- Excel --- */
 function buildWorkbook(y,m){const mo=monthObj(y,m),res=mo.res,days=dayInfos(y,m),n=days.length;
@@ -452,31 +452,103 @@ function fallbackOut(blob,y,m){let url='';try{url=URL.createObjectURL(blob);}cat
 async function copyCSV(y,m){const t=toCSV(y,m);try{await navigator.clipboard.writeText(t);toast('CSVをコピーしました');}catch(e){const a=$('#csvbox');a.style.display='block';a.value=t;a.select();try{document.execCommand('copy');toast('CSVをコピーしました');}catch(_){toast('表示されたCSVを長押ししてコピーしてください');}}}
 
 
-function printOpts(){return `<select id="psel" style="padding:6px;font-size:14px"><option value="">全事業所（事業所ごとに改ページ）</option>${ST.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}</select><button class="pri" onclick="doPrint($('#psel').value)">🖨 印刷</button>`;}
+function deptAbbr(dep){const used={};for(const d of ST.depts){let a=d.short||d.name[0];if(Object.values(used).includes(a))a=d.name.slice(0,2);used[d.id]=a;}return used[dep.id]||dep.name[0];}
+function abbrLegend(){return ST.depts.map(d=>deptAbbr(d)+'＝'+d.name).join('、');}
+function ownMark(v,dep){const N=String(v.c).replace(/[Ａ-Ｚ]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248));const sb=dep.subs.find(q=>N.includes(q.code));return sb?sb.code.slice(-1):'○';}
+function printOpts(){return `<select id="psel" style="padding:6px;font-size:14px"><option value="">全事業所（事業所ごとに改ページ）</option>${ST.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}</select><button onclick="doPrint($('#psel').value)">🖨 印刷</button><button class="pri" onclick="doPdf($('#psel').value)">📄 PDFを作成</button>${IS_IOS?'<small style="width:100%;color:#555">iPhoneは『PDFを作成』が確実です</small>':''}<div id="pdfst" style="width:100%;font-size:13px"></div>`;}
 function buildPrint(y,m,only){const mo=curMo(),res=mo.res,days=dayInfos(y,m),n=days.length;
  const cls=di=>di.w===0||di.h?'sun':di.w===6?'sat':'';let H='';
  for(const dep of ST.depts){if(only&&dep.id!==only)continue;
   const home=ST.staff.filter(s=>s.dept===dep.id);const hp=ST.staff.filter(s=>s.dept!==dep.id&&res&&days.some(di=>{const v=res[s.id][di.d];return v&&cellDept(v,s)===dep;}));
   if(!home.length&&!hp.length)continue;const rows=home.length+hp.length;
-  const pf=rows>24?'6pt':rows>18?'6.8pt':'7.5pt';
-  H+=`<section class="pp" style="--pf:${pf};--pn:${pf};--rh:${Math.min(9,Math.floor(150/(rows+3)*10)/10)}mm"><h2>${ST.corp?esc(ST.corp)+'　':''}${esc(dep.name)}　${y}年${m}月 シフト表</h2><table><colgroup><col class="pn" style="width:26mm"><col style="width:9mm">${days.map(()=>'<col>').join('')}</colgroup>
+  const rhm=Math.min(14,Math.floor(150/(rows+3)*10)/10);const pf=Math.min(8,Math.max(6,rhm*1.15)).toFixed(1)+'pt',pn=Math.min(12,Math.max(6.5,rhm*1.15)).toFixed(1)+'pt';
+  H+=`<section class="pp" style="--pf:${pf};--pn:${pn};--rh:${rhm}mm"><h2>${ST.corp?esc(ST.corp)+'　':''}${esc(dep.name)}　${y}年${m}月 シフト表</h2><table><colgroup><col class="pn" style="width:26mm"><col style="width:9mm">${days.map(()=>'<col>').join('')}</colgroup>
   <tr><th class="pn" rowspan="2">氏名</th><th class="pk" rowspan="2">区分</th>${days.map(di=>`<th class="${cls(di)}">${di.d}</th>`).join('')}</tr>
   <tr>${days.map(di=>`<th class="${cls(di)}">${WD[di.w]}${di.h?'<br>祝':''}</th>`).join('')}</tr>`;
   const cnt=Array(n+1).fill(0);
   const row=(s,isHelp)=>{const num=res?numbered(res,s,y,m):{};let r=`<tr><td class="pn">${isHelp?'【応援】':''}${esc(s.name)}</td><td class="pk">${esc(s.kind==='常勤'?'常':'非')}</td>`;
    for(const di of days){const v=res?(res[s.id][di.d]||{c:''}):{c:''};const cd=cellDept(v,s);let t='',c='';
-    if(isHelp){if(cd===dep){t='応'+(v.c===dep.name?'':v.c);c='hp';cnt[di.d]++;}else{c='ou';}}
-    else if(isWork(v.c)){if(cd&&cd!==dep){t='→'+cd.name;c='ou';}else{t=num[di.d];cnt[di.d]++;if(v.n==='ヘルプ')c='hp';}}
+    if(isHelp){if(cd===dep){t='応'+(isWork(v.c)?(ownMark(v,dep)==='○'?'':ownMark(v,dep)):'');c='hp';cnt[di.d]++;}else{c='ou';}}
+    else if(isWork(v.c)){if(cd&&cd!==dep){t='→'+deptAbbr(cd);c='ou';}else{t=ownMark(v,dep);cnt[di.d]++;if(v.n==='ヘルプ')c='hp';}}
     else{t=num[di.d]||'';c=v.c?'off':'';}
-    r+=`<td class="${c}">${esc(t)}</td>`;}return r+'</tr>';};
+    r+=`<td class="${c}"${t.length>=2?' style="font-size:.78em;letter-spacing:-.5px"':''}>${esc(t)}</td>`;}return r+'</tr>';};
   for(const s of home)H+=row(s,false);for(const s of hp)H+=row(s,true);
   H+=`<tr class="sum"><td class="pn" colspan="2">出勤人数</td>${days.map(di=>`<td>${cnt[di.d]}</td>`).join('')}</tr></table>
-  <div class="lg">凡例：灰色・斜体＝休み（公休①②…／有給／希休など）　【応援】行・点線枠＝他事業所からの応援　→○○＝他事業所へ応援　青・下線＝土曜　赤・二重下線＝日曜・祝日</div></section>`;}
+  <div class="lg">凡例：○＝出勤（A・B等＝班）　灰色・斜体＝休み（公休①②…／有給／希休など）　【応援】行・点線枠・応＝他事業所からの応援　→略称＝他事業所へ応援（${esc(abbrLegend())}）　青・下線＝土曜　赤・二重下線＝日曜・祝日</div></section>`;}
  return H||'<p>印刷する職員がいません</p>';}
-function doPrint(only){const{y,m}=ST.cur;if(!curMo().res&&!confirm('まだ自動作成していません。空の表を印刷しますか？'))return;
+function doPrint(only){if(IS_IOS&&IS_SA){if(confirm('ホーム画面から開いたアプリでは印刷画面が開かないことがあります。PDFを作成しますか？'))doPdf(only);return;}const{y,m}=ST.cur;if(!curMo().res&&!confirm('まだ自動作成していません。空の表を印刷しますか？'))return;
  const pv=$('#printview');pv.innerHTML=buildPrint(y,m,only);document.body.classList.add('printing');
  const done=()=>{document.body.classList.remove('printing');pv.innerHTML='';window.removeEventListener('afterprint',done);};
  window.addEventListener('afterprint',done);setTimeout(()=>{try{window.print();}catch(e){showErr(e.message);}setTimeout(()=>{if(!matchMedia('print').matches)done();},1500);},60);}
+
+const IS_IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const IS_SA=!!(window.navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches));
+function printModel(y,m,dep){const res=curMo().res,days=dayInfos(y,m),n=days.length;
+ const home=ST.staff.filter(s=>s.dept===dep.id);const hp=ST.staff.filter(s=>s.dept!==dep.id&&res&&days.some(di=>{const v=res[s.id][di.d];return v&&cellDept(v,s)===dep;}));
+ if(!home.length&&!hp.length)return null;const cnt=Array(n+1).fill(0);const rows=[];
+ const row=(s,isHelp)=>{const num=res?numbered(res,s,y,m):{};const cells=[];
+  for(const di of days){const v=res?(res[s.id][di.d]||{c:''}):{c:''};const cd=cellDept(v,s);let t='',c='';
+   if(isHelp){if(cd===dep){t='応'+(isWork(v.c)?(ownMark(v,dep)==='○'?'':ownMark(v,dep)):'');c='hp';cnt[di.d]++;}else c='ou';}
+   else if(isWork(v.c)){if(cd&&cd!==dep){t='→'+deptAbbr(cd);c='ou';}else{t=ownMark(v,dep);cnt[di.d]++;if(v.n==='ヘルプ')c='hp';}}
+   else{t=num[di.d]||'';c=v.c?'off':'';}cells.push({t:String(t??''),c});}
+  rows.push({name:(isHelp?'【応援】':'')+s.name,kind:s.kind==='常勤'?'常':'非',cells});};
+ home.forEach(s=>row(s,false));hp.forEach(s=>row(s,true));
+ return {title:`${ST.corp?ST.corp+'　':''}${dep.name}　${y}年${m}月 シフト表`,days,rows,cnt};}
+function drawPage(md){const W=2400,H=1697,M=60,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+ const F='"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Noto Sans CJK JP","Yu Gothic",Meiryo,sans-serif';
+ g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle='#000';g.textBaseline='middle';
+ g.font=`bold 46px ${F}`;g.fillText(md.title,M,M+20);
+ const n=md.days.length,nw=300,kw=70,top=M+70,legH=90,dw=(W-2*M-nw-kw)/n,hh=50;
+ const rh=Math.min(150,(H-top-2*hh-legH-M)/(md.rows.length+1));
+ const fit=(t,x,y,w,size,bold,col,align)=>{let s=size;g.font=`${bold?'bold ':''}${s}px ${F}`;while(s>10&&g.measureText(t).width>w-6){s--;g.font=`${bold?'bold ':''}${s}px ${F}`;}
+  g.fillStyle=col||'#000';g.textAlign=align||'center';const tx=align==='left'?x+6:x+w/2;g.fillText(t,tx,y);return g.measureText(t).width;};
+ const cls=di=>di.w===0||di.h?'sun':di.w===6?'sat':'';const X=i=>M+nw+kw+i*dw;
+ const fs=Math.max(16,Math.min(44,rh*0.5));
+ // header
+ for(let r=0;r<2;r++){const y0=top+r*hh;
+  md.days.forEach((di,i)=>{const c=cls(di);if(c){g.fillStyle=c==='sun'?'#fbe3e3':'#e4ecfa';g.fillRect(X(i),y0,dw,hh);}
+   const t=r?WD[di.w]+(di.h?'祝':''):String(di.d);const col=c==='sun'?'#c00':c==='sat'?'#0645ad':'#000';const w=fit(t,X(i),y0+hh/2,dw,26,true,col);
+   if(c){g.strokeStyle=col;g.lineWidth=2;const ux=X(i)+dw/2-w/2,uy=y0+hh/2+15;g.beginPath();g.moveTo(ux,uy);g.lineTo(ux+w,uy);if(c==='sun'){g.moveTo(ux,uy+5);g.lineTo(ux+w,uy+5);}g.stroke();}});}
+ fit('氏名',M,top+hh,nw,26,true,'#000','left');fit('区分',M+nw,top+hh,kw,24,true);
+ let y=top+2*hh;
+ const grid=(y0,h)=>{g.strokeStyle='#000';g.lineWidth=1.2;g.strokeRect(M,y0,nw,h);g.strokeRect(M+nw,y0,kw,h);for(let i=0;i<n;i++)g.strokeRect(X(i),y0,dw,h);};
+ grid(top,hh);grid(top+hh,hh);g.lineWidth=1.2;g.beginPath();g.moveTo(M,top+hh);g.lineTo(M,top+hh);g.stroke();
+ g.fillStyle='#fff';g.fillRect(M+1,top+hh-1,nw+kw-2,2);
+ for(const r of md.rows){r.cells.forEach((c,i)=>{if(c.c==='off'){g.fillStyle='#e0e0e0';g.fillRect(X(i),y,dw,rh);}else if(c.c==='ou'){g.save();g.beginPath();g.rect(X(i),y,dw,rh);g.clip();g.strokeStyle='#bbb';g.lineWidth=2;for(let k=-rh;k<dw;k+=10){g.beginPath();g.moveTo(X(i)+k,y+rh);g.lineTo(X(i)+k+rh,y);g.stroke();}g.restore();}});
+  grid(y,rh);fit(r.name,M,y+rh/2,nw,fs,false,'#000','left');fit(r.kind,M+nw,y+rh/2,kw,fs);
+  r.cells.forEach((c,i)=>{if(c.c==='hp'){g.save();g.setLineDash([6,4]);g.lineWidth=3;g.strokeRect(X(i)+3,y+3,dw-6,rh-6);g.restore();}
+   if(c.t){g.save();if(c.c==='off'){g.font=`italic ${fs}px ${F}`;}fit(c.t,X(i),y+rh/2,dw,fs,c.c==='hp',c.c==='off'?'#333':'#000');g.restore();}});
+  y+=rh;}
+ grid(y,rh);g.lineWidth=4;g.beginPath();g.moveTo(M,y);g.lineTo(W-M,y);g.stroke();fit('出勤人数',M,y+rh/2,nw+kw,fs,true,'#000','left');md.days.forEach((di,i)=>fit(String(md.cnt[di.d]),X(i),y+rh/2,dw,fs,true));
+ g.textAlign='left';g.fillStyle='#000';g.font=`24px ${F}`;g.fillText('凡例：○＝出勤（A・B等＝班）　灰色・斜体＝休み（公休①②…／有給／希休など）　【応援】行・点線枠・応＝他事業所からの応援　青・下線＝土曜　赤・二重下線＝日曜・祝日',M,y+rh+34);g.fillText('斜線・→略称＝他事業所へ応援（'+abbrLegend()+'）',M,y+rh+66);
+ return cv;}
+function jpegOf(cv){return new Promise((ok,ng)=>{if(cv.toBlob)cv.toBlob(b=>b?b.arrayBuffer().then(a=>ok(new Uint8Array(a))):ng(new Error('toBlob失敗')),'image/jpeg',0.82);else{const u=cv.toDataURL('image/jpeg',0.82),s=atob(u.split(',')[1]),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);ok(a);}});}
+function makePdf(imgs){const E=new TextEncoder(),parts=[],offs=[];let len=0;const push=x=>{const b=typeof x==='string'?E.encode(x):x;parts.push(b);len+=b.length;};
+ const N=imgs.length,obj=(id,body)=>{offs[id]=len;push(`${id} 0 obj\n`);body();push('\nendobj\n');};
+ push('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+ const kids=imgs.map((_,i)=>`${3+i*3} 0 R`).join(' ');
+ obj(1,()=>push('<< /Type /Catalog /Pages 2 0 R >>'));obj(2,()=>push(`<< /Type /Pages /Kids [${kids}] /Count ${N} >>`));
+ imgs.forEach((im,i)=>{const p=3+i*3,c=p+1,x=p+2;const cs=`q 842 0 0 595 0 0 cm /Im0 Do Q`;
+  obj(p,()=>push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /XObject << /Im0 ${x} 0 R >> >> /Contents ${c} 0 R >>`));
+  obj(c,()=>push(`<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`));
+  obj(x,()=>{push(`<< /Type /XObject /Subtype /Image /Width ${im.w} /Height ${im.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${im.d.length} >>\nstream\n`);push(im.d);push('\nendstream');});});
+ const total=3+N*3,xr=len;let t=`xref\n0 ${total}\n0000000000 65535 f \n`;for(let i=1;i<total;i++)t+=String(offs[i]).padStart(10,'0')+' 00000 n \n';
+ push(t+`trailer\n<< /Size ${total} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF\n`);
+ const out=new Uint8Array(len);let o=0;for(const b of parts){out.set(b,o);o+=b.length;}return out;}
+let PDF_READY=null;
+async function makePdfFile(only){const{y,m}=ST.cur;const deps=ST.depts.filter(d=>!only||d.id===only);const imgs=[];
+ for(const d of deps){const md=printModel(y,m,d);if(!md)continue;const cv=drawPage(md);imgs.push({w:cv.width,h:cv.height,d:await jpegOf(cv)});await new Promise(r=>setTimeout(r,0));}
+ if(!imgs.length)throw new Error('印刷する職員がいません');
+ const dn=only?(deptById(only)||{}).name:'全事業所';const name=`シフト表_${y}年${m}月_${dn}.pdf`;
+ return {name,blob:new Blob([makePdf(imgs)],{type:'application/pdf'}),pages:imgs.length};}
+async function doPdf(only){if(!curMo().res&&!confirm('まだ自動作成していません。空の表でPDFを作りますか？'))return;
+ const st=$('#pdfst');if(st)st.innerHTML='PDFを作成中…';
+ try{const f=await makePdfFile(only);PDF_READY=f;const mb=(f.blob.size/1048576).toFixed(1);
+  if(st)st.innerHTML=`PDFができました（${f.pages}ページ・${mb}MB）　<button class="pri" onclick="sharePdf()">共有・保存</button>`;}
+ catch(e){if(st)st.textContent='PDF作成に失敗: '+e.message;showErr(e.message);}}
+async function sharePdf(){const f=PDF_READY;if(!f)return;
+ try{if(window.File&&navigator.canShare){const file=new File([f.blob],f.name,{type:'application/pdf'});if(navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:f.name});return;}catch(e){if(e&&e.name==='AbortError')return;}}}}catch(e){}
+ download(f.name,f.blob);}
 /* 起動 */
 function boot(){const nj=document.getElementById('nojs');if(nj)nj.style.display='none';
  setTimeout(()=>{try{load();document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));setTab('shift');if(!LS_OK)document.getElementById('memband').style.display='block';}catch(e){showErr((e&&e.message||e)+(e&&e.stack?'\n'+e.stack:''));}},30);}
