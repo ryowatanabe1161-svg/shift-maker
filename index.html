@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>シフト自動作成</title><meta name="robots" content="noindex,nofollow"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="シフト作成">
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;font-size:14px;color:#222;background:#f6f7f9;padding-bottom:70px}
-header{background:#2f5d8a;color:#fff;padding:10px 12px;font-weight:bold;position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between}.ur button{background:#fff;color:#2f5d8a;border:0;border-radius:8px;font-size:20px;min-width:44px;min-height:36px;margin-left:6px}.ur button:disabled{opacity:.4}.steps{display:flex;gap:4px;margin:6px 0;flex-wrap:wrap}.steps button{flex:1;min-width:70px;padding:8px 4px;border:1px solid #2f5d8a;background:#fff;border-radius:8px;font-size:13px}.steps button.ok{background:#e3f1e3;border-color:#3a8a3a}.bk{background:#fff4d6;border:1px solid #e0b040;border-radius:8px;padding:8px;margin:6px 0;font-size:14px}.grp{border:1px solid #e0a0a0;border-radius:8px;margin:6px 0;padding:6px;background:#fff8f8}.grp summary{font-weight:bold;cursor:pointer}.why{margin:6px 0;padding:6px;border-top:1px dashed #ddd;font-size:14px}.sugs{display:flex;flex-direction:column;gap:4px;margin-top:4px}.sug{text-align:left;padding:8px;border:1px solid #2f5d8a;border-radius:8px;background:#eef4fb;font-size:14px}
+header{background:#2f5d8a;color:#fff;padding:10px 12px;font-weight:bold;position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between}.ur button{background:#fff;color:#2f5d8a;border:0;border-radius:8px;font-size:20px;min-width:44px;min-height:36px;margin-left:6px}.ur button:disabled{opacity:.4}.steps{display:flex;gap:4px;margin:6px 0;flex-wrap:wrap}.steps button{flex:1;min-width:70px;padding:8px 4px;border:1px solid #2f5d8a;background:#fff;border-radius:8px;font-size:13px}.steps button.ok{background:#e3f1e3;border-color:#3a8a3a}.bdg{background:#fde2c4;border-radius:6px;padding:0 4px;font-size:12px}.furi{margin-top:8px;padding:6px;border:1px dashed #999;border-radius:8px}.bk{background:#fff4d6;border:1px solid #e0b040;border-radius:8px;padding:8px;margin:6px 0;font-size:14px}.grp{border:1px solid #e0a0a0;border-radius:8px;margin:6px 0;padding:6px;background:#fff8f8}.grp summary{font-weight:bold;cursor:pointer}.why{margin:6px 0;padding:6px;border-top:1px dashed #ddd;font-size:14px}.sugs{display:flex;flex-direction:column;gap:4px;margin-top:4px}.sug{text-align:left;padding:8px;border:1px solid #2f5d8a;border-radius:8px;background:#eef4fb;font-size:14px}
 nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:#fff;border-top:1px solid #ccc;z-index:6}
 nav button{flex:1 1 0;min-width:0;border:0;background:none;padding:9px 0;font-size:10px;letter-spacing:-.5px;white-space:nowrap;overflow:hidden;color:#555}nav button.on{color:#2f5d8a;font-weight:bold;border-top:3px solid #2f5d8a}
 #main{padding:10px;max-width:1400px;margin:auto}
@@ -23,7 +23,7 @@ table.tb{border-collapse:collapse;font-size:12px}.tb th,.tb td{border:1px solid 
 .red{background:#fdd;color:#b00;font-weight:bold}.org{background:#ffe7c2}.sun{color:#c00}.sat{color:#1f5fbf}
 .ck-list{max-height:40vh;overflow:auto;padding-left:18px;font-size:12px}.ck-list .err{color:#b00}.ck-list .warn{color:#a60}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.chips button{padding:6px 10px}.chips button.on{background:#2f5d8a;color:#fff}.offb{background:#eee}
-.ck2{display:inline-flex;align-items:center;gap:4px;margin:3px 8px 3px 0}
+.ck2{display:inline-flex;flex-direction:row;align-items:center;gap:4px;margin:3px 8px 3px 0;width:auto}.ck2 input{width:auto;margin:0}
 .form{display:grid;gap:10px}.form label{display:flex;flex-direction:column;font-size:12px;color:#555}
 input,select{font-size:15px;padding:6px;border:1px solid #bbb;border-radius:6px}input[type=number]{width:70px}
 .card{background:#fff;border-radius:8px;padding:8px;margin:8px 0;box-shadow:0 1px 2px #0001}
@@ -93,7 +93,7 @@ function write(wb){const fonts=[],fills=['<fill><patternFill patternType="none"/
  return zip(f);}
 return {version:'mini-1',utils:{encode_cell:ec,encode_range:er,book_new:()=>({SheetNames:[],Sheets:{}}),book_append_sheet:(wb,ws,n)=>{wb.SheetNames.push(n);wb.Sheets[n]=ws;}},write};})();
 </script><script>const SEED_DEPTS=[{"id": "seiho", "name": "生ホ", "color": "#f6d7e6", "req": {"sun": 0, "mon": 2, "tue": 2, "wed": 3, "thu": 3, "fri": 3, "sat": 0, "hol": 3}, "subs": [{"code": "中A", "req": {"sun": 0, "mon": 0, "tue": 0, "wed": 0, "thu": 0, "fri": 0, "sat": 0, "hol": 0}, "note": ""}, {"code": "中B", "req": {"sun": 0, "mon": 1, "tue": 1, "wed": 1, "thu": 1, "fri": 1, "sat": 0, "hol": 1}, "note": ""}], "closedDow": []}, {"id": "job", "name": "ジョブ", "color": "#d4e8fb", "req": {"sun": 0, "mon": 7, "tue": 8, "wed": 8, "thu": 8, "fri": 7, "sat": 0, "hol": 6}, "subs": [], "closedDow": []}, {"id": "juku", "name": "塾", "color": "#e2d9f7", "req": {"sun": 0, "mon": 4, "tue": 3, "wed": 4, "thu": 4, "fri": 4, "sat": 4, "hol": 3}, "subs": [{"code": "塾A", "req": {"sun": 0, "mon": 2, "tue": 1, "wed": 2, "thu": 0, "fri": 2, "sat": 0, "hol": 0}, "note": ""}, {"code": "塾B", "req": {"sun": 0, "mon": 1, "tue": 0, "wed": 1, "thu": 1, "fri": 1, "sat": 0, "hol": 0}, "note": ""}, {"code": "塾C", "req": {"sun": 0, "mon": 0, "tue": 0, "wed": 0, "thu": 0, "fri": 0, "sat": 3, "hol": 3}, "note": ""}, {"code": "塾D", "req": {"sun": 0, "mon": 0, "tue": 0, "wed": 0, "thu": 0, "fri": 0, "sat": 1, "hol": 0}, "note": ""}], "closedDow": []}, {"id": "cafe", "name": "カフェ", "color": "#d8f2dc", "req": {"sun": 0, "mon": 7, "tue": 6, "wed": 7, "thu": 7, "fri": 7, "sat": 3, "hol": 6}, "subs": [], "closedDow": []}, {"id": "sausage", "name": "ソーセージ", "color": "#efe6d2", "req": {"sun": 0, "mon": 1, "tue": 1, "wed": 1, "thu": 1, "fri": 1, "sat": 0, "hol": 1}, "subs": [], "closedDow": []}, {"id": "seikatsu", "name": "生活", "color": "#fde2c4", "req": {"sun": 0, "mon": 6, "tue": 6, "wed": 7, "thu": 7, "fri": 7, "sat": 0, "hol": 6}, "subs": [{"code": "生活A", "req": {"sun": 0, "mon": 2, "tue": 2, "wed": 2, "thu": 2, "fri": 2, "sat": 0, "hol": 2}, "note": ""}, {"code": "生活B", "req": {"sun": 0, "mon": 2, "tue": 2, "wed": 2, "thu": 2, "fri": 2, "sat": 0, "hol": 2}, "note": ""}], "closedDow": []}, {"id": "flat", "name": "ふらっと", "color": "#cdeff0", "req": {"sun": 0, "mon": 0, "tue": 2, "wed": 3, "thu": 2, "fri": 2, "sat": 2, "hol": 0}, "subs": [], "closedDow": [1]}, {"id": "king", "name": "キング", "color": "#fff3b0", "req": {"sun": 0, "mon": 5, "tue": 6, "wed": 5, "thu": 6, "fri": 6, "sat": 0, "hol": 5}, "subs": [], "closedDow": []}, {"id": "chimane", "name": "地マネ", "color": "#e6e6e6", "req": {"sun": 0, "mon": 2, "tue": 2, "wed": 2, "thu": 2, "fri": 2, "sat": 0, "hol": 1}, "subs": [], "closedDow": []}];
-const SEED_STAFF=[];
+const SEED_STAFF=[{"id": "s1", "name": "職員A01", "kind": "常勤", "title": "支援員", "dept": "seiho", "subs": ["中A", "中B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s2", "name": "職員A02", "kind": "常勤", "title": "支援員", "dept": "seiho", "subs": ["中A", "中B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s3", "name": "職員A03", "kind": "常勤", "title": "支援員", "dept": "seiho", "subs": ["中A", "中B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s4", "name": "職員A04", "kind": "常勤", "title": "支援員", "dept": "seiho", "subs": ["中A", "中B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s5", "name": "職員B01", "kind": "常勤", "title": "支援員", "dept": "job", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s6", "name": "職員B02", "kind": "常勤", "title": "支援員", "dept": "job", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s7", "name": "職員B03", "kind": "常勤", "title": "支援員", "dept": "job", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s8", "name": "職員B04", "kind": "常勤", "title": "支援員", "dept": "job", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s9", "name": "職員B05", "kind": "常勤", "title": "支援員", "dept": "job", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s10", "name": "職員B06", "kind": "常勤", "title": "支援員", "dept": "job", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s11", "name": "職員B07", "kind": "常勤", "title": "支援員", "dept": "job", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s12", "name": "職員B08", "kind": "常勤", "title": "支援員", "dept": "job", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s13", "name": "職員B09", "kind": "常勤", "title": "支援員", "dept": "job", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s14", "name": "職員B10", "kind": "常勤", "title": "支援員", "dept": "job", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s15", "name": "職員C01", "kind": "常勤", "title": "支援員", "dept": "juku", "subs": ["塾A", "塾B", "塾C", "塾D"], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s16", "name": "職員C02", "kind": "常勤", "title": "支援員", "dept": "juku", "subs": ["塾A", "塾B", "塾C", "塾D"], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s17", "name": "職員C03", "kind": "常勤", "title": "支援員", "dept": "juku", "subs": ["塾A", "塾B", "塾C", "塾D"], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s18", "name": "職員C04", "kind": "常勤", "title": "支援員", "dept": "juku", "subs": ["塾A", "塾B", "塾C", "塾D"], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s19", "name": "職員C05", "kind": "常勤", "title": "支援員", "dept": "juku", "subs": ["塾A", "塾B", "塾C", "塾D"], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s20", "name": "職員C06", "kind": "常勤", "title": "支援員", "dept": "juku", "subs": ["塾A", "塾B", "塾C", "塾D"], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s21", "name": "職員D01", "kind": "常勤", "title": "支援員", "dept": "cafe", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s22", "name": "職員D02", "kind": "常勤", "title": "支援員", "dept": "cafe", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s23", "name": "職員D03", "kind": "常勤", "title": "支援員", "dept": "cafe", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s24", "name": "職員D04", "kind": "常勤", "title": "支援員", "dept": "cafe", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s25", "name": "職員D05", "kind": "常勤", "title": "支援員", "dept": "cafe", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s26", "name": "職員D06", "kind": "常勤", "title": "支援員", "dept": "cafe", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s27", "name": "職員D07", "kind": "常勤", "title": "支援員", "dept": "cafe", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s28", "name": "職員D08", "kind": "常勤", "title": "支援員", "dept": "cafe", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s29", "name": "職員D09", "kind": "常勤", "title": "支援員", "dept": "cafe", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": []}, {"id": "s30", "name": "職員E01", "kind": "常勤", "title": "支援員", "dept": "sausage", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s31", "name": "職員E02", "kind": "常勤", "title": "支援員", "dept": "sausage", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s32", "name": "職員E03", "kind": "常勤", "title": "支援員", "dept": "sausage", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s33", "name": "職員F01", "kind": "常勤", "title": "支援員", "dept": "seikatsu", "subs": ["生活A", "生活B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s34", "name": "職員F02", "kind": "常勤", "title": "支援員", "dept": "seikatsu", "subs": ["生活A", "生活B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s35", "name": "職員F03", "kind": "常勤", "title": "支援員", "dept": "seikatsu", "subs": ["生活A", "生活B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s36", "name": "職員F04", "kind": "常勤", "title": "支援員", "dept": "seikatsu", "subs": ["生活A", "生活B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s37", "name": "職員F05", "kind": "常勤", "title": "支援員", "dept": "seikatsu", "subs": ["生活A", "生活B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s38", "name": "職員F06", "kind": "常勤", "title": "支援員", "dept": "seikatsu", "subs": ["生活A", "生活B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s39", "name": "職員F07", "kind": "常勤", "title": "支援員", "dept": "seikatsu", "subs": ["生活A", "生活B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s40", "name": "職員F08", "kind": "常勤", "title": "支援員", "dept": "seikatsu", "subs": ["生活A", "生活B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s41", "name": "職員F09", "kind": "常勤", "title": "支援員", "dept": "seikatsu", "subs": ["生活A", "生活B"], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s42", "name": "職員G01", "kind": "常勤", "title": "支援員", "dept": "flat", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": [], "satRate": 4, "satCap": 5}, {"id": "s43", "name": "職員G02", "kind": "常勤", "title": "支援員", "dept": "flat", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": [], "satRate": 4, "satCap": 5}, {"id": "s44", "name": "職員G03", "kind": "常勤", "title": "支援員", "dept": "flat", "subs": [], "fixed": [], "help": [], "satOK": true, "carry": 0, "quals": [], "leaves": [], "satRate": 4, "satCap": 5}, {"id": "s45", "name": "職員H01", "kind": "常勤", "title": "支援員", "dept": "king", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s46", "name": "職員H02", "kind": "常勤", "title": "支援員", "dept": "king", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s47", "name": "職員H03", "kind": "常勤", "title": "支援員", "dept": "king", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s48", "name": "職員H04", "kind": "常勤", "title": "支援員", "dept": "king", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s49", "name": "職員H05", "kind": "常勤", "title": "支援員", "dept": "king", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s50", "name": "職員H06", "kind": "常勤", "title": "支援員", "dept": "king", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s51", "name": "職員H07", "kind": "常勤", "title": "支援員", "dept": "king", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s52", "name": "職員H08", "kind": "常勤", "title": "支援員", "dept": "king", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s53", "name": "職員J01", "kind": "常勤", "title": "支援員", "dept": "chimane", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s54", "name": "職員J02", "kind": "常勤", "title": "支援員", "dept": "chimane", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s55", "name": "職員J03", "kind": "常勤", "title": "支援員", "dept": "chimane", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}, {"id": "s56", "name": "職員J04", "kind": "常勤", "title": "支援員", "dept": "chimane", "subs": [], "fixed": [], "help": [], "satOK": false, "carry": 0, "quals": [], "leaves": []}];
 const HOL={"2025-01-01": "元日", "2025-01-13": "成人の日", "2025-02-11": "建国記念の日", "2025-02-23": "天皇誕生日", "2025-02-24": "天皇誕生日 振替休日", "2025-03-20": "春分の日", "2025-04-29": "昭和の日", "2025-05-03": "憲法記念日", "2025-05-04": "みどりの日", "2025-05-05": "こどもの日", "2025-05-06": "みどりの日 振替休日", "2025-07-21": "海の日", "2025-08-11": "山の日", "2025-09-15": "敬老の日", "2025-09-23": "秋分の日", "2025-10-13": "スポーツの日", "2025-11-03": "文化の日", "2025-11-23": "勤労感謝の日", "2025-11-24": "勤労感謝の日 振替休日", "2026-01-01": "元日", "2026-01-12": "成人の日", "2026-02-11": "建国記念の日", "2026-02-23": "天皇誕生日", "2026-03-20": "春分の日", "2026-04-29": "昭和の日", "2026-05-03": "憲法記念日", "2026-05-04": "みどりの日", "2026-05-05": "こどもの日", "2026-05-06": "憲法記念日 振替休日", "2026-07-20": "海の日", "2026-08-11": "山の日", "2026-09-21": "敬老の日", "2026-09-22": "国民の休日", "2026-09-23": "秋分の日", "2026-10-12": "スポーツの日", "2026-11-03": "文化の日", "2026-11-23": "勤労感謝の日", "2027-01-01": "元日", "2027-01-11": "成人の日", "2027-02-11": "建国記念の日", "2027-02-23": "天皇誕生日", "2027-03-21": "春分の日", "2027-03-22": "春分の日 振替休日", "2027-04-29": "昭和の日", "2027-05-03": "憲法記念日", "2027-05-04": "みどりの日", "2027-05-05": "こどもの日", "2027-07-19": "海の日", "2027-08-11": "山の日", "2027-09-20": "敬老の日", "2027-09-23": "秋分の日", "2027-10-11": "スポーツの日", "2027-11-03": "文化の日", "2027-11-23": "勤労感謝の日", "2028-01-01": "元日", "2028-01-10": "成人の日", "2028-02-11": "建国記念の日", "2028-02-23": "天皇誕生日", "2028-03-20": "春分の日", "2028-04-29": "昭和の日", "2028-05-03": "憲法記念日", "2028-05-04": "みどりの日", "2028-05-05": "こどもの日", "2028-07-17": "海の日", "2028-08-11": "山の日", "2028-09-18": "敬老の日", "2028-09-22": "秋分の日", "2028-10-09": "スポーツの日", "2028-11-03": "文化の日", "2028-11-23": "勤労感謝の日"}
 ;
 'use strict';
@@ -123,7 +123,7 @@ let ST;
 let LS_OK=true,MEM={};
 function lsGet(k){try{return window.localStorage.getItem(k);}catch(e){LS_OK=false;return MEM[k]??null;}}
 function lsSet(k,v){MEM[k]=v;try{window.localStorage.setItem(k,v);}catch(e){LS_OK=false;}}
-function load(){let s=null;try{s=JSON.parse(lsGet(LS_KEY));}catch(e){}if(s&&s.ver===1){ST=s;}else ST=defaultState();try{window.localStorage.setItem(LS_KEY+'.t','1');window.localStorage.removeItem(LS_KEY+'.t');}catch(e){LS_OK=false;}}
+function load(){let s=null;try{s=JSON.parse(lsGet(LS_KEY));}catch(e){}if(s&&s.ver===1){ST=s;}else{ST=defaultState();if(ST.staff.length)ST.sample=true;}try{window.localStorage.setItem(LS_KEY+'.t','1');window.localStorage.removeItem(LS_KEY+'.t');}catch(e){LS_OK=false;}}
 function save(){try{lsSet(LS_KEY,JSON.stringify(ST));}catch(e){LS_OK=false;}if(!LS_OK){const b=document.getElementById('memband');if(b)b.style.display='block';}}
 const key=(y,m)=>y+'-'+String(m).padStart(2,'0');
 function monthObj(y,m){const k=key(y,m);if(!ST.months[k])ST.months[k]={closed:null,req:{},res:null};const o=ST.months[k];if(o.closed===null)o.closed=defaultClosed(y,m);return o;}
@@ -185,18 +185,19 @@ function oneTrial(y,m,R){
  const attendDay=(s,d)=>(mdays[d]||[]).some(mt=>attends(s,mt));
  // 1 初期化
  for(const s of staff){res[s.id]={};const rq=reqs[s.id]||{};const dep=deptById(s.dept);
-  for(const di of days){const d=di.d;
+  for(const di of days){const d=di.d;const dst=dayStat(s,y,m,d);if(dst){res[s.id][d]={c:dst==='out'?'対象外':'休職',n:dst==='leave'?leaveName(s,y,m,d):'',lock:true};continue;}
    if(rq[d]){res[s.id][d]={c:rq[d]==='出勤'?primaryCode(s):rq[d],n:'',lock:true};continue;}
    if(s.kind==='常勤'){
     if(di.closed&&di.w!==0&&di.w!==6)res[s.id][d]={c:'休所',n:''};
     else if(di.w===0)res[s.id][d]={c:'休',n:''};
     else if(di.w===6)res[s.id][d]={c:'休',n:''};
     else if(!deptOpen(dep,di)&&di.kind==='hol'){res[s.id][d]={c:'休所',n:''};}
-    else if(dep.closedDow.includes(di.w))res[s.id][d]={c:'休',n:''}; // 部署定休(例:ふらっと月曜)
+    else if(dep.closedDow.includes(di.w))res[s.id][d]={c:inclDow(dep)?'休':'定休',n:''}; // 部署定休(例:ふらっと月曜)
     else res[s.id][d]={c:primaryCode(s),n:''};
    }else{
     res[s.id][d]=(s.fixed.includes(di.w)&&deptOpen(dep,di))?{c:primaryCode(s),n:''}:{c:'',n:''};
    }}}
+ for(const sid in (mo.furi||{}))if(res[sid])for(const sd in mo.furi[sid]){const z=mo.furi[sid][sd];if(res[sid][z]&&res[sid][z].c==='代休')res[sid][z].furiOf=+sd;}
  // 2 土曜(常勤)
  const satC={};staff.forEach(s=>satC[s.id]=0);
  for(const di of days){if(di.w!==6||di.closed||di.h)continue;
@@ -205,21 +206,21 @@ function oneTrial(y,m,R){
     .sort((a,b)=>(a.dept===dep.id?0:1)-(b.dept===dep.id?0:1)||satC[a.id]/Math.max(a.satRate||0.3,0.2)-satC[b.id]/Math.max(b.satRate||0.3,0.2)||((b.helpW||{})[dep.id]||0)-((a.helpW||{})[dep.id]||0));
    for(const s of cands){if(need<=0)break;res[s.id][di.d]=s.dept===dep.id?{c:primaryCode(s),n:''}:{c:dep.name,n:'ヘルプ',dp:dep.id};satC[s.id]++;need--;}}}
  // 3 平日公休の配置(常勤)
- const offCount=s=>Object.values(res[s.id]).filter(v=>KOUKYU.includes(v.c)).length;
+ const offCount=s=>Object.values(res[s.id]).filter(v=>KOUKYU.includes(v.c)||(v.c==='代休'&&v.furiOf)).length;
  const canRest=(s,d)=>{const v=res[s.id][d],di=days[d-1];return v&&!v.lock&&isWork(v.c)&&di.w!==6&&di.w!==0&&!attendDay(s,d);};
  const runAt=(s,d)=>{let a=0,b=0;for(let i=d-1;i>=1&&isWork(res[s.id][i].c);i--)a++;if(d-1-a<1)a+=carry[s.id];for(let i=d+1;i<=n&&isWork(res[s.id][i].c);i++)b++;return a+b+1;};
  const restScore=(s,d)=>{const v=res[s.id][d];const dep=cellDept(v,s)||deptById(s.dept);return surplus(dep.id,days[d-1].d)*3+Math.min(runAt(s,d),9)+((s.restW||[])[days[d-1].w]||0)*6+R()*1.5;};
- for(const s of shuffle(staff.filter(s=>s.kind==='常勤'),R)){
+ for(const s of shuffle(staff.filter(s=>s.kind==='常勤'),R)){const Ts=koukyuT(s,y,m);
   // 土曜出勤の代休(同週の平日)
-  for(const di of days){if(di.w!==6||!isWork(res[s.id][di.d].c)||offCount(s)>=T)continue;
+  for(const di of days){if(di.w!==6||!isWork(res[s.id][di.d].c)||offCount(s)>=Ts)continue;
    let c=[];for(let d=di.d-5;d<di.d;d++)if(d>=1&&canRest(s,d))c.push(d);
    if(!c.length)for(let d=di.d+2;d<=Math.min(n,di.d+6);d++)if(canRest(s,d))c.push(d);
    if(c.length){const cw=x=>((s.compW||[])[days[x-1].w]||0)*6;c.sort((a,b)=>restScore(s,b)+cw(b)-restScore(s,a)-cw(a));res[s.id][c[0]]={c:'休',n:''};}}
-  let need=T-offCount(s),g=0;
+  let need=Ts-offCount(s),g=0;
   while(need>0&&g++<40){const c=[];for(let d=1;d<=n;d++)if(canRest(s,d))c.push(d);if(!c.length)break;
    c.sort((a,b)=>restScore(s,b)-restScore(s,a));res[s.id][c[0]]={c:'休',n:''};need--;}
   // 多すぎる場合(土曜を休にしている等)→ 休を出勤に戻す(平日の非ロック)
-  g=0;while(offCount(s)>T&&g++<40){const c=[];for(let d=1;d<=n;d++){const v=res[s.id][d],di=days[d-1];if(v.c==='休'&&!v.lock&&di.w!==0&&di.w!==6&&!deptById(s.dept).closedDow.includes(di.w))c.push(d);}if(!c.length)break;res[s.id][c[Math.floor(R()*c.length)]]={c:primaryCode(s),n:''};}
+  g=0;while(offCount(s)>Ts&&g++<40){const c=[];for(let d=1;d<=n;d++){const v=res[s.id][d],di=days[d-1];if(v.c==='休'&&!v.lock&&di.w!==0&&di.w!==6&&!deptById(s.dept).closedDow.includes(di.w))c.push(d);}if(!c.length)break;res[s.id][c[Math.floor(R()*c.length)]]={c:primaryCode(s),n:''};}
  }
  // 4 連勤修正(休の移動)
  for(let it=0;it<3;it++)for(const s of staff.filter(s=>s.kind==='常勤')){
@@ -227,7 +228,7 @@ function oneTrial(y,m,R){
    // 連続区間を求め中央付近に休を入れ、他の休を出勤へ
    let a=d;while(a>1&&isWork(res[s.id][a-1].c))a--;let b=d;while(b<n&&isWork(res[s.id][b+1].c))b++;
    const ins=[];for(let x=a;x<=b;x++)if(canRest(s,x))ins.push(x);if(!ins.length)continue;
-   ins.sort((p,q)=>Math.abs((p-a)-(b-p))-Math.abs((q-a)-(b-q))||restScore(s,q)-restScore(s,p));
+   const cy=a===1?(carry[s.id]||0):0;ins.sort((p,q)=>Math.max(p-a+cy,b-p)-Math.max(q-a+cy,b-q)||restScore(s,q)-restScore(s,p));
    const x=ins[0];const outs=[];for(let z=1;z<=n;z++){const v=res[s.id][z],di=days[z-1];if(v.c==='休'&&!v.lock&&di.w>=1&&di.w<=5&&(z<a-1||z>b+1))outs.push(z);}
    let done=false;
    for(const z of shuffle(outs,R)){res[s.id][x]={c:'休',n:''};res[s.id][z]={c:primaryCode(s),n:''};
@@ -245,6 +246,7 @@ function oneTrial(y,m,R){
    // ヘルプ
    for(const s of shuffle(staff.filter(s=>s.help.includes(dep.id)),R).sort((a,b)=>((b.helpW||{})[dep.id]||0)-((a.helpW||{})[dep.id]||0))){if(need<=0)break;const v=res[s.id][d];if(!isWork(v.c)||v.lock)continue;
     const hd=cellDept(v,s);if(!hd||hd.id===dep.id)continue;if(surplus(hd.id,d)<=0)continue;res[s.id][d]={c:dep.name,n:'ヘルプ',dp:dep.id};need--;}}}
+ fillQuals(y,m,res,days,R,canRest,runAt);
  // 6 サブ区分・個人の表記(実績傾向で重み付け)
  const N=x=>x.replace(/[Ａ-Ｚ]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248));
  for(const di of days){const d=di.d,g=(di.w===0||di.w===6||di.h)?'we':'wd';for(const dep of ST.depts){
@@ -263,16 +265,16 @@ function oneTrial(y,m,R){
 function checks(y,m,res){const days=dayInfos(y,m),n=days.length,T=satCountTarget(y,m),carry=prevCarry(y,m),mdays=meetingDays(y,m);
  const list=[];let err=0,warn=0;const E=(msg,sid,d)=>{list.push({lv:'err',msg,sid,d});err++;};const W=(msg,sid,d)=>{list.push({lv:'warn',msg,sid,d});warn++;};const I=(msg,sid,d)=>{list.push({lv:'info',msg,sid,d});};
  const per={};const sats=[];
- for(const s of ST.staff){const r=res[s.id];if(!r)continue;let off=0,yu=0,work=0,run=carry[s.id],mx=run,sat=0;
-  for(const di of days){const v=r[di.d]||{c:''};if(KOUKYU.includes(v.c))off++;if(['有給','特休','夏季','リフ','代休'].includes(v.c))yu++;
+ for(const s of ST.staff){const r=res[s.id];if(!r)continue;if(!empIn(s,y,m))continue;const Ts=koukyuT(s,y,m),fu=(monthObj(y,m).furi||{})[s.id]||{};let off=0,yu=0,work=0,run=carry[s.id],mx=run,sat=0;
+  for(const di of days){const v=r[di.d]||{c:''};if(KOUKYU.includes(v.c)||(v.c==='代休'&&v.furiOf))off++;if(['有給','特休','夏季','リフ','代休'].includes(v.c)&&!v.furiOf)yu++;
    if(isWork(v.c)){work++;run++;if(run>mx)mx=run;if(di.w===6)sat++;
     if(run===ST.rules.maxRun+1)W(`${s.name}: ${ST.rules.maxRun+1}連勤`,s.id,di.d);
     if(run===ST.rules.maxRun+2)E(`${s.name}: ${ST.rules.maxRun+2}連勤以上(禁止)`,s.id,di.d);
-    if(s.kind==='常勤'&&di.w===0)E(`${s.name}: 日曜出勤`,s.id,di.d);
+    if(s.kind==='常勤'&&di.w===0){const z=fu[di.d];if(z&&(r[z]||{}).c==='代休')I(`${s.name}: ${di.d}日 日曜出勤（${z}日に振替の代休）`,s.id,di.d);else E(`${s.name}: 日曜出勤${z?'（振替の代休日が代休になっていません）':''}`,s.id,di.d);}
     if(s.kind==='非常勤'&&!s.fixed.includes(di.w)&&!v.lock)W(`${s.name}: 固定曜日外の出勤`,s.id,di.d);
     if(di.closed)W(`${s.name}: 休所日に出勤`,s.id,di.d);
    }else run=0;}
-  if(s.kind==='常勤'){const lk=days.filter(di=>{const v=r[di.d]||{};return v.lock&&KOUKYU.includes(v.c)&&di.w>=1&&di.w<=6;}).length;if(off<T||(off>T&&off-lk>T))E(`${s.name}: 公休 ${off}/${T}日`,s.id,null);else if(off>T)I(`${s.name}: 公休 ${off}/${T}日（希休入力により目標より多い）`,s.id,null);if(s.satOK)sats.push(sat);if(sat>satCapOf(s,days))W(`${s.name}: 土曜出勤 ${sat}回(上限${satCapOf(s,days)})`,s.id,null);}
+  if(s.kind==='常勤'){const lk=days.filter(di=>{const v=r[di.d]||{};return v.lock&&KOUKYU.includes(v.c)&&di.w>=1&&di.w<=6;}).length;if(Ts!==T&&off===Ts)I(`${s.name}: 公休目標 ${Ts}日（定休日・入退職・休職を反映。月の標準は${T}日）`,s.id,null);if(off<Ts||(off>Ts&&off-lk>Ts))E(`${s.name}: 公休 ${off}/${Ts}日`,s.id,null);else if(off>Ts)I(`${s.name}: 公休 ${off}/${Ts}日（希休入力により目標より多い）`,s.id,null);if(s.satOK)sats.push(sat);if(sat>satCapOf(s,days))W(`${s.name}: 土曜出勤 ${sat}回(上限${satCapOf(s,days)})`,s.id,null);}
   per[s.id]={off,yu,work,mx,sat};}
  const daily={};
  for(const di of days){const d=di.d;daily[d]={};
@@ -280,8 +282,9 @@ function checks(y,m,res){const days=dayInfos(y,m),n=days.length,T=satCountTarget
    const rq=deptReq(dep,di);daily[d][dep.id]={c,rq};
    if(c<rq)E(`${d}日 ${dep.name}: ${c}/${rq}人 不足`,null,d);
    if(rq===0&&c>0&&!di.closed&&di.w===6)W(`${d}日(土) ${dep.name}: 土曜対象外部署に出勤`,null,d);
-   for(const sb of dep.subs){const q=subReq(sb,dep,di);if(q>0&&(sc[sb.code]||0)<q)W(`${d}日 ${sb.code}: ${sc[sb.code]||0}/${q}人 不足`,null,d);}}
-  for(const mt of (mdays[d]||[]))for(const s of ST.staff)if(attends(s,mt)&&res[s.id]&&!isWork((res[s.id][d]||{}).c)&&mt.target==='施設長')W(`${d}日 ${mt.name}: ${s.name}が不在`,s.id,d);
+   for(const sb of dep.subs){const q=subReq(sb,dep,di);if(q>0&&(sc[sb.code]||0)<q)W(`${d}日 ${sb.code}: ${sc[sb.code]||0}/${q}人 不足`,null,d);}
+   for(const qr of (dep.qreq||[])){const q=(di.closed||dep.closedDow.includes(di.w))?0:(+qr.req[di.kind]||0);if(!q)continue;let qc=0;for(const s of ST.staff){const v=(res[s.id]||{})[d];if(v&&isWork(v.c)&&cellDept(v,s)===dep&&(s.quals||[]).includes(qr.q))qc++;}if(qc<q)E(`${d}日 ${dep.name}（${qr.q}）: ${qc}/${q}人 不足`,null,d);}}
+  for(const mt of (mdays[d]||[]))for(const s of ST.staff)if(attends(s,mt)&&res[s.id]&&!isWork((res[s.id][d]||{}).c)&&!['休職','対象外'].includes((res[s.id][d]||{}).c)&&mt.target==='施設長')W(`${d}日 ${mt.name}: ${s.name}が不在`,s.id,d);
  }
  const mean=sats.reduce((a,b)=>a+b,0)/(sats.length||1);const balance=sats.reduce((a,b)=>a+(b-mean)**2,0);
  return {err,warn,list,per,daily,balance,T};}
@@ -301,7 +304,7 @@ function mv(k){let{y,m}=ST.cur;m+=k;if(m<1){m=12;y--;}if(m>12){m=1;y++;}ST.cur={
 function render(){const el=$('#main');const f={shift:rShift,sum:rSum,req:rReq,month:rMonth,dept:rDept,staff:rStaff,data:rData}[TAB];el.innerHTML=f();}
 
 /* --- シフト表 --- */
-function rShift(){if(!ST.staff.length)return `<div style="margin:20px 8px;padding:22px;border:3px solid #2f5d8a;border-radius:12px;background:#eef4fb;text-align:center;font-size:18px;line-height:1.6"><b>職員データがまだありません</b><br>保存タブの『データ読み込み』でデータファイルを選んでください<br><label class="btn pri" style="display:inline-block;margin-top:14px;padding:14px 22px;font-size:18px">データ読み込み<input type="file" onchange="importJson(this)" hidden></label></div>`;const{y,m}=ST.cur,mo=curMo(),days=dayInfos(y,m);
+function rShift(){if(!ST.staff.length)return `<div style="margin:20px 8px;padding:22px;border:3px solid #2f5d8a;border-radius:12px;background:#eef4fb;text-align:center;font-size:18px;line-height:1.6"><b>職員データがまだありません</b><br>保存タブの『データ読み込み』でデータファイルを選んでください<br><label class="btn pri" style="display:inline-block;margin-top:14px;padding:14px 22px;font-size:18px">データ読み込み<input type="file" onchange="importJson(this)" hidden></label>${defaultStaff().length?'<br><button style="margin-top:12px;padding:10px 16px" onclick="loadSample()">お試し用の架空データを入れる</button>':''}</div>`;const{y,m}=ST.cur,mo=curMo(),days=dayInfos(y,m);
  let h=monthBar()+guideBar()+`<div class="acts"><button class="pri" onclick="runGen()">⚙ 自動作成</button>${mo.res?'<button onclick="altPlan()">🎲 別の案を作る</button>':''}<button onclick="showHist()">🕘 履歴</button><button onclick="exportXlsx()">Excel出力</button></div><div class="acts">${printOpts()}${mo.res?'<button onclick="clearRes()">結果を消去</button>':''}</div>`;
  if(!mo.res)return h+`<p class="hint">「自動作成」を押すと、この月のシフトを作成します（希休などは「希望休」タブで先に入力）。</p>`;
  const ck=checks(y,m,mo.res);
@@ -331,7 +334,7 @@ function editCell(sid,d){const s=ST.staff.find(x=>x.id===sid),v=curMo().res[sid]
  const codes=[];for(const dep of ST.depts){codes.push(dep.name);dep.subs.forEach(x=>codes.push(x.code));}
  $('#modal').innerHTML=`<div class="mb"><h3>${esc(s.name)} ${ST.cur.m}/${d}</h3><div class="chips">${codes.map(c=>`<button style="background:${deptColor(c)}" onclick="setCell('${sid}',${d},'${esc(c)}')">${esc(c)}</button>`).join('')}</div>
  <div class="chips">${OFF_CODES.map(c=>`<button class="offb" onclick="setCell('${sid}',${d},'${c}')">${c}</button>`).join('')}<button onclick="setCell('${sid}',${d},'')">空欄</button></div>
- <label>下段メモ（会議・時間など）<input id="note" value="${esc(v.n)}"></label><div class="acts"><button class="pri" onclick="setNote('${sid}',${d})">メモ保存</button>${isWork(v.c)?`<button class="danger" onclick="absent('${sid}',${d})">🚑 急な欠勤・代わりを探す</button>`:''}<button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');}
+ <label>下段メモ（会議・時間など）<input id="note" value="${esc(v.n)}"></label><div class="acts"><button class="pri" onclick="setNote('${sid}',${d})">メモ保存</button>${isWork(v.c)?`<button class="danger" onclick="absent('${sid}',${d})">🚑 急な欠勤・代わりを探す</button>`:''}${furiHtml(sid,d)}<button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');}
 function setCell(sid,d,c){const v=curMo().res[sid][d];v.c=c;delete v.dp;v.lock=true;v.man=true;v.n=$('#note').value;save();closeM();render();}
 function setNote(sid,d){curMo().res[sid][d].n=$('#note').value;save();closeM();render();}
 function closeM(){$('#modal').classList.remove('on');$('#modal').innerHTML='';}
@@ -376,7 +379,7 @@ function rDept(){let h=`<p class="hint">最低必要人数（初期値は令和7
  ST.depts.forEach((d,i)=>{h+=`<div class="card" style="border-left:8px solid ${d.color}"><div class="row"><input value="${esc(d.name)}" onchange="ST.depts[${i}].name=this.value;save()"><input type="color" value="${d.color}" onchange="ST.depts[${i}].color=this.value;save();render()"><button onclick="delDept(${i})">✕</button></div>
  <div class="req">${KINDS.map(([k,l])=>`<label>${l}<input type="number" min="0" value="${d.req[k]}" onchange="ST.depts[${i}].req.${k}=+this.value;save()"></label>`).join('')}</div>
  <div class="row small">定休曜日：${[1,2,3,4,5,6].map(w=>`<label class="ck2"><input type="checkbox" ${d.closedDow.includes(w)?'checked':''} onchange="togDow(${i},${w},this.checked)">${WD[w]}</label>`).join('')}</div>
- <details><summary>サブ区分 ${d.subs.length}件</summary>${d.subs.map((s,j)=>`<div class="sub"><input value="${esc(s.code)}" onchange="ST.depts[${i}].subs[${j}].code=this.value;save()"><small>${esc(s.note)}</small><div class="req">${KINDS.map(([k,l])=>`<label>${l}<input type="number" min="0" value="${s.req[k]}" onchange="ST.depts[${i}].subs[${j}].req.${k}=+this.value;save()"></label>`).join('')}</div><button onclick="ST.depts[${i}].subs.splice(${j},1);save();render()">削除</button></div>`).join('')}
+ ${deptExtraHtml(d,i)}<details><summary>サブ区分 ${d.subs.length}件</summary>${d.subs.map((s,j)=>`<div class="sub"><input value="${esc(s.code)}" onchange="ST.depts[${i}].subs[${j}].code=this.value;save()"><small>${esc(s.note)}</small><div class="req">${KINDS.map(([k,l])=>`<label>${l}<input type="number" min="0" value="${s.req[k]}" onchange="ST.depts[${i}].subs[${j}].req.${k}=+this.value;save()"></label>`).join('')}</div><button onclick="ST.depts[${i}].subs.splice(${j},1);save();render()">削除</button></div>`).join('')}
  <button onclick="addSub(${i})">＋サブ区分</button></details></div>`;});
  return h+`<div class="acts"><button onclick="addDept()">＋部署を追加</button></div>`;}
 function togDow(i,w,on){const a=ST.depts[i].closedDow;const k=a.indexOf(w);if(on&&k<0)a.push(w);if(!on&&k>=0)a.splice(k,1);save();}
@@ -385,7 +388,7 @@ function delDept(i){if(ST.staff.some(s=>s.dept===ST.depts[i].id))return alert('�
 
 /* --- スタッフ --- */
 function rStaff(){let h=`<p class="hint">名前は端末内（このブラウザ）にのみ保存されます。初期値は仮名です。</p><div class="acts"><button class="pri" onclick="editStaff(null)">＋スタッフ追加</button></div>`;
- for(const d of ST.depts){const ss=ST.staff.filter(s=>s.dept===d.id);h+=`<h3 style="background:${d.color}">${esc(d.name)}（${ss.length}人）</h3>`+ss.map(s=>`<div class="srow" onclick="editStaff('${s.id}')"><b>${esc(s.name)}</b> <span>${s.kind} / ${esc(s.title)}</span><small>${s.kind==='非常勤'?'固定:'+s.fixed.map(w=>WD[w]).join(''):''}${s.subs.length?' 区分:'+esc(s.subs.join(',')):''}${s.help.length?' ヘルプ:'+s.help.map(x=>esc(deptById(x)?.name)).join(','):''}${s.satOK?' 土曜可':''}</small></div>`).join('');}
+ for(const d of ST.depts){const ss=ST.staff.filter(s=>s.dept===d.id);h+=`<h3 style="background:${d.color}">${esc(d.name)}（${ss.length}人）</h3>`+ss.map(s=>`<div class="srow" onclick="editStaff('${s.id}')"><b>${esc(s.name)}</b> <span>${s.kind} / ${esc(s.title)}${staffBadge(s)}</span><small>${s.kind==='非常勤'?'固定:'+s.fixed.map(w=>WD[w]).join(''):''}${s.subs.length?' 区分:'+esc(s.subs.join(',')):''}${s.help.length?' ヘルプ:'+s.help.map(x=>esc(deptById(x)?.name)).join(','):''}${s.satOK?' 土曜可':''}</small></div>`).join('');}
  return h;}
 function editStaff(id){const s=id?ST.staff.find(x=>x.id===id):{id:'s'+Date.now(),name:'',kind:'常勤',title:'',dept:ST.depts[0].id,subs:[],fixed:[],help:[],satOK:false,carry:0};
  const codes=[];ST.depts.forEach(d=>d.subs.forEach(x=>codes.push(x.code)));
@@ -400,10 +403,10 @@ function editStaff(id){const s=id?ST.staff.find(x=>x.id===id):{id:'s'+Date.now()
  <label class="ck2"><input type="checkbox" id="f_sat" ${s.satOK?'checked':''}>常勤の土曜出勤ローテーションに入れる</label>
  <label>土曜上限（空欄=全体設定）<input type="number" id="f_satcap" value="${s.satCap||''}"></label>
  ${tendHtml(s)}
- <label>前月末の連勤日数（前月未作成時）<input type="number" id="f_carry" value="${s.carry||0}"></label></div>
+ ${empHtml(s)}<label>前月末の連勤日数（前月をこのツールで作っていないときに使用）<input type="number" id="f_carry" value="${s.carry||0}"></label></div>
  <div class="acts"><button class="pri" onclick="saveStaff('${s.id}',${!!id})">保存</button>${id?`<button class="danger" onclick="delStaff('${s.id}')">削除</button>`:''}<button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');}
 function saveStaff(id,exists){let s=exists?ST.staff.find(x=>x.id===id):{id};const g=c=>[...document.querySelectorAll(c)].filter(x=>x.checked).map(x=>x.value);
- Object.assign(s,{name:$('#f_name').value.trim()||'未設定',kind:$('#f_kind').value,title:$('#f_title').value,dept:$('#f_dept').value,fixed:g('.f_fx').map(Number),subs:g('.f_sb'),help:g('.f_hp'),satOK:$('#f_sat').checked,satCap:+$('#f_satcap').value||0,carry:+$('#f_carry').value||0});readTend(s);
+ Object.assign(s,{name:$('#f_name').value.trim()||'未設定',kind:$('#f_kind').value,title:$('#f_title').value,dept:$('#f_dept').value,fixed:g('.f_fx').map(Number),subs:g('.f_sb'),help:g('.f_hp'),satOK:$('#f_sat').checked,satCap:+$('#f_satcap').value||0,carry:+$('#f_carry').value||0});readTend(s);readEmp(s);
  if(!exists)ST.staff.push(s);save();closeM();render();}
 function delStaff(id){if(!confirm('削除しますか？'))return;ST.staff=ST.staff.filter(s=>s.id!==id);save();closeM();render();}
 
@@ -413,7 +416,7 @@ function rData(){return `<h3>バックアップ</h3><p class="hint">データは
  <h3>このツールのルール（実績から推定）</h3><ul class="hint"><li>個人ごとの傾向（主な勤務表記と割合、土曜頻度、休みやすい曜日、土曜後の代休曜日、ヘルプ先、会議）を重みとして使用</li><li>常勤の公休＝その月の土日数（希休を含む）</li><li>連勤5日まで（6日は警告、7日以上は違反）</li><li>日曜は常勤休み（部署の日曜人数で非常勤のみ）</li><li>非常勤は固定曜日のみ</li><li>土曜は土曜人数が設定された部署のみ。常勤は上限内で均等に、代休は同じ週の平日</li><li>会議日は対象者を出勤に</li><li>ヘルプは登録された組合せのみ、不足時だけ</li></ul>`;}
 function download(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
 function exportJson(){download('shift_backup_'+new Date().toISOString().slice(0,10)+'.json',new Blob([JSON.stringify(ST)],{type:'application/json'}));}
-function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const s=JSON.parse(r.result);if(s.ver!==1)throw 0;const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur});if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;save();render();toast(ST.staff.length+'人を読み込みました');}catch(e){alert('読み込めませんでした');}};r.readAsText(f);}
+function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const s=JSON.parse(r.result);if(s.ver!==1)throw 0;const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur});if(!s.sample)delete ST.sample;if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;save();render();toast(ST.staff.length+'人を読み込みました');}catch(e){alert('読み込めませんでした');}};r.readAsText(f);}
 
 /* --- Excel --- */
 function buildWorkbook(y,m){const mo=monthObj(y,m),res=mo.res,days=dayInfos(y,m),n=days.length;
@@ -459,7 +462,7 @@ function printOpts(){return `<select id="psel" style="padding:6px;font-size:14px
 function buildPrint(y,m,only){const mo=curMo(),res=mo.res,days=dayInfos(y,m),n=days.length;
  const cls=di=>di.w===0||di.h?'sun':di.w===6?'sat':'';let H='';
  for(const dep of ST.depts){if(only&&dep.id!==only)continue;
-  const home=ST.staff.filter(s=>s.dept===dep.id);const hp=ST.staff.filter(s=>s.dept!==dep.id&&res&&days.some(di=>{const v=res[s.id][di.d];return v&&cellDept(v,s)===dep;}));
+  const home=ST.staff.filter(s=>s.dept===dep.id&&staffOrdered().includes(s));const hp=ST.staff.filter(s=>s.dept!==dep.id&&res&&days.some(di=>{const v=res[s.id][di.d];return v&&cellDept(v,s)===dep;}));
   if(!home.length&&!hp.length)continue;const rows=home.length+hp.length;
   const rhm=Math.min(24,Math.floor(158/(rows+2.6)*10)/10);const pf=Math.min(8,Math.max(6,rhm*1.1)).toFixed(1)+'pt',pn=Math.min(13,Math.max(6.5,rhm*1.1)).toFixed(1)+'pt';
   H+=`<section class="pp" style="--pf:${pf};--pn:${pn};--rh:${rhm}mm"><h2>${ST.corp?esc(ST.corp)+'　':''}${esc(dep.name)}　${y}年${m}月 シフト表</h2><table><colgroup><col class="pn" style="width:26mm"><col style="width:9mm">${days.map(()=>'<col>').join('')}</colgroup>
@@ -474,7 +477,7 @@ function buildPrint(y,m,only){const mo=curMo(),res=mo.res,days=dayInfos(y,m),n=d
     r+=`<td class="${c}"${c!=='off'&&t.length>=2?' style="font-size:.78em;letter-spacing:-.5px"':''}>${esc(t)}</td>`;}return r+'</tr>';};
   for(const s of home)H+=row(s,false);for(const s of hp)H+=row(s,true);
   H+=`<tr class="sum"><td class="pn" colspan="2">出勤人数</td>${days.map(di=>`<td>${cnt[di.d]}</td>`).join('')}</tr></table>
-  <div class="lg">凡例：○＝出勤（A・B等＝班）　灰色・斜体＝休み（休①②…＝公休、希＝希望休、有＝有給、特＝特休、夏＝夏季、リ＝リフレッシュ、代＝代休、所＝休所）　【応援】行・点線枠・応＝他事業所からの応援　→略称＝他事業所へ応援（${esc(abbrLegend())}）　青・下線＝土曜　赤・二重下線＝日曜・祝日</div></section>`;}
+  <div class="lg">凡例：○＝出勤（A・B等＝班）　灰色・斜体＝休み（休①②…＝公休、休職＝産休・育休など、－＝在籍外、定＝定休日、希＝希望休、有＝有給、特＝特休、夏＝夏季、リ＝リフレッシュ、代＝代休、所＝休所）　【応援】行・点線枠・応＝他事業所からの応援　→略称＝他事業所へ応援（${esc(abbrLegend())}）　青・下線＝土曜　赤・二重下線＝日曜・祝日</div></section>`;}
  return H||'<p>印刷する職員がいません</p>';}
 function doPrint(only){if(IS_IOS&&IS_SA){if(confirm('ホーム画面から開いたアプリでは印刷画面が開かないことがあります。PDFを作成しますか？'))doPdf(only);return;}const{y,m}=ST.cur;if(!curMo().res&&!confirm('まだ自動作成していません。空の表を印刷しますか？'))return;
  const pv=$('#printview');pv.innerHTML=buildPrint(y,m,only);document.body.classList.add('printing');
@@ -485,7 +488,7 @@ const IS_IOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='
 const IS_AND=/Android/i.test(navigator.userAgent);const IS_MOB=IS_IOS||IS_AND;
 const IS_SA=!!(window.navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches));
 function printModel(y,m,dep){const res=curMo().res,days=dayInfos(y,m),n=days.length;
- const home=ST.staff.filter(s=>s.dept===dep.id);const hp=ST.staff.filter(s=>s.dept!==dep.id&&res&&days.some(di=>{const v=res[s.id][di.d];return v&&cellDept(v,s)===dep;}));
+ const home=ST.staff.filter(s=>s.dept===dep.id&&staffOrdered().includes(s));const hp=ST.staff.filter(s=>s.dept!==dep.id&&res&&days.some(di=>{const v=res[s.id][di.d];return v&&cellDept(v,s)===dep;}));
  if(!home.length&&!hp.length)return null;const cnt=Array(n+1).fill(0);const rows=[];
  const row=(s,isHelp)=>{const num=res?numbered(res,s,y,m):{};const cells=[];
   for(const di of days){const v=res?(res[s.id][di.d]||{c:''}):{c:''};const cd=cellDept(v,s);let t='',c='';
@@ -521,7 +524,7 @@ function drawPage(md){const W=2400,H=1697,M=60,cv=document.createElement('canvas
    if(c.t){g.save();if(c.c==='off'){g.font=`italic ${fs}px ${F}`;}fit(c.t,X(i),y+rh/2,dw,fs,c.c==='hp',c.c==='off'?'#333':'#000');g.restore();}});
   y+=rh;}
  grid(y,rh);g.lineWidth=4;g.beginPath();g.moveTo(M,y);g.lineTo(W-M,y);g.stroke();fit('出勤人数',M,y+rh/2,nw+kw,fs,true,'#000','left');md.days.forEach((di,i)=>fit(String(md.cnt[di.d]),X(i),y+rh/2,dw,fs,true));
- g.textAlign='left';g.fillStyle='#000';g.font=`24px ${F}`;g.fillText('凡例：○＝出勤（A・B等＝班）　灰色・斜体＝休み（休①②…＝公休、希＝希望休、有＝有給、特＝特休、夏＝夏季、リ＝リフレッシュ、代＝代休、所＝休所）　【応援】行・点線枠・応＝他事業所からの応援　青・下線＝土曜　赤・二重下線＝日曜・祝日',M,y+rh+34);g.fillText('斜線・→略称＝他事業所へ応援（'+abbrLegend()+'）',M,y+rh+66);
+ g.textAlign='left';g.fillStyle='#000';g.font=`24px ${F}`;g.fillText('凡例：○＝出勤（A・B等＝班）　灰色・斜体＝休み（休①②…＝公休、休職＝産休・育休など、－＝在籍外、定＝定休日、希＝希望休、有＝有給、特＝特休、夏＝夏季、リ＝リフレッシュ、代＝代休、所＝休所）　【応援】行・点線枠・応＝他事業所からの応援　青・下線＝土曜　赤・二重下線＝日曜・祝日',M,y+rh+34);g.fillText('斜線・→略称＝他事業所へ応援（'+abbrLegend()+'）',M,y+rh+66);
  return cv;}
 function jpegOf(cv){return new Promise((ok,ng)=>{if(cv.toBlob)cv.toBlob(b=>b?b.arrayBuffer().then(a=>ok(new Uint8Array(a))):ng(new Error('toBlob失敗')),'image/jpeg',0.82);else{const u=cv.toDataURL('image/jpeg',0.82),s=atob(u.split(',')[1]),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);ok(a);}});}
 function makePdf(imgs){const E=new TextEncoder(),parts=[],offs=[];let len=0;const push=x=>{const b=typeof x==='string'?E.encode(x):x;parts.push(b);len+=b.length;};
@@ -557,7 +560,7 @@ function migrate(){ST.ver=1;ST.months=ST.months||{};ST.rules=Object.assign({maxR
  for(const d of ST.depts){d.req=normReq(d.req);d.subs=d.subs||[];d.closedDow=d.closedDow||[];for(const s of d.subs)s.req=normReq(s.req);}
  for(const s of ST.staff){s.subs=s.subs||[];s.fixed=s.fixed||[];s.help=(s.help||[]).filter(x=>deptById(x));s.kind=s.kind||'常勤';s.title=s.title||'';if(!deptById(s.dept)&&ST.depts[0])s.dept=ST.depts[0].id;}
  for(const k in ST.months){const mo=ST.months[k];mo.req=mo.req||{};}
- if(!ST.cur){const t=new Date();ST.cur={y:t.getFullYear(),m:t.getMonth()+1};}}
+ if(!ST.cur){const t=new Date();ST.cur={y:t.getFullYear(),m:t.getMonth()+1};}migrate2();}
 function ymdLocal(){const t=new Date(),p=n=>String(n).padStart(2,'0');return `${t.getFullYear()}-${p(t.getMonth()+1)}-${p(t.getDate())}`;}
 /* Undo/Redo */
 let UNDO=[],REDO=[],LAST=null;
@@ -567,7 +570,7 @@ function undo(){if(!UNDO.length)return toast('これ以上戻せません');REDO
 function redo(){if(!REDO.length)return toast('やり直せる操作はありません');UNDO.push(LAST);LAST=REDO.pop();ST=JSON.parse(LAST);persist();updUR();render();toast('やり直しました');}
 function updUR(){const u=document.getElementById('bUndo'),r=document.getElementById('bRedo');if(u)u.disabled=!UNDO.length;if(r)r.disabled=!REDO.length;}
 /* 履歴 */
-function pushHist(mo,label){if(!mo.res)return;mo.hist=mo.hist||[];mo.hist.unshift({t:Date.now(),label,res:JSON.parse(JSON.stringify(mo.res))});mo.hist=mo.hist.slice(0,3);
+function pushHist(mo,label){if(!mo.res)return;mo.hist=mo.hist||[];if(mo.hist[0]&&JSON.stringify(mo.hist[0].res)===JSON.stringify(mo.res))return;mo.hist.unshift({t:Date.now(),label,res:JSON.parse(JSON.stringify(mo.res))});mo.hist=mo.hist.slice(0,3);
  const ck=ST.cur.y*12+ST.cur.m;for(const k in ST.months){const [yy,mm]=k.split('-').map(Number);if(yy*12+mm<ck-2&&ST.months[k].hist)delete ST.months[k].hist;}}
 function fmtT(t){const d=new Date(t),p=n=>String(n).padStart(2,'0');return `${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`;}
 function showHist(){const mo=curMo(),hs=mo.hist||[];
@@ -609,20 +612,20 @@ function suggestFor(y,m,d,dep){const res=curMo().res,days=dayInfos(y,m),di=days[
  const surplus=(dp,z)=>dayCnt(res,dp,z)-deptReq(dp,days[z-1]);
  for(const s of ST.staff){const v=res[s.id][d];if(!v)continue;const home=deptById(s.dept);const can=s.dept===dep.id||s.help.includes(dep.id);if(!can)continue;
   if(v.c==='休'&&!v.lock&&(s.kind==='常勤'?di.w!==0:s.fixed.includes(di.w))){
-   for(const x of days){const z=x.d;if(z===d||Math.abs(z-d)>7)continue;const vz=res[s.id][z];if(!vz||!isWork(vz.c)||vz.lock)continue;const hz=cellDept(vz,s);if(!hz||surplus(hz.id,z)<=0)continue;
+   for(const x of days){const z=x.d;if(z===d||Math.abs(z-d)>7)continue;const vz=res[s.id][z];if(!vz||!isWork(vz.c)||vz.lock)continue;const hz=cellDept(vz,s);if(!hz||surplus(hz,z)<=0)continue;
     const a=JSON.stringify(v),b=JSON.stringify(vz);res[s.id][d]={c:'x'};res[s.id][z]={c:'休'};const ok=maxRunOf(res,s,y,m)<=ST.rules.maxRun;res[s.id][d]=JSON.parse(a);res[s.id][z]=JSON.parse(b);
     if(ok){out.push({sid:s.id,d,z,dep:dep.id,txt:`${s.name}：${d}日を出勤${s.dept===dep.id?'':'（応援）'}にして、${z}日（${hz.name}に余裕あり）を休みにする`});break;}}}
-  else if(isWork(v.c)&&s.dept!==dep.id){const hd=cellDept(v,s);if(hd&&hd!==dep&&surplus(hd.id,d)>0)out.push({sid:s.id,d,z:null,dep:dep.id,txt:`${s.name}：${d}日だけ${hd.name}（余裕あり）から${dep.name}へ応援`});}}
+  else if(isWork(v.c)&&s.dept!==dep.id){const hd=cellDept(v,s);if(hd&&hd!==dep&&surplus(hd,d)>0)out.push({sid:s.id,d,z:null,dep:dep.id,txt:`${s.name}：${d}日だけ${hd.name}（余裕あり）から${dep.name}へ応援`});}}
  return out.slice(0,6);}
 function applySug(i){const g=SUG[i];if(!g)return;const mo=curMo(),s=ST.staff.find(x=>x.id===g.sid),dep=deptById(g.dep);pushHist(mo,'修正の前');
  mo.res[g.sid][g.d]=s.dept===dep.id?{c:primaryCode(s),n:'',lock:true,man:true}:{c:dep.name,n:'ヘルプ',dp:dep.id,lock:true,man:true};
- if(g.z)mo.res[g.sid][g.z]={c:'休',n:'',lock:true,man:true};save();closeM();render();toast('入れ替えました（元に戻す：↶）');}
+ if(g.z)mo.res[g.sid][g.z]={c:'休',n:'',lock:true,man:true};save();closeM();render();toast(g.z?`${g.d}日を出勤、${g.z}日を休みに入れ替えました（元に戻す：↶）`:`${g.d}日に${s.name}さんを${dep.name}へ応援に入れました（元に戻す：↶）`);}
 function sugHtml(y,m,d,dep){const ss=suggestFor(y,m,d,dep);return ss.length?ss.map(x=>{SUG.push(x);return `<button class="sug" onclick="applySug(${SUG.length-1})">${esc(x.txt)}</button>`;}).join(''):'<small>自動で見つかる候補はありません。必要人数・ヘルプ可能部署の設定を見直してください。</small>';}
 /* 集計（グループ化） */
 function rSum(){const{y,m}=ST.cur,mo=curMo(),days=dayInfos(y,m);let h=monthBar();if(!mo.res)return h+'<p class="hint">まだ作成されていません。シフト表タブで「⚙ 自動作成」を押してください。</p>';
  const ck=checks(y,m,mo.res);SUG=[];
  const short={};const other=[];const info=[];
- for(const x of ck.list){const mm=x.msg.match(/^(\d+)日 (.+?): (\d+)\/(\d+)人 不足$/);if(x.lv==='err'&&mm){const dep=ST.depts.find(d=>d.name===mm[2]);(short[mm[2]]=short[mm[2]]||{dep,ds:[]}).ds.push(+mm[1]);}else if(x.lv==='info')info.push(x);else other.push(x);}
+ for(const x of ck.list){const mm=x.msg.match(/^(\d+)日 (.+?): (\d+)\/(\d+)人 不足$/);if(x.lv==='err'&&mm&&ST.depts.some(d=>d.name===mm[2])){const dep=ST.depts.find(d=>d.name===mm[2]);(short[mm[2]]=short[mm[2]]||{dep,ds:[]}).ds.push(+mm[1]);}else if(x.lv==='info')info.push(x);else other.push(x);}
  h+=`<div class="ck ${ck.err?'bad':ck.warn?'mid':'good'}">必須違反 <b>${ck.err}</b> ／ 警告 <b>${ck.warn}</b>${info.length?` ／ お知らせ ${info.length}`:''}</div>`;
  for(const k in short){const g=short[k];h+=`<details class="grp" open><summary>⛔ ${esc(k)}：${g.ds.length}日不足（${g.ds.join('・')}日）</summary>`;
   for(const d of g.ds.slice(0,8)){h+=`<div class="why"><b>${d}日</b> ${esc(whyShort(y,m,d,g.dep,mo.res))}<div class="sugs">${sugHtml(y,m,d,g.dep)}</div></div>`;}
@@ -643,15 +646,17 @@ function fairness(y,m,res){const days=dayInfos(y,m);const help={};const sats=[],
 /* 急な欠勤 */
 function absent(sid,d){const s=ST.staff.find(x=>x.id===sid);
  $('#modal').innerHTML=`<div class="mb"><h3>🚑 ${esc(s.name)} ${ST.cur.m}/${d} の急な欠勤</h3><p>理由を選ぶと、その日だけの代わりの候補を出します（他の日は動かしません）。</p><div class="chips">${['有給','休','特休','代休'].map(c=>`<button class="offb" onclick="setAbsent('${sid}',${d},'${c}')">${c}</button>`).join('')}</div><div class="acts"><button onclick="closeM()">キャンセル</button></div></div>`;}
-function setAbsent(sid,d,code){const{y,m}=ST.cur;const mo=curMo(),s=ST.staff.find(x=>x.id===sid);const v=mo.res[sid][d];const dep=cellDept(v,s)||deptById(s.dept);pushHist(mo,'急な欠勤の前');
- mo.res[sid][d]={c:code,n:'',lock:true,man:true};save();render();SUG=[];const di=dayInfos(y,m)[d-1];const c=dayCnt(mo.res,dep,d),rq=deptReq(dep,di);
- $('#modal').innerHTML=`<div class="mb"><h3>${d}日 ${esc(dep.name)}：${c}/${rq}人</h3>${c>=rq?'<p>必要人数は足りています。代わりは不要です。</p>':`<p>代わりの候補（タップで反映・他の日は入れ替え先の1日だけ変わります）</p><div class="sugs">${sugHtml(y,m,d,dep)}</div>`}<div class="acts"><button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');}
+function setAbsent(sid,d,code){const{y,m}=ST.cur;const mo=curMo(),s=ST.staff.find(x=>x.id===sid);const v=mo.res[sid][d];const dep=cellDept(v,s)||deptById(s.dept);const hl=(mo.hist||[]).length;pushHist(mo,'急な欠勤の前');
+ const old=JSON.stringify(v);let html;mo.res[sid][d]={c:code,n:'',lock:true,man:true};SUG=[];
+ try{const di=dayInfos(y,m)[d-1];const c=dayCnt(mo.res,dep,d),rq=deptReq(dep,di);const sh=c>=rq?'':sugHtml(y,m,d,dep);
+ html=`<div class="mb"><h3>${d}日 ${esc(dep.name)}：${c}/${rq}人</h3>${c>=rq?'<p>必要人数は足りています。代わりは不要です。</p>':SUG.length?`<p>代わりの候補（タップで反映・他の日は入れ替え先の1日だけ変わります）</p><div class="sugs">${sh}</div>`:`<p>${sh}</p>`}`;}catch(e){mo.res[sid][d]=JSON.parse(old);if(mo.hist&&mo.hist.length>hl)mo.hist.shift();alert('処理中にエラーが出たため、マスは変更していません。\n'+e.message);return;}
+ save();render();$('#modal').innerHTML=html+`<div class="acts"><button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');}
 /* 希望休まとめ入力 */
 function parseDays(t,n){const out=new Set();for(const p of String(t).replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248)).replace(/[〜～ー−]/g,'-').split(/[,、\s]+/)){const mm=p.match(/^(\d+)(?:-(\d+))?$/);if(!mm)continue;const a=+mm[1],b=+(mm[2]||mm[1]);for(let d=Math.min(a,b);d<=Math.max(a,b);d++)if(d>=1&&d<=n)out.add(d);}return [...out].sort((a,b)=>a-b);}
 function bulkReq(){const BR=['希休','有給','特休','夏季','リフ','代休','休','出勤','消去'];
  $('#modal').innerHTML=`<div class="mb"><h3>📝 希望休をまとめて入力</h3><div class="form"><label>職員<select id="b_s">${staffOrdered().map(s=>`<option value="${s.id}">${esc(s.name)}（${esc(deptById(s.dept)?.name||'')}）</option>`).join('')}</select></label>
  <label>種類<select id="b_t">${BR.map(b=>`<option>${b}</option>`).join('')}</select></label><label>日付（例：3,5,10-12）<input id="b_d" inputmode="numeric" placeholder="3,5,10-12"></label>
- <div>曜日でまとめて<div class="chips">${[1,2,3,4,5,6].map(w=>`<label class="ck2"><input type="checkbox" class="b_w" value="${w}">毎${WD[w]}</label>`).join('')}</div></div></div>
+ <div>曜日でまとめて<div class="chips">${[1,2,3,4,5,6].map(w=>`<label class="ck2"><input type="checkbox" class="b_w" value="${w}">毎週${WD[w]}</label>`).join('')}</div></div></div>
  <div class="acts"><button class="pri" onclick="applyBulk(false)">入力して閉じる</button><button onclick="applyBulk(true)">入力して次の人</button><button onclick="closeM()">閉じる</button></div></div>`;$('#modal').classList.add('on');}
 function applyBulk(next){const{y,m}=ST.cur,n=dim(y,m),mo=curMo();const sid=$('#b_s').value,t=$('#b_t').value;const ds=new Set(parseDays($('#b_d').value,n));
  const ws=[...document.querySelectorAll('.b_w')].filter(x=>x.checked).map(x=>+x.value);dayInfos(y,m).forEach(di=>{if(ws.includes(di.w))ds.add(di.d);});
@@ -664,12 +669,12 @@ function importJson(inp){const f=inp.files[0];if(!f)return;const r=new FileReade
  if(errs.length){inp.value='';return alert('読み込めませんでした：\n'+errs.join('\n'));}
  if(ST.staff.length&&!confirm(`今のデータ（${ST.staff.length}人）を、読み込むデータ（${s.staff.length}人）で置き換えます。\n置き換える前の今のデータは、自動で控えを残します。よろしいですか？`)){inp.value='';return;}
  try{lsSet(LS_KEY+'.before_import',JSON.stringify(ST));}catch(e){}if(ST.staff.length)try{exportJson('自動控え_読み込み前_');}catch(e){}
- const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur});if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;migrate();save();render();toast(ST.staff.length+'人を読み込みました');inp.value='';};r.readAsText(f);}
+ const d=defaultState();ST=Object.assign(d,s,{cur:s.cur||d.cur});if(!s.sample)delete ST.sample;if(!Array.isArray(ST.depts)||!ST.depts.length)ST.depts=d.depts;migrate();save();render();toast(ST.staff.length+'人を読み込みました');inp.value='';};r.readAsText(f);}
 function restoreBeforeImport(){const t=lsGet(LS_KEY+'.before_import');if(!t)return alert('読み込み前の控えはありません');if(!confirm('読み込み前のデータに戻しますか？'))return;ST=JSON.parse(t);migrate();save();render();toast('読み込み前のデータに戻しました');}
 function backupBand(){const lb=ST.lastBackup;const days=lb?Math.floor((Date.now()-lb)/864e5):null;if(lb&&days<14)return '';
  return `<div class="bk">💾 ${lb?`最後のバックアップから${days}日たっています`:'まだバックアップ（JSON書き出し）をしていません'}。端末の故障や機種変更に備えて、<button onclick="exportJson()">今すぐ書き出す</button></div>`;}
 function guideBar(){const mo=curMo();const nReq=Object.values(mo.req||{}).reduce((a,r)=>a+Object.keys(r).length,0);const st=[['①希望休',nReq>0,"setTab('req')"],['②自動作成',!!mo.res,'runGen()'],['③確認・調整',!!mo.res,"setTab('sum')"],['④印刷・配布',false,"document.getElementById('psel')&&document.getElementById('psel').focus()"]];
- return backupBand()+`<div class="steps">${st.map(([t,ok,f])=>`<button class="${ok?'ok':''}" onclick="${f}">${ok?'✓':''}${t}</button>`).join('')}</div>`;}
+ return sampleBand()+backupBand()+`<div class="steps">${st.map(([t,ok,f])=>`<button class="${ok?'ok':''}" onclick="${f}">${ok?'✓':''}${t}</button>`).join('')}</div>`;}
 /* 部署削除の参照掃除 */
 function delDept(i){const id=ST.depts[i].id;if(ST.staff.some(s=>s.dept===id))return alert('所属スタッフがいるため削除できません');if(!confirm('削除しますか？（ヘルプ可能部署・会議対象からも外れます）'))return;
  ST.depts.splice(i,1);for(const s of ST.staff){s.help=(s.help||[]).filter(x=>x!==id);if(s.helpW)delete s.helpW[id];}ST.meetings=ST.meetings.filter(mt=>mt.target!==id);save();render();}
@@ -711,7 +716,7 @@ async function makePdfFile(only){const{y,m}=ST.cur;const imgs=[];let cvs=[];
 async function printPersons(){const{y,m}=ST.cur;const cvs=await personPages(y,m);const pv=$('#printview');pv.innerHTML=cvs.map(cv=>`<section class="pp"><img src="${cv.toDataURL('image/jpeg',0.85)}" style="width:283mm;height:auto;display:block"></section>`).join('');
  document.body.classList.add('printing');const done=()=>{document.body.classList.remove('printing');pv.innerHTML='';window.removeEventListener('afterprint',done);};window.addEventListener('afterprint',done);
  setTimeout(()=>{try{window.print();}catch(e){showErr(e.message);}setTimeout(()=>{if(!matchMedia('print').matches)done();},1500);},120);}
-function shortOff(t){return String(t).replace(/^希休/,'希').replace(/^有給/,'有').replace(/^特休/,'特').replace(/^夏季/,'夏').replace(/^リフ/,'リ').replace(/^代休/,'代').replace(/^休所/,'所');}
+function shortOff(t){return String(t).replace(/^対象外$/,'－').replace(/^定休$/,'定').replace(/^希休/,'希').replace(/^有給/,'有').replace(/^特休/,'特').replace(/^夏季/,'夏').replace(/^リフ/,'リ').replace(/^代休/,'代').replace(/^休所/,'所');}
 
 function fixExtraOff(y,m,res){const days=dayInfos(y,m),T=satCountTarget(y,m);
  for(const s of ST.staff){if(s.kind!=='常勤'||!res[s.id])continue;const r=res[s.id];const dep=deptById(s.dept);if(!dep)continue;
@@ -722,6 +727,81 @@ function fixExtraOff(y,m,res){const days=dayInfos(y,m),T=satCountTarget(y,m);
    if(!cands.length)break;cands.sort((a,b)=>(dayCnt(res,dep,a.d)-deptReq(dep,a))-(dayCnt(res,dep,b.d)-deptReq(dep,b)));
    r[cands[0].d]={c:primaryCode(s),n:''};off--;}}
  return res;}
+/* ===== v3: 在籍・休職・振替・資格 ===== */
+OFF_CODES.push('休職','対象外','定休');
+function ymdN(y,m,d){return y*10000+m*100+d;}
+function pd(t){if(!t)return null;const a=String(t).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);return a?(+a[1])*10000+(+a[2])*100+(+a[3]):null;}
+function dayStat(s,y,m,d){const k=ymdN(y,m,d),st=pd(s.start),en=pd(s.end);if((st&&k<st)||(en&&k>en))return 'out';
+ for(const L of (s.leaves||[])){const a=pd(L.from),b=pd(L.to);if(a&&k>=a&&(!b||k<=b))return 'leave';}return '';}
+function leaveName(s,y,m,d){const k=ymdN(y,m,d);for(const L of (s.leaves||[])){const a=pd(L.from),b=pd(L.to);if(a&&k>=a&&(!b||k<=b))return L.kind||'休職';}return '';}
+function empIn(s,y,m){const st=pd(s.start),en=pd(s.end);return !((st&&st>ymdN(y,m,dim(y,m)))||(en&&en<ymdN(y,m,1)));}
+function inclDow(dep){return !dep||dep.dowKoukyu!==false;}
+function koukyuT(s,y,m){const days=dayInfos(y,m),dep=deptById(s.dept);const act=days.filter(di=>!dayStat(s,y,m,di.d));
+ const base=act.filter(di=>di.w===0||di.w===6).length;
+ const forced=act.filter(di=>di.w===0||(di.w===6&&di.closed)||(dep&&inclDow(dep)&&di.w>=1&&di.w<=5&&dep.closedDow.includes(di.w)&&!di.closed&&di.kind!=='hol')).length;
+ return Math.max(base,forced);}
+function migrate2(){if(!Array.isArray(ST.quals))ST.quals=['サビ管','看護師','運転者'];
+ for(const d of ST.depts){if(!Array.isArray(d.qreq))d.qreq=[];for(const q of d.qreq)q.req=normReq(q.req);}
+ for(const s of ST.staff){if(!Array.isArray(s.quals))s.quals=[];if(!Array.isArray(s.leaves))s.leaves=[];}
+ for(const k in ST.months){const mo=ST.months[k];if(mo.furi&&typeof mo.furi!=='object')mo.furi={};}}
+function staffOrdered(){const{y,m}=ST.cur,mo=curMo(),res=mo.res,days=dayInfos(y,m);
+ return ST.staff.filter(s=>{const e=empIn(s,y,m);if(res&&!res[s.id]&&e){res[s.id]={};for(const di of days)res[s.id][di.d]={c:'',n:''};}
+  return e;});}
+function fixExtraOff(y,m,res){const days=dayInfos(y,m);
+ for(const s of ST.staff){if(s.kind!=='常勤'||!res[s.id])continue;const r=res[s.id];const dep=deptById(s.dept);if(!dep)continue;const Ts=koukyuT(s,y,m);
+  let off=days.filter(di=>{const v=r[di.d]||{};return KOUKYU.includes(v.c)||(v.c==='代休'&&v.furiOf);}).length;let guard=0;
+  while(off>Ts&&guard++<5){const cands=days.filter(di=>{const v=r[di.d];if(!v||v.c!=='休'||v.lock||di.w===0||di.closed||deptReq(dep,di)<=0)return false;
+    if(di.w===6){if(!s.satOK)return false;const sc=days.filter(x=>x.w===6&&isWork((r[x.d]||{}).c)).length;if(sc>=satCapOf(s,days))return false;}
+    const keep=JSON.stringify(v);r[di.d]={c:primaryCode(s),n:''};const ok=maxRunOf(res,s,y,m)<=ST.rules.maxRun;r[di.d]=JSON.parse(keep);return ok;});
+   if(!cands.length)break;cands.sort((a,b)=>(dayCnt(res,dep,a.d)-deptReq(dep,a))-(dayCnt(res,dep,b.d)-deptReq(dep,b)));
+   r[cands[0].d]={c:primaryCode(s),n:''};off--;}}
+ return res;}
+function fillQuals(y,m,res,days,R,canRest,runAt){const n=days.length,has=(s,q)=>(s.quals||[]).includes(q),MR=ST.rules.maxRun;
+ const qc=(dep,q,d)=>ST.staff.filter(s=>{const v=res[s.id]&&res[s.id][d];return v&&isWork(v.c)&&cellDept(v,s)===dep&&has(s,q);}).length;
+ const need=(dep,qr,di)=>(di.closed||dep.closedDow.includes(di.w))?0:(+qr.req[di.kind]||0);
+ for(const dep of ST.depts)for(const qr of (dep.qreq||[]))for(const di of days){const d=di.d;let k=need(dep,qr,di)-qc(dep,qr.q,d);if(k<=0)continue;
+  for(const s of shuffle(ST.staff.filter(s=>s.kind==='常勤'&&s.dept===dep.id&&has(s,qr.q)&&res[s.id][d].c==='休'&&!res[s.id][d].lock&&di.w!==0),R)){if(k<=0)break;
+   if(di.w===6&&!s.satOK)continue;
+   for(const z of shuffle(days.map(x=>x.d),R)){if(z===d||!canRest(s,z))continue;const dz=days[z-1],vz=res[s.id][z];if(cellDept(vz,s)!==dep)continue;
+    if(qc(dep,qr.q,z)-1<need(dep,qr,dz)||dayCnt(res,dep,z)-1<deptReq(dep,dz))continue;
+    const a=res[s.id][d],b=vz;res[s.id][d]={c:primaryCode(s),n:''};res[s.id][z]={c:'休',n:''};
+    if(runAt(s,d)<=MR&&runAt(s,Math.max(1,z-1))<=MR&&runAt(s,Math.min(n,z+1))<=MR){k--;break;}res[s.id][d]=a;res[s.id][z]=b;}}
+  for(const s of shuffle(ST.staff.filter(s=>has(s,qr.q)&&s.dept!==dep.id&&(s.help||[]).includes(dep.id)),R)){if(k<=0)break;const v=res[s.id][d];if(!v||!isWork(v.c)||v.lock)continue;const hd=cellDept(v,s);if(!hd||hd===dep)continue;
+   if(dayCnt(res,hd,d)-1<deptReq(hd,di))continue;if((hd.qreq||[]).some(x=>has(s,x.q)&&qc(hd,x.q,d)-1<need(hd,x,di)))continue;res[s.id][d]={c:dep.name,n:'ヘルプ',dp:dep.id};k--;}}}
+/* 職員画面：在籍・休職・資格 */
+function empHtml(s){const lv=(s.leaves||[]).map(L=>`${L.from||''}〜${L.to||''} ${L.kind||'休職'}`).join('\n');
+ return `<label>入職日（空欄＝前から在籍）<input type="date" id="f_start" value="${esc(s.start||'')}"></label>
+ <label>退職日（空欄＝在籍中）<input type="date" id="f_end" value="${esc(s.end||'')}"></label>
+ <label>休職期間（産休・育休・病欠など。1行に1件「開始〜終了 種類」例：2027-01-05〜2027-06-30 産休）<textarea id="f_leaves" rows="2" placeholder="2027-01-05〜2027-06-30 産休">${esc(lv)}</textarea></label>
+ <div>資格<div class="chips">${(ST.quals||[]).map(q=>`<label class="ck2"><input type="checkbox" class="f_q" value="${esc(q)}" ${(s.quals||[]).includes(q)?'checked':''}>${esc(q)}</label>`).join('')}</div><label>資格の種類を追加（読点区切り）<input id="f_newq" placeholder="例：保育士、調理師"></label></div>`;}
+function readEmp(s){if(!$('#f_start'))return;s.start=$('#f_start').value||'';s.end=$('#f_end').value||'';if(!s.start)delete s.start;if(!s.end)delete s.end;
+ s.leaves=String($('#f_leaves').value||'').split(/\n/).map(x=>x.trim()).filter(Boolean).map(x=>{const ds=x.match(/\d{4}\D+\d{1,2}\D+\d{1,2}/g)||[];const kind=x.replace(/\d{4}\D+?\d{1,2}\D+?\d{1,2}/g,'').replace(/[〜～~\-ー\s]/g,'').trim()||'休職';
+  const f=t=>{const p=pd(t);return p?`${Math.floor(p/10000)}-${String(Math.floor(p/100)%100).padStart(2,'0')}-${String(p%100).padStart(2,'0')}`:'';};return {from:f(ds[0]),to:f(ds[1]),kind};}).filter(L=>L.from);
+ const nq=String($('#f_newq').value||'').split(/[,、\s]+/).map(x=>x.trim()).filter(Boolean);for(const q of nq)if(!ST.quals.includes(q))ST.quals.push(q);
+ s.quals=[...document.querySelectorAll('.f_q')].filter(x=>x.checked).map(x=>x.value).concat(nq.filter(q=>!(s.quals||[]).includes(q)));s.quals=[...new Set(s.quals)];}
+function staffBadge(s){const t=new Date(),y=t.getFullYear(),m=t.getMonth()+1,d=t.getDate();const st=dayStat(s,y,m,d);
+ return (s.end?` <b class="bdg">退職 ${esc(s.end)}</b>`:'')+(s.start&&pd(s.start)>ymdN(y,m,d)?` <b class="bdg">入職予定 ${esc(s.start)}</b>`:'')+(st==='leave'?` <b class="bdg">${esc(leaveName(s,y,m,d))}中</b>`:'')+((s.quals||[]).length?` <small>資格:${esc(s.quals.join('・'))}</small>`:'');}
+function delStaff(id){const s=ST.staff.find(x=>x.id===id);const used=Object.values(ST.months).some(mo=>mo&&mo.res&&mo.res[id]);
+ if(used){const t=prompt(`${s.name}さんは作成済みの月の表に載っています。\n削除すると過去の表から消えるため、「退職」として扱います。\n退職日を入力してください（例：2027-03-31）`,s.end||ymdLocal());if(!t)return;const p=pd(t);if(!p)return alert('日付が読めません（例：2027-03-31）');
+  s.end=`${Math.floor(p/10000)}-${String(Math.floor(p/100)%100).padStart(2,'0')}-${String(p%100).padStart(2,'0')}`;save();closeM();render();toast('退職日を設定しました（過去の表には残ります）');return;}
+ if(!confirm('削除しますか？'))return;ST.staff=ST.staff.filter(x=>x.id!==id);save();closeM();render();}
+/* 部署画面：定休日の扱い・必要な資格者 */
+function deptExtraHtml(d,i){const qs=ST.quals||[];
+ return `${d.closedDow.length?`<div class="row small"><label class="ck2"><input type="checkbox" ${inclDow(d)?'checked':''} onchange="ST.depts[${i}].dowKoukyu=this.checked;save()">定休日を公休に数える（常勤の公休は「土日の数」か「日曜＋定休日の数」の多い方）</label></div>`:''}
+ <details><summary>必要な資格者 ${(d.qreq||[]).length?d.qreq.length+'件':'設定なし'}</summary>${(d.qreq||[]).map((q,j)=>`<div class="sub"><select onchange="ST.depts[${i}].qreq[${j}].q=this.value;save()">${qs.map(x=>`<option ${x===q.q?'selected':''}>${esc(x)}</option>`).join('')}</select><div class="req">${KINDS.map(([k,l])=>`<label>${l}<input type="number" min="0" value="${q.req[k]}" onchange="ST.depts[${i}].qreq[${j}].req.${k}=+this.value;save()"></label>`).join('')}</div><button onclick="ST.depts[${i}].qreq.splice(${j},1);save();render()">削除</button></div>`).join('')}
+ ${qs.length?`<button onclick="ST.depts[${i}].qreq.push({q:ST.quals[0],req:normReq({})});save();render()">＋必要な資格者</button>`:''}<p class="hint">資格の種類はスタッフ編集で追加できます。足りない日は「必須違反」になります。</p></details>`;}
+/* 振替の代休 */
+function furiHtml(sid,d){const{y,m}=ST.cur;if(dowOf(y,m,d)!==0)return '';const mo=curMo(),cur=((mo.furi||{})[sid]||{})[d];const ds=dayInfos(y,m).filter(di=>di.w>=1&&di.w<=6&&!di.closed);
+ return `<div class="furi"><label>日曜出勤の振替の代休日<select id="furi">${ds.map(di=>`<option value="${di.d}" ${cur===di.d?'selected':''}>${di.d}日(${WD[di.w]})</option>`).join('')}</select></label><button onclick="linkFuri('${sid}',${d})">代休をひもづける</button>${cur?`<button onclick="unlinkFuri('${sid}',${d})">ひもづけを外す</button>`:''}</div>`;}
+function linkFuri(sid,d){const z=+$('#furi').value,mo=curMo();pushHist(mo,'振替の前');mo.furi=mo.furi||{};const old=((mo.furi[sid]||{})[d]);
+ if(old&&old!==z&&mo.res[sid][old]&&mo.res[sid][old].furiOf===d){mo.res[sid][old]={c:'',n:''};if(mo.req[sid])delete mo.req[sid][old];}
+ (mo.furi[sid]=mo.furi[sid]||{})[d]=z;mo.req[sid]=mo.req[sid]||{};const v=mo.res[sid][d];if(!isWork(v.c))mo.res[sid][d]={c:primaryCode(ST.staff.find(s=>s.id===sid)),n:''};
+ mo.res[sid][d].lock=true;mo.res[sid][d].man=true;mo.req[sid][d]='出勤';mo.req[sid][z]='代休';mo.res[sid][z]={c:'代休',n:`振替(${d}日分)`,lock:true,man:true,furiOf:d};save();closeM();render();toast(`${d}日の出勤と${z}日の代休をひもづけました`);}
+function unlinkFuri(sid,d){const mo=curMo(),z=mo.furi[sid][d];delete mo.furi[sid][d];if(mo.res[sid][z])delete mo.res[sid][z].furiOf;save();closeM();render();toast('ひもづけを外しました');}
+/* お試しサンプル */
+function sampleBand(){return ST.sample?`<div class="bk">🧪 これは<b>お試し用の架空データ</b>（職員A01など）です。実際のデータは<b>保存</b>タブの「データ読み込み」で取り込んでください。</div>`:'';}
+function loadSample(){const d=defaultState();ST.staff=d.staff;ST.sample=true;migrate();save();render();toast('お試し用の架空データを入れました');}
+
 /* 起動 */
 function boot(){const nj=document.getElementById('nojs');if(nj)nj.style.display='none';
  setTimeout(()=>{try{load();migrate();LAST=JSON.stringify(ST);persist();updUR();document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));setTab('shift');if(!LS_OK)document.getElementById('memband').style.display='block';}catch(e){showErr((e&&e.message||e)+(e&&e.stack?'\n'+e.stack:''));}},30);}
