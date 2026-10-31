@@ -55,6 +55,7 @@ header{padding-top:calc(10px + env(safe-area-inset-top));padding-left:calc(12px 
 #inst{display:none;position:fixed;left:8px;right:8px;bottom:calc(64px + env(safe-area-inset-bottom));z-index:7;background:#fff;border:1px solid #2f5d8a;border-radius:10px;padding:8px 10px;box-shadow:0 2px 8px rgba(0,0,0,.15);font-size:13px;align-items:center;gap:8px}#inst.on{display:flex}#inst span{flex:1}#inst button{min-height:44px;border-radius:8px;border:1px solid #2f5d8a;background:#2f5d8a;color:#fff;padding:0 12px;font-size:14px}#inst button.x{background:#fff;color:#2f5d8a;min-width:44px;padding:0}
 @media print{#inst{display:none!important}}
 .srow2{display:flex;gap:6px;align-items:stretch}.srow2 .srow{flex:1;min-width:0}.srow2>button,.effbox input,#main button.danger{min-height:44px;min-width:44px}.effbox{border:1px dashed #c90;border-radius:8px;padding:6px 8px;margin:6px 0;background:#fffbea}button.danger{color:#b00}
+.pp.a1 table{table-layout:fixed}.pp.a1 h2{font-size:10pt;margin:0 0 1mm}.pp.a1 th,.pp.a1 td{font-size:var(--a1f);height:var(--a1h);line-height:1;padding:0;border:.3pt solid #000;letter-spacing:-.3px}.pp.a1 td.pn{text-align:left;padding-left:1px;font-size:var(--a1f)}.pp.a1 tr.dl td{text-align:left;font-weight:bold;border-top:1pt solid #000;padding-left:2px}.pp.a1 tr.sum td{font-weight:bold;border-top:.6pt solid #000;border-bottom:.8pt solid #000}.pp.a1 .sat{background:#e4ecfa;text-decoration:none}.pp.a1 .sun{background:#fbe3e3;text-decoration:none}.pp.a1 td.off{background:#e6e6e6;font-style:normal;color:#444}.pp.a1 td.off.sat,.pp.a1 td.off.sun{background:#d6d6d6}.pp.a1 td.ou{background:#fff;font-weight:bold}.pp.a1 .lg{font-size:6pt;margin-top:.8mm}
 </style></head><body><div id="nojs" style="margin:16px;padding:20px;border:4px solid #d00;border-radius:12px;background:#fff4f4;color:#900;font-size:22px;line-height:1.6;font-weight:bold">この画面のままなら、プレビューでは動きません。<br>共有ボタンから『Safariで開く』か『ファイルに保存』してから開いてください。</div><div id="errbox" style="display:none;margin:8px;padding:10px;background:#ffe0e0;color:#900;border:2px solid #d00;font-size:13px;white-space:pre-wrap;word-break:break-all"></div><div id="memband" style="display:none;padding:8px 12px;background:#fff3b0;color:#640;font-size:14px;font-weight:bold">この開き方では保存できません。JSON書き出しで控えをとってください</div>
 <script>function showErr(m){if(String(m).includes('印刷する職員がいません')){try{closeM();}catch(e){}toast('印刷する職員がいません');return;}try{var e=document.getElementById('errbox');e.style.display='block';e.textContent+='エラー: '+m+'\n';}catch(_){}}
 window.onerror=function(msg,src,l,c,err){showErr(msg+' (行'+l+':'+c+')'+(err&&err.stack?'\n'+err.stack:''));};
@@ -470,7 +471,7 @@ async function copyCSV(y,m){const t=toCSV(y,m);try{await navigator.clipboard.wri
 function deptAbbr(dep){const used={};for(const d of ST.depts){let a=d.short||d.name[0];if(Object.values(used).includes(a))a=d.name.slice(0,2);used[d.id]=a;}return used[dep.id]||dep.name[0];}
 function abbrLegend(){return ST.depts.map(d=>deptAbbr(d)+'＝'+d.name).join('、');}
 function ownMark(v,dep){const N=String(v.c).replace(/[Ａ-Ｚ]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248));const sb=dep.subs.find(q=>N.includes(q.code));return sb?sb.code.slice(-1):'○';}
-function printOpts(){return `<select id="psel" style="padding:6px;font-size:14px"><option value="">全事業所（事業所ごとに改ページ）</option>${ST.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}<option value="__person">個人別（配布用・1枚に4人）</option></select><button onclick="$('#psel').value==='__person'?printPersons():doPrint($('#psel').value)">🖨 印刷</button><button class="pri" onclick="doPdf($('#psel').value)">📄 PDFを作成</button><small class="phint" style="width:100%;color:#555">${IS_IOS?'iPhone：『PDFを作成』→『共有・保存』→プリント／ファイルに保存が確実です':IS_AND?'Android：『PDFを作成』→『共有・保存』で印刷やドライブ保存が確実です（印刷ボタンは横向きにならない場合あり。そのときは📄 PDFを作成を使ってください）':'パソコン：『🖨 印刷』でA4横に印刷。『PDFを作成』はダウンロード保存'}</small><div id="pdfst" style="width:100%;font-size:13px"></div>`;}
+function printOpts(){return `<select id="psel" style="padding:6px;font-size:14px"><option value="">全事業所（事業所ごとに改ページ）</option>${ST.depts.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}<option value="__all1">全体を1枚で（A4横）</option><option value="__person">個人別（配布用・1枚に4人）</option></select><button onclick="$('#psel').value==='__person'?printPersons():doPrint($('#psel').value)">🖨 印刷</button><button class="pri" onclick="doPdf($('#psel').value)">📄 PDFを作成</button><small class="phint" style="width:100%;color:#555">${IS_IOS?'iPhone：『PDFを作成』→『共有・保存』→プリント／ファイルに保存が確実です':IS_AND?'Android：『PDFを作成』→『共有・保存』で印刷やドライブ保存が確実です（印刷ボタンは横向きにならない場合あり。そのときは📄 PDFを作成を使ってください）':'パソコン：『🖨 印刷』でA4横に印刷。『PDFを作成』はダウンロード保存'}</small><div id="pdfst" style="width:100%;font-size:13px"></div>`;}
 const LEGEND='凡例：○＝出勤（A・B等＝班）　研＝研修・張＝出張（人数に数えない）　灰色・斜体＝休み（休①②…＝公休、休職＝産休・育休など、－＝在籍外、定＝定休日、希＝希望休、有＝有給、特＝特休、夏＝夏季、リ＝リフレッシュ、代＝代休、所＝休所）　【応援】行・点線枠・応＝他事業所からの応援　【異動】＝月の途中で所属が変わった人　青・下線＝土曜　赤・二重下線＝日曜・祝日';
 function buildPrint(y,m,only){const mo=curMo(),res=mo.res,days=dayInfos(y,m),n=days.length;
  const cls=di=>di.w===0||di.h?'sun':di.w===6?'sat':'';let H='';
@@ -974,6 +975,30 @@ rStaff=function(){let h=`<p class="hint">名前は端末内（このブラウザ
 /* シフト表：途中から作り直すボタン・異動の印 */
 {const f=rShift;rShift=function(){let h=f();if(curMo().res)h=h.replace('<button onclick="showHist()">🕘 履歴</button>','<button onclick="askRegen()">✂ 途中から作り直す</button><button onclick="showHist()">🕘 履歴</button>');return h;};}
 
+/* ===== 全体を1枚で（A4横） ===== */
+function buildPrintAll(y,m){const mo=curMo(),res=mo.res,days=dayInfos(y,m),n=days.length;const ord=staffOrdered();
+ const groups=ST.depts.map(dep=>({dep,ss:ord.filter(s=>s.dept===dep.id)})).filter(g=>g.ss.length);
+ const rows=groups.reduce((a,g)=>a+g.ss.length+2,0)+2;const avail=210-14-9-8;const rh=Math.max(1.6,Math.min(5,Math.floor(avail/rows*100)/100));
+ const pf=Math.max(3.5,Math.min(7.5,rh*2.2)).toFixed(1);const cls=di=>di.w===0||di.h?'sun':di.w===6?'sat':'';
+ const cnt=g=>{const c=Array(n+1).fill(0);if(res)for(const s of ST.staff){if(!res[s.id])continue;for(const di of days){const v=res[s.id][di.d];if(v&&isWork(v.c)&&!AWAY.includes(v.c)&&cellDept(v,s)===g.dep)c[di.d]++;}}return c;};
+ let H=`<section class="pp a1" style="--a1f:${pf}pt;--a1h:${rh}mm"><h2>${ST.corp?esc(ST.corp)+'　':''}${y}年${m}月 全体シフト表</h2><table><colgroup><col style="width:24mm"><col style="width:4mm">${days.map(()=>'<col>').join('')}</colgroup>
+ <tr><th rowspan="2">氏名</th><th rowspan="2">区</th>${days.map(di=>`<th class="${cls(di)}">${di.d}</th>`).join('')}</tr><tr>${days.map(di=>`<th class="${cls(di)}">${WD[di.w]}</th>`).join('')}</tr>`;
+ for(const g of groups){const dep=g.dep;H+=`<tr class="dl"><td colspan="${n+2}" style="background:${dep.color||'#eee'}">${esc(dep.name)}（${g.ss.length}人）</td></tr>`;
+  for(const s of g.ss){const num=res&&res[s.id]?numbered(res,s,y,m):{};H+=`<tr><td class="pn">${esc(s.name)}</td><td>${s.kind==='常勤'?'常':'非'}</td>`;
+   for(const di of days){const v=res&&res[s.id]?(res[s.id][di.d]||{c:''}):{c:''};const cd=cellDept(v,s);let t='',c=cls(di);
+    if(AWAY.includes(v.c))t=v.c==='研修'?'研':'張';else if(isWork(v.c)){if(cd&&cd!==dep){t=deptAbbr(cd);c+=' ou';}else t=ownMark(v,dep);}
+    else{t=shortOff(num[di.d]||'').replace(/[①-⑳]/g,'');if(v.c)c+=' off';}
+    H+=`<td class="${c}">${esc(t)}</td>`;}H+='</tr>';}
+  const c=cnt(g);H+=`<tr class="sum"><td colspan="2">出勤人数</td>${days.map(di=>`<td class="${cls(di)}">${c[di.d]}</td>`).join('')}</tr>`;}
+ H+=`</table><div class="lg">○・A/B＝出勤（班）　略称＝他事業所へ応援（${esc(abbrLegend())}）　研＝研修・張＝出張　休＝公休　希＝希望休　有＝有給　代＝代休　定＝定休日　－＝在籍外　灰色＝休み　青＝土曜　赤＝日曜・祝日</div></section>`;
+ return groups.length?H:'<p>印刷する職員がいません</p>';}
+function printAll1(){const{y,m}=ST.cur;if(!curMo().res&&!confirm('まだ自動作成していません。空の表を印刷しますか？'))return;
+ const pv=$('#printview');pv.innerHTML=buildPrintAll(y,m);document.body.classList.add('printing');
+ const done=()=>{document.body.classList.remove('printing');pv.innerHTML='';window.removeEventListener('afterprint',done);};
+ window.addEventListener('afterprint',done);setTimeout(()=>{try{window.print();}catch(e){showErr(e.message);}setTimeout(()=>{if(!matchMedia('print').matches)done();},1500);},60);}
+{const f=buildPrint;buildPrint=function(y,m,only){return only==='__all1'?buildPrintAll(y,m):f.apply(this,arguments);};}
+{const f=doPrint;doPrint=function(only){if(only==='__all1')return printAll1();return f.apply(this,arguments);};}
+{const f=doPdf;doPdf=async function(only){if(only==='__all1'){toast('印刷画面で「PDFに保存」を選ぶとPDFになります');return printAll1();}return await f.apply(this,arguments);};}
 /* ===== PWA（アプリとして追加） ===== */
 let _bip=null;
 function isStandalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;}
