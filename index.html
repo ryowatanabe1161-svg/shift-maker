@@ -59,7 +59,7 @@ header{padding-top:calc(10px + env(safe-area-inset-top));padding-left:calc(12px 
 .dpanel{margin:6px 0 8px}.dsel{display:flex;gap:8px;align-items:center;font-weight:bold}.dsel select{min-height:44px;font-size:16px;flex:1}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.chip{min-height:44px;display:flex;flex-direction:column;align-items:flex-start;padding:4px 10px}.stc{display:inline-block;border:1.5px solid;border-radius:10px;padding:0 6px;font-size:12px;margin-left:4px;background:#fff}.dhead{border-left:6px solid;padding:6px 8px;margin-top:6px;background:#f7f9fc;border-radius:6px}.dhead .acts button{min-height:44px}
 #bUndo,#bRedo{min-height:44px;min-width:44px;box-sizing:border-box}
 .mrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0}.mrow .hint{font-size:12px;color:#666}.mbox{margin:8px 0}
-</style></head><body><div id="nojs" style="margin:16px;padding:20px;border:4px solid #d00;border-radius:12px;background:#fff4f4;color:#900;font-size:22px;line-height:1.6;font-weight:bold">この画面のままなら、プレビューでは動きません。<br>共有ボタンから『Safariで開く』か『ファイルに保存』してから開いてください。</div><div id="errbox" style="display:none;margin:8px;padding:10px;background:#ffe0e0;color:#900;border:2px solid #d00;font-size:13px;white-space:pre-wrap;word-break:break-all"></div><div id="memband" style="display:none;padding:8px 12px;background:#fff3b0;color:#640;font-size:14px;font-weight:bold">この開き方では保存できません。JSON書き出しで控えをとってください</div>
+details.mbox>summary{min-height:44px;display:flex;align-items:center;cursor:pointer}</style></head><body><div id="nojs" style="margin:16px;padding:20px;border:4px solid #d00;border-radius:12px;background:#fff4f4;color:#900;font-size:22px;line-height:1.6;font-weight:bold">この画面のままなら、プレビューでは動きません。<br>共有ボタンから『Safariで開く』か『ファイルに保存』してから開いてください。</div><div id="errbox" style="display:none;margin:8px;padding:10px;background:#ffe0e0;color:#900;border:2px solid #d00;font-size:13px;white-space:pre-wrap;word-break:break-all"></div><div id="memband" style="display:none;padding:8px 12px;background:#fff3b0;color:#640;font-size:14px;font-weight:bold">この開き方では保存できません。JSON書き出しで控えをとってください</div>
 <script>function showErr(m){if(String(m).includes('印刷する職員がいません')){try{closeM();}catch(e){}toast('印刷する職員がいません');return;}try{var e=document.getElementById('errbox');e.style.display='block';e.textContent+='エラー: '+m+'\n';}catch(_){}}
 window.onerror=function(msg,src,l,c,err){showErr(msg+' (行'+l+':'+c+')'+(err&&err.stack?'\n'+err.stack:''));};
 window.addEventListener('unhandledrejection',function(e){showErr(String(e.reason));});</script><header>シフト自動作成<span class="ur"><button id="bUndo" onclick="undo()" title="元に戻す" disabled>↶</button><button id="bRedo" onclick="redo()" title="やり直し" disabled>↷</button></span></header><main id="main"></main><div id="inst" role="dialog" aria-label="アプリとして追加"><span id="instT">ホーム画面に追加すると、アプリのように使えます。</span><button id="instB" onclick="doInstall()">アプリとして追加</button><button class="x" onclick="hideInst(1)" aria-label="閉じる">✕</button></div><div id="printview"></div>
@@ -1130,6 +1130,93 @@ function meetRows(filter,depForAdd){const{y,m}=ST.cur,mo=curMo(),ov=mo.mtgDate||
 function deptMeetFilter(dep){return mt=>!isCorpMeet(mt)&&(mt.target===dep||ST.staff.some(s=>s.dept===dep&&attends(s,mt)));}
 {const f=deptPanel;deptPanel=function(){const h=f();const fd=focusDept();if(!fd)return h;const box=`<details class="mbox" open><summary>📅 ${ST.cur.m}月の事業所の会議（日付の変更・追加・削除）</summary>${meetRows(deptMeetFilter(fd),fd)}<p class="hint">法人の会議（業務会議・施設長会議）は「月の設定」で日付を指定できます。</p></details>`;return h.replace(/<\/div>$/,box+'</div>');};}
 {const f=rMonth;rMonth=function(){const h=f();return h+`<div class="card mbox"><h3>📅 ${ST.cur.y}年${ST.cur.m}月の会議の日付</h3><p class="hint">この月だけ日付を決めたい会議は、ここで日にちを選んでください（あとから変更・自動に戻すこともできます）。</p>${meetRows(()=>true,null)}</div>`;};}
+/* ===== v15：実績に合わせた作成（出勤率・兼務の割合・土曜なし・休業日・会議の出席者） ===== */
+const ROLE_MEET_ONLY_LIST=1;
+{const f=defaultClosed;defaultClosed=function(y,m){const R=ST.rules||{};let r=f(y,m);
+ if(R.closeNewYear&&m===1)r=r.filter(d=>d!==3);
+ if(R.closeGW&&m===5){r=r.filter(d=>d!==3);for(const d of [4,5,6])if(!r.includes(d)&&holName(y,m,d))r.push(d);r.sort((a,b)=>a-b);}
+ return r;};}
+{const _d=defaultMeetings;defaultMeetings=function(){const a=_d().filter(mt=>mt.name!=='塾会議'&&mt.name!=='ジョブ会議');
+ a.push({name:'ジョブ会議',week:'4',dow:3,target:'job'},{name:'ジョブ会議',week:'2',dow:5,target:'job'});return a;};}
+/* 施設長会議：会議リストに書いた人がいればその人だけ。運営・連絡など事業所の会議を役職で配るのは、本人の会議リストにある人だけ */
+{const f=attends;attends=function(s,mt){const lst=s.meet||[];
+ if(mt.name==='施設長会議'&&ST.staff.some(x=>(x.meet||[]).includes('施設長会議')))return lst.includes('施設長会議');
+ if(mt.name&&mt.target==='施設長'&&!CORP_MEET.includes(mt.name))return lst.includes(mt.name);
+ return f(s,mt);};}
+/* 出勤率（非常勤の固定曜日）と、他事業所に入る割合 */
+{const f=oneTrial;oneTrial=function(y,m,R){const res=f(y,m,R);try{fitPass(y,m,res,R);}catch(e){console.error(e);}return res;};}
+function fitPass(y,m,res,R){const days=dayInfos(y,m),md=meetingDays(y,m);
+ const sur=(dep,d)=>dayCnt(res,dep,d)-deptReq(dep,days[d-1]);
+ const busyMeet=(s,d)=>(md[d]||[]).some(mt=>attends(s,mt));
+ for(const s of ST.staff){const r=res[s.id];if(!r)continue;const home=deptById(s.dept);if(!home)continue;
+  if(s.kind==='非常勤'&&Array.isArray(s.fixR))for(const w of s.fixed||[]){const p=+s.fixR[w];if(!(p>0&&p<0.9))continue;
+   const ds=days.filter(di=>di.w===w&&r[di.d]&&isWork(r[di.d].c)&&!r[di.d].lock&&!busyMeet(s,di.d)).map(di=>di.d);
+   let k=Math.round(ds.length*(1-p)+R()*0.49);
+   for(const d of shuffle(ds,R).sort((a,b)=>sur(home,b)-sur(home,a))){if(k<=0)break;if(sur(home,d)<=0)continue;r[d]={c:'',n:''};k--;}}
+  if(s.split&&s.kind==='常勤'){const wds=days.filter(di=>r[di.d]&&isWork(r[di.d].c)&&!r[di.d].lock&&di.w>=1&&di.w<=5&&!di.h).map(di=>di.d);
+   for(const id in s.split){const to=deptById(id);if(!to)continue;const want=Math.round(wds.length*(+s.split[id]||0));
+    let have=wds.filter(d=>cellDept(r[d],s)===to).length;
+    for(const d of shuffle(wds.slice(),R).sort((a,b)=>sur(to,a)-sur(to,b))){if(have>=want)break;const cd=cellDept(r[d],s);if(!cd||cd===to)continue;if(sur(cd,d)<=0||!deptOpen(to,days[d-1]))continue;
+     const lab=labsOf(s,'wd').find(x=>codeDept(x.c)===to);r[d]={c:lab?lab.c:to.name,n:r[d].n||'',dp:to.id};have++;}}}}
+}
+/* 会議の重なり・出席者の休み */
+function meetIssues(y,m,res){const md=meetingDays(y,m),out=[];
+ for(const d in md){const ms=md[d];for(const s of ST.staff){if(!empIn(s,y,m))continue;const mine=ms.filter(mt=>attends(s,mt));
+  if(mine.length>=2){const mo=monthObj(y,m),ov=mo.mtgDate||{};const kk=mine.map(mt=>mt.extra||(mKey(mt) in ov)?'x'+Math.random():mt.week+'/'+mt.dow);if(new Set(kk).size>1)out.push({t:'dup',s,d:+d,ms:mine});}
+  const v=res&&res[s.id]&&res[s.id][d];if(mine.length&&v&&!isWork(v.c)&&!v.lock&&(KOUKYU.includes(v.c)||v.c===''))out.push({t:'off',s,d:+d,ms:mine});}}
+ return out;}
+function freeMeetDay(y,m,mt,avoid){const md=meetingDays(y,m),mo=monthObj(y,m),who=ST.staff.filter(s=>attends(s,mt));
+ for(let k=1;k<=dim(y,m);k++)for(const d of [avoid+k,avoid-k]){if(d<1||d>dim(y,m)||!bizDay(y,m,d,mo))continue;if(!(md[d]||[]).some(x=>who.some(s=>attends(s,x))))return d;}return 0;}
+{const f=checks;checks=function(y,m,res){const c=f(y,m,res);if(!res)return c;
+ for(const x of meetIssues(y,m,res)){const nm=x.ms.map(a=>a.name).join('・');
+  if(x.t==='dup'){const alt=freeMeetDay(y,m,x.ms[x.ms.length-1],x.d);c.list.push({lv:'warn',msg:`${x.s.name}: ${x.d}日に会議が重なっています（${nm}）${alt?`。${alt}日なら重なりません`:''}`,sid:x.s.id,d:x.d});c.warn++;}
+  else{c.list.push({lv:'warn',msg:`${x.s.name}: ${x.d}日は${nm}ですが休みです（「事業所の会議」から休みを入れ替えできます）`,sid:x.s.id,d:x.d});c.warn++;}}
+ return c;};}
+/* 出席者が休みの日に会議を動かした・足したとき：休みを近くの平日と入れ替える */
+function swapOffFor(y,m,s,d){const mo=monthObj(y,m),r=mo.res&&mo.res[s.id];if(!r)return false;const md=meetingDays(y,m),n=dim(y,m);
+ for(let k=1;k<=6;k++)for(const z of [d+k,d-k]){if(z<1||z>n)continue;const v=r[z];if(!v||v.lock||!isWork(v.c)||!bizDay(y,m,z,mo))continue;if((md[z]||[]).some(mt=>attends(s,mt)))continue;
+  const off=r[d];r[d]={c:primaryCode(s),n:''};r[z]={c:off.c||'休',n:''};return true;}
+ return false;}
+function meetOffCheck(){const{y,m}=ST.cur,mo=curMo();if(!mo.res)return;const iss=meetIssues(y,m,mo.res).filter(x=>x.t==='off');if(!iss.length)return;
+ const t=iss.map(x=>`・${x.s.name}：${x.d}日（${x.ms.map(a=>a.name).join('・')}）`).join('\n');
+ if(confirm(`会議の日に休みの出席者がいます。\n${t}\n\n休みを近くの平日と入れ替えますか？（↶で戻せます）`)){let ok=0;for(const x of iss)if(swapOffFor(y,m,x.s,x.d))ok++;reNote(y,m);save();render();toast(`${ok}人の休みを入れ替えました`);}}
+{const f=setMeetDay;setMeetDay=function(i,val){f(i,val);meetOffCheck();};}
+{const f=addMeet;addMeet=function(dep){f(dep);meetOffCheck();};}
+{const f=moveExtra;moveExtra=function(i,val){f(i,val);meetOffCheck();};}
+/* 会議パネルに重なりと候補日を表示 */
+{const f=meetRows;meetRows=function(filter,dep){let h=f(filter,dep);const{y,m}=ST.cur;const iss=meetIssues(y,m,curMo().res).filter(x=>x.t==='dup'&&x.ms.some(filter));
+ if(iss.length){const seen=new Set();h+=`<div class="hint" style="color:#a60">`+iss.filter(x=>{const k=x.d+'|'+x.ms.map(a=>a.name).join();if(seen.has(k))return false;seen.add(k);return true;}).map(x=>{const mt=x.ms.find(filter)||x.ms[0];const alt=freeMeetDay(y,m,mt,x.d);return `⚠ ${x.d}日：${x.ms.map(a=>esc(a.name)).join('と')}が重なる人がいます${alt?`（${mt.name}を${alt}日にすると重なりません）`:''}`;}).join('<br>')+`</div>`;}
+ return h;};}
+/* 傾向の編集：出勤率と兼務の割合 */
+{const f=tendHtml;tendHtml=function(s){const h=f(s);const fr=s.fixR?(s.fixed||[]).map(w=>WD[w]+':'+Math.round((+s.fixR[w]||0)*100)).join(', '):'';
+ const sp=Object.entries(s.split||{}).map(([id,v])=>((deptById(id)||{}).name||id)+':'+Math.round(v*100)).join(', ');
+ return h.replace(/<\/div><\/details>$/,`<label>非常勤：固定曜日に実際に出る割合（月:90, 水:70 …　空欄＝毎回）<input id="t_fr" value="${esc(fr)}"></label><label>他の事業所に入る割合（事業所名:割合%, …）<input id="t_sp" value="${esc(sp)}" placeholder="カフェ:10"></label></div></details>`);};}
+{const f=readTend;readTend=function(s){const ex=!!$('#t_fr');f(s);if(!ex)return;
+ const pr=t=>String(t||'').split(/[,、]/).map(x=>x.trim()).filter(Boolean).map(x=>x.match(/^(.+?)[:：]\s*(\d+(?:\.\d+)?)%?$/)).filter(Boolean);
+ const fr=pr($('#t_fr').value);if(fr.length){s.fixR=[0,0,0,0,0,0,0];for(const [,k,v] of fr){const w=WD.indexOf(k.trim());if(w>=0)s.fixR[w]=Math.min(1,+v/100);}}else delete s.fixR;
+ const sp={};for(const [,k,v] of pr($('#t_sp').value)){const d=ST.depts.find(x=>x.name===k.trim());if(d&&d.id!==s.dept||d&&d.id===s.dept)sp[d.id]=Math.min(1,+v/100);}if(Object.keys(sp).length)s.split=sp;else delete s.split;};}
+/* 全日休所などで働ける日がない人は公休数の違反にしない／同じ名前の会議の警告は1つにまとめる */
+{const f=checks;checks=function(y,m,res){const c=f(y,m,res);if(!res)return c;const days=dayInfos(y,m);
+ const noWork=s=>{const dep=deptById(s.dept);return days.every(di=>di.closed||di.w===0||(dep&&dep.closedDow.includes(di.w)));};
+ const out=[];let err=0,warn=0;const seen=new Set();
+ for(const x of c.list){const s=x.sid&&ST.staff.find(q=>q.id===x.sid);
+  if(x.lv==='err'&&s&&/公休 \d+\/\d+日/.test(x.msg)&&noWork(s)){out.push({lv:'info',msg:`${s.name}: この月は全日が休所・定休のため、公休の数は数えません`,sid:x.sid,d:null});continue;}
+  if(x.lv==='warn'&&/この月に開ける営業日がありません/.test(x.msg)){if(seen.has(x.msg))continue;seen.add(x.msg);}
+  out.push(x);if(x.lv==='err')err++;if(x.lv==='warn')warn++;}
+ c.list=out;c.err=err;c.warn=warn;return c;};}
+/* 同じ会議が月に2回以上あるとき、1回ずつ別に動かせるよう番号付きの鍵にする（name@target#n） */
+mKey=function(mt){const t=mt.target||'',b=mt.name+'@'+t;const same=(ST.meetings||[]).filter(x=>x.name===mt.name&&(x.target||'')===t);const i=same.indexOf(mt);return b+'#'+(i<0?0:i);};
+function mkMigrate(){if(!ST||ST.mkV15||!ST.months)return;
+ for(const k in ST.months){const mo=ST.months[k];if(!mo||!mo.mtgDate)continue;const nd={};
+  for(const key in mo.mtgDate){if(key.includes('#')){nd[key]=mo.mtgDate[key];continue;}const [nm,t]=key.split('@');const same=(ST.meetings||[]).filter(x=>x.name===nm&&(x.target||'')===(t||''));
+   if(!same.length)nd[key+'#0']=mo.mtgDate[key];same.forEach((x,i)=>nd[key+'#'+i]=mo.mtgDate[key]);}
+  mo.mtgDate=nd;}
+ ST.mkV15=1;}
+{const _m=migrate;migrate=function(){_m();mkMigrate();};}
+/* まだ入職前の人を消すときは「完全に削除」を先に選んでおく */
+{const f=delStaff;delStaff=function(id){f(id);const s=ST.staff.find(x=>x.id===id);if(!s||!s.start)return;const st=pd(s.start);if(!st||st<=pd(ymdLocal()))return;
+ const r=document.querySelector('input[name=dm][value=ret]');if(r&&r.parentElement)r.parentElement.innerHTML=r.parentElement.innerHTML.replace('（おすすめ）','');
+ const a=document.querySelector('input[name=dm][value=all]');if(a){a.parentElement.insertAdjacentHTML('beforeend','<b>（まだ入職前なので、こちらがおすすめ）</b>');a.checked=true;}};}
 /* ===== PWA（アプリとして追加） ===== */
 let _bip=null;
 function isStandalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;}
