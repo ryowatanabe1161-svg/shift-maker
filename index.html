@@ -56,6 +56,7 @@ header{padding-top:calc(10px + env(safe-area-inset-top));padding-left:calc(12px 
 @media print{#inst{display:none!important}}
 .srow2{display:flex;gap:6px;align-items:stretch}.srow2 .srow{flex:1;min-width:0}.srow2>button,.effbox input,#main button.danger{min-height:44px;min-width:44px}.effbox{border:1px dashed #c90;border-radius:8px;padding:6px 8px;margin:6px 0;background:#fffbea}button.danger{color:#b00}
 .pp.a1 table{table-layout:fixed}.pp.a1 h2{font-size:10pt;margin:0 0 1mm}.pp.a1 th,.pp.a1 td{font-size:var(--a1f);height:var(--a1h);line-height:1;padding:0;border:.3pt solid #000;letter-spacing:-.3px}.pp.a1 td.pn{text-align:left;padding-left:1px;font-size:var(--a1f)}.pp.a1 tr.dl td{text-align:left;font-weight:bold;border-top:1pt solid #000;padding-left:2px}.pp.a1 tr.sum td{font-weight:bold;border-top:.6pt solid #000;border-bottom:.8pt solid #000}.pp.a1 .sat{background:#e4ecfa;text-decoration:none}.pp.a1 .sun{background:#fbe3e3;text-decoration:none}.pp.a1 td.off{background:#e6e6e6;font-style:normal;color:#444}.pp.a1 td.off.sat,.pp.a1 td.off.sun{background:#d6d6d6}.pp.a1 td.ou{background:#fff;font-weight:bold}.pp.a1 .lg{font-size:6pt;margin-top:.8mm}
+.dpanel{margin:6px 0 8px}.dsel{display:flex;gap:8px;align-items:center;font-weight:bold}.dsel select{min-height:44px;font-size:16px;flex:1}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.chip{min-height:44px;display:flex;flex-direction:column;align-items:flex-start;padding:4px 10px}.stc{display:inline-block;border:1.5px solid;border-radius:10px;padding:0 6px;font-size:12px;margin-left:4px;background:#fff}.dhead{border-left:6px solid;padding:6px 8px;margin-top:6px;background:#f7f9fc;border-radius:6px}.dhead .acts button{min-height:44px}
 </style></head><body><div id="nojs" style="margin:16px;padding:20px;border:4px solid #d00;border-radius:12px;background:#fff4f4;color:#900;font-size:22px;line-height:1.6;font-weight:bold">この画面のままなら、プレビューでは動きません。<br>共有ボタンから『Safariで開く』か『ファイルに保存』してから開いてください。</div><div id="errbox" style="display:none;margin:8px;padding:10px;background:#ffe0e0;color:#900;border:2px solid #d00;font-size:13px;white-space:pre-wrap;word-break:break-all"></div><div id="memband" style="display:none;padding:8px 12px;background:#fff3b0;color:#640;font-size:14px;font-weight:bold">この開き方では保存できません。JSON書き出しで控えをとってください</div>
 <script>function showErr(m){if(String(m).includes('印刷する職員がいません')){try{closeM();}catch(e){}toast('印刷する職員がいません');return;}try{var e=document.getElementById('errbox');e.style.display='block';e.textContent+='エラー: '+m+'\n';}catch(_){}}
 window.onerror=function(msg,src,l,c,err){showErr(msg+' (行'+l+':'+c+')'+(err&&err.stack?'\n'+err.stack:''));};
@@ -999,6 +1000,76 @@ function printAll1(){const{y,m}=ST.cur;if(!curMo().res&&!confirm('まだ自動�
 {const f=buildPrint;buildPrint=function(y,m,only){return only==='__all1'?buildPrintAll(y,m):f.apply(this,arguments);};}
 {const f=doPrint;doPrint=function(only){if(only==='__all1')return printAll1();return f.apply(this,arguments);};}
 {const f=doPdf;doPdf=async function(only){if(only==='__all1'){toast('印刷画面で「PDFに保存」を選ぶとPDFになります');return printAll1();}return await f.apply(this,arguments);};}
+/* ===== v11：ホーム／生ホ（ホームから生活介護へ応援） ===== */
+const SEIHO='生ホ';
+function seikatsuDept(){return ST.depts.find(d=>d.id==='seikatsu')||ST.depts.find(d=>d.name==='生活'||d.name==='生活介護');}
+function homeMigrate(){if(!ST||!Array.isArray(ST.depts)||ST.homeV)return;const h=ST.depts.find(d=>d.name===SEIHO);const sk=seikatsuDept();
+ if(h&&sk){h.name='ホーム';if(!sk.subs.some(x=>x.code===SEIHO))sk.subs.push({code:SEIHO,req:{sun:0,mon:0,tue:0,wed:0,thu:0,fri:0,sat:0,hol:0},note:'ホーム所属で生活介護へ応援'});
+  for(const s of ST.staff||[]){const L=s.lab||{};const uses=Object.values(L).some(a=>Array.isArray(a)&&a.some(e=>e.c===SEIHO));if(uses&&s.dept!==sk.id){s.help=s.help||[];if(!s.help.includes(sk.id))s.help.push(sk.id);}}}
+ ST.homeV=1;}
+{const _m=migrate;migrate=function(){_m();homeMigrate();};}
+{const f=labsOf;labsOf=function(s,g){const b=s&&(s._base||s);if(b&&b.seihoDef&&g!=='we'&&seikatsuDept()&&seikatsuDept().subs.some(x=>x.code===SEIHO))return [{c:SEIHO,w:1}];return f(s,g);};}
+{const f=editStaff;editStaff=function(id){f(id);const s=id&&ST.staff.find(x=>x.id===id);const sk=seikatsuDept();if(!sk||!sk.subs.some(x=>x.code===SEIHO))return;const fd=$('#f_dept');if(!fd)return;
+ const el=document.createElement('label');el.className='ck2';el.style.minHeight='44px';el.innerHTML=`<input type="checkbox" id="f_seiho" ${s&&s.seihoDef?'checked':''}> 平日の基本を「生ホ」（ホーム所属で生活介護へ応援）にする`;
+ const lb=fd.closest('label');lb.parentNode.insertBefore(el,lb.nextSibling);};}
+{const f=saveStaff;saveStaff=function(id,exists){const c=$('#f_seiho');const v=c?c.checked:null;f(id,exists);if(v===null)return;const s=ST.staff.find(x=>x.id===id)||ST.staff[ST.staff.length-1];if(!s)return;
+ if(v){s.seihoDef=true;const sk=seikatsuDept();if(sk&&s.dept!==sk.id){s.help=s.help||[];if(!s.help.includes(sk.id))s.help.push(sk.id);}}else delete s.seihoDef;save();render();};}
+/* ===== v11：事業所ごとの調整（選ぶ・この事業所だけ作り直す・確定） ===== */
+let FOCUS_ON=false;
+const DST=['未調整','調整中','確定'];
+function dStat(mo,id){mo=mo||curMo();if(!mo.res)return '';return (mo.dstat&&mo.dstat[id])||'未調整';}
+function setDStat(id,v,mo){mo=mo||curMo();mo.dstat=mo.dstat||{};mo.dstat[id]=v;}
+function lockedDepts(mo){mo=mo||curMo();return Object.keys(mo.dstat||{}).filter(k=>mo.dstat[k]==='確定');}
+function sidsOfDept(id){return withSnap(curK(),()=>ST.staff.filter(s=>s.dept===id).map(s=>s.id));}
+function focusDept(){const f=ST.focus;return f&&deptById(f)?f:'';}
+function setFocus(id){ST.focus=id||'';save();if(TAB!=='shift')setTab('shift');else render();window.scrollTo(0,0);}
+{const f=staffOrdered;staffOrdered=function(){const a=f();const fd=FOCUS_ON&&focusDept();return fd?a.filter(s=>s.dept===fd):a;};}
+for(const nm of ['rShift','rReq','rSum']){const f=window[nm];window[nm]=function(...a){FOCUS_ON=true;try{return f.apply(this,a);}finally{FOCUS_ON=false;}};}
+function stChip(s){const c=s==='確定'?'#2e7d32':s==='調整中'?'#c77700':'#777';return `<span class="stc" style="border-color:${c};color:${c}">${s==='確定'?'🔒 ':''}${s}</span>`;}
+function deptPanel(){const mo=curMo(),fd=focusDept();const opts=`<option value="">全体（全事業所）</option>`+ST.depts.filter(d=>!d.end).map(d=>`<option value="${d.id}" ${d.id===fd?'selected':''}>${esc(d.name)}${mo.res?'（'+dStat(mo,d.id)+'）':''}</option>`).join('');
+ let h=`<div class="dpanel"><label class="dsel">🏢 事業所を選ぶ<select onchange="setFocus(this.value)">${opts}</select></label>`;
+ if(!fd){if(mo.res)h+=`<div class="chips">${ST.depts.filter(d=>!d.end).map(d=>`<button class="chip" onclick="setFocus('${d.id}')"><b>${esc(d.name)}</b>${stChip(dStat(mo,d.id))}</button>`).join('')}</div><p class="hint">事業所をタップすると、その事業所だけを表示・調整できます。</p>`;}
+ else{const d=deptById(fd),st=dStat(mo,fd);
+  h+=`<div class="dhead" style="border-color:${d.color||'#999'}"><b>${esc(d.name)}</b> だけ表示中 ${mo.res?stChip(st):''}<div class="acts">`;
+  if(mo.res){h+=st==='確定'?`<button onclick="unlockDept('${fd}')">🔓 確定を解除</button>`:`<button class="pri" onclick="lockDept('${fd}')">🔒 確定する</button><button onclick="regenDept('${fd}')">↻ この事業所だけ自動で作り直す</button>`;
+   h+=`<button onclick="exportDept('${fd}')">📤 この事業所を書き出す</button>`;}
+  h+=`<button onclick="setFocus('')">← 全体に戻る</button></div></div>`;}
+ return h+'</div>';}
+{const f=rShift;rShift=function(){let h=f();if(!ST.staff.length)return h;const mo=curMo(),fd=focusDept();
+ if(mo.res)h=h.replace('<button class="pri" onclick="runGen()">⚙ 自動作成</button>',fd?'':'<button onclick="runGen()">⚙ 全体を作り直す</button>').replace(`<button onclick="altPlan()">🎲 別の案を作る</button>`,fd?'':'<button onclick="altPlan()">🎲 別の案</button>');
+ else h=h.replace('⚙ 自動作成</button>','⚙ 全体を自動作成（土台）</button>');
+ const i=h.indexOf('<div class="acts">');return i<0?deptPanel()+h:h.slice(0,i)+deptPanel()+h.slice(i);};}
+{const f=runGen;runGen=function(){const mo=curMo();if(mo.res){const L=lockedDepts(mo).map(id=>(deptById(id)||{}).name).filter(Boolean);
+ if(!confirm(`全事業所の表を自動で作り直します。${L.length?`\n確定した事業所（${L.join('、')}）はそのまま残ります。`:''}\nふだんは事業所を選んで「この事業所だけ自動で作り直す」を使ってください。\n続けますか？`))return;}return f();};}
+{const f=altPlan;altPlan=function(){if(!confirm('全事業所を別の案で作り直します（確定した事業所はそのまま）。続けますか？'))return;return f();};}
+/* 確定した事業所は、どの自動作成でも上書きしない */
+{const f=genAsync;genAsync=async function(y,m){const mo=monthObj(y,m);const L=lockedDepts(mo);if(!L.length||!mo.res)return await f(y,m);
+ const keep={},bak=JSON.parse(JSON.stringify(mo.req||{}));const sids=new Set();for(const id of L)for(const sid of withSnap(ymdN(y,m,1),()=>ST.staff.filter(s=>s.dept===id).map(s=>s.id)))sids.add(sid);
+ for(const sid of sids){const r=mo.res[sid];if(!r)continue;keep[sid]=JSON.parse(JSON.stringify(r));for(const d in r)(mo.req[sid]=mo.req[sid]||{})[d]=r[d].c||'休';}
+ let g;try{g=await f(y,m);}finally{mo.req=bak;}for(const sid in keep)g.res[sid]=keep[sid];g.ck=checks(y,m,g.res);return g;};}
+function lockDept(id){const mo=curMo();pushHist(mo,`${deptById(id).name}を確定する前`);setDStat(id,'確定');save();render();toast(`${deptById(id).name}を確定しました（自動作成で上書きされません）`);}
+function unlockDept(id){const mo=curMo();setDStat(id,'調整中');save();render();toast('確定を解除しました');}
+async function regenDept(id){const{y,m}=ST.cur,mo=curMo(),dep=deptById(id);if(!mo.res)return alert('先に「全体を自動作成（土台）」をしてください');if(dStat(mo,id)==='確定')return alert('確定済みです。先に「確定を解除」してください');
+ if(!confirm(`${dep.name}だけを自動で作り直します。\nほかの事業所の表と、手で直したマスはそのまま残ります。`))return;
+ const mine=new Set(sidsOfDept(id));const orig=JSON.parse(JSON.stringify(mo.res)),bak=JSON.parse(JSON.stringify(mo.req||{})),keep={};
+ for(const sid in orig){const r=orig[sid];for(const d in r){const v=r[d];if(!v)continue;if(!mine.has(sid)||v.man){(keep[sid]=keep[sid]||{})[d]=v;(mo.req[sid]=mo.req[sid]||{})[d]=v.c||'休';}}}
+ GEN_STOP=false;busy(true,'0%');let g;try{g=await genAsync(y,m);}catch(e){busy(false);mo.req=bak;if(e.message==='__stop'){toast('中止しました（表は変わっていません）');return;}showErr(e.message);return;}finally{mo.req=bak;}
+ for(const sid in keep)for(const d in keep[sid])if(g.res[sid])g.res[sid][d]=keep[sid][d];
+ pushHist(mo,`${dep.name}だけ作り直す前`);mo.res=g.res;setDStat(id,'調整中');save();busy(false);render();const ck=checks(y,m,mo.res);toast(`${dep.name}を作り直しました：違反${ck.err}／警告${ck.warn}`);return ck;}
+{const f=editCell;editCell=function(sid,d){const mo=curMo();const s=ST.staff.find(x=>x.id===sid);const dep=s&&withSnap(curK(),()=>(ST.staff.find(x=>x.id===sid)||{}).dept);
+ if(dep&&dStat(mo,dep)==='確定'){if(!confirm(`${deptById(dep).name}は確定済みです。確定を解除して直しますか？`))return;setDStat(dep,'調整中');save();}return f(sid,d);};}
+{const f=setCell;setCell=function(sid,d,c){const mo=curMo();const dep=withSnap(curK(),()=>(ST.staff.find(x=>x.id===sid)||{}).dept);if(dep&&mo.res&&dStat(mo,dep)==='未調整')setDStat(dep,'調整中');return f(sid,d,c);};}
+/* 事業所ごとの書き出し・取り込み（施設長→とりまとめ） */
+function deptExportObj(id){const{y,m}=ST.cur,mo=curMo(),d=deptById(id);const sids=sidsOfDept(id);const cells={},req={};for(const sid of sids){if(mo.res&&mo.res[sid])cells[sid]=mo.res[sid];if(mo.req&&mo.req[sid])req[sid]=mo.req[sid];}
+ return {kind:'shift-dept',ver:1,y,m,dept:{id:d.id,name:d.name},staff:sids.map(sid=>({id:sid,name:(ST.staff.find(s=>s.id===sid)||{}).name})),cells,req,status:dStat(mo,id),at:new Date().toISOString()};}
+function exportDept(id){const o=deptExportObj(id);download(`シフト_${o.y}年${o.m}月_${o.dept.name}.json`,new Blob([JSON.stringify(o)],{type:'application/json'}));toast('書き出しました。このファイルをとりまとめの人に送ってください');}
+function applyDeptImport(o){if(!o||o.kind!=='shift-dept')return false;const mo=monthObj(o.y,o.m);if(!mo.res){alert(`${o.y}年${o.m}月はまだ自動作成していません。先に全体を自動作成してから取り込んでください。`);return true;}
+ const ok=Object.keys(o.cells||{}).filter(sid=>ST.staff.some(s=>s.id===sid));if(!ok.length){alert('この端末の職員と一致しませんでした');return true;}
+ if(!confirm(`${o.y}年${o.m}月「${o.dept.name}」の${ok.length}人分を取り込みます（ほかの事業所はそのまま）。よろしいですか？`))return true;
+ pushHist(mo,`${o.dept.name}を取り込む前`);for(const sid of ok){mo.res[sid]=o.cells[sid];if(o.req&&o.req[sid])mo.req[sid]=o.req[sid];}
+ setDStat(o.dept.id,o.status==='確定'?'確定':'調整中',mo);ST.cur={y:o.y,m:o.m};save();render();toast(`${o.dept.name}を取り込みました（${ok.length}人）`);return true;}
+{const f=importJson;importJson=function(inp){const fl=inp&&inp.files&&inp.files[0];if(!fl)return f(inp);const r=new FileReader();r.onload=()=>{let o=null;try{o=JSON.parse(r.result);}catch(e){}if(o&&o.kind==='shift-dept'){applyDeptImport(o);inp.value='';}else f(inp);};r.readAsText(fl);};}
+{const f=buildPrintAll;buildPrintAll=function(y,m){return f(y,m).replace('研＝研修','生ホ＝ホームから生活介護へ応援　研＝研修');};}
 /* ===== PWA（アプリとして追加） ===== */
 let _bip=null;
 function isStandalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;}
