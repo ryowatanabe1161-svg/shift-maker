@@ -58,6 +58,7 @@ header{padding-top:calc(10px + env(safe-area-inset-top));padding-left:calc(12px 
 .pp.a1 table{table-layout:fixed}.pp.a1 h2{font-size:10pt;margin:0 0 1mm}.pp.a1 th,.pp.a1 td{font-size:var(--a1f);height:var(--a1h);line-height:1;padding:0;border:.3pt solid #000;letter-spacing:-.3px}.pp.a1 td.pn{text-align:left;padding-left:1px;font-size:var(--a1f)}.pp.a1 tr.dl td{text-align:left;font-weight:bold;border-top:1pt solid #000;padding-left:2px}.pp.a1 tr.sum td{font-weight:bold;border-top:.6pt solid #000;border-bottom:.8pt solid #000}.pp.a1 .sat{background:#e4ecfa;text-decoration:none}.pp.a1 .sun{background:#fbe3e3;text-decoration:none}.pp.a1 td.off{background:#e6e6e6;font-style:normal;color:#444}.pp.a1 td.off.sat,.pp.a1 td.off.sun{background:#d6d6d6}.pp.a1 td.ou{background:#fff;font-weight:bold}.pp.a1 .lg{font-size:6pt;margin-top:.8mm}
 .dpanel{margin:6px 0 8px}.dsel{display:flex;gap:8px;align-items:center;font-weight:bold}.dsel select{min-height:44px;font-size:16px;flex:1}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.chip{min-height:44px;display:flex;flex-direction:column;align-items:flex-start;padding:4px 10px}.stc{display:inline-block;border:1.5px solid;border-radius:10px;padding:0 6px;font-size:12px;margin-left:4px;background:#fff}.dhead{border-left:6px solid;padding:6px 8px;margin-top:6px;background:#f7f9fc;border-radius:6px}.dhead .acts button{min-height:44px}
 #bUndo,#bRedo{min-height:44px;min-width:44px;box-sizing:border-box}
+.mrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0}.mrow .hint{font-size:12px;color:#666}.mbox{margin:8px 0}
 </style></head><body><div id="nojs" style="margin:16px;padding:20px;border:4px solid #d00;border-radius:12px;background:#fff4f4;color:#900;font-size:22px;line-height:1.6;font-weight:bold">この画面のままなら、プレビューでは動きません。<br>共有ボタンから『Safariで開く』か『ファイルに保存』してから開いてください。</div><div id="errbox" style="display:none;margin:8px;padding:10px;background:#ffe0e0;color:#900;border:2px solid #d00;font-size:13px;white-space:pre-wrap;word-break:break-all"></div><div id="memband" style="display:none;padding:8px 12px;background:#fff3b0;color:#640;font-size:14px;font-weight:bold">この開き方では保存できません。JSON書き出しで控えをとってください</div>
 <script>function showErr(m){if(String(m).includes('印刷する職員がいません')){try{closeM();}catch(e){}toast('印刷する職員がいません');return;}try{var e=document.getElementById('errbox');e.style.display='block';e.textContent+='エラー: '+m+'\n';}catch(_){}}
 window.onerror=function(msg,src,l,c,err){showErr(msg+' (行'+l+':'+c+')'+(err&&err.stack?'\n'+err.stack:''));};
@@ -1018,6 +1019,22 @@ function homeMigrate(){if(!ST||!Array.isArray(ST.depts)||ST.homeV)return;const h
 /* ===== v12：会議・研修は実績傾向から引かない（会議は会議ルールの日だけ注記） ===== */
 function isEventCode(c){c=String(c||'');if(!c)return false;if(/会議|研修|ミーティング|MTG/i.test(c))return true;return (ST.meetings||[]).some(mt=>mt.name&&c===mt.name);}
 {const f=labsOf;labsOf=function(s,g){const a=f(s,g);const b=a.filter(x=>!isEventCode(x.c));if(b.length)return b;const o=g==='wd'?'we':'wd';const c=f(s,o).filter(x=>!isEventCode(x.c));return c.length?c:[{c:(s.subs||[])[0]||deptById(s.dept).name,w:1}];};}
+/* ===== v13：会議の日付（月をまたぐ時は前の営業日）と出席者（実績の会議参加を優先） ===== */
+let MEET_LOST={};
+function bizDay(y,m,d,mo){const w=dowOf(y,m,d);return !(mo.closed.includes(d)||holName(y,m,d)||w===0||w===6);}
+meetingDays=function(y,m){const n=dim(y,m),out={},mo=monthObj(y,m),lost=[];
+ for(const mt of ST.meetings||[]){const ds=[];for(let d=1;d<=n;d++)if(dowOf(y,m,d)===+mt.dow)ds.push(d);let d0=mt.week==='last'?ds[ds.length-1]:ds[+mt.week-1];if(!d0)continue;
+  let d=d0;while(d<=n&&!bizDay(y,m,d,mo))d++;
+  if(d>n){d=d0;while(d>=1&&!bizDay(y,m,d,mo))d--;}
+  if(d<1){lost.push(mt.name);continue;}(out[d]=out[d]||[]).push(mt);}
+ MEET_LOST[key(y,m)]=lost;return out;};
+attends=function(s,mt){const own=Array.isArray(s.meet)&&s.meet.length;if(mt.target==='施設長')return own?s.meet.includes(mt.name):String(s.title||'').trim()==='施設長';return s.dept===mt.target||(own&&s.meet.includes(mt.name));};
+{const f=checks;checks=function(y,m,res){const c=f(y,m,res);meetingDays(y,m);for(const nm of MEET_LOST[key(y,m)]||[]){c.list.push({lv:'warn',msg:`${nm}: この月に開ける営業日がありません（日付を手で決めてください）`,sid:null,d:null});c.warn++;}return c;};}
+{const f=oneTrial;oneTrial=function(y,m,R){const res=f(y,m,R);const md=meetingDays(y,m),n=dim(y,m),rq=(monthObj(y,m).req)||{};
+ for(const d0 in md){const d=+d0;for(const s of ST.staff){const ms=md[d].filter(mt=>attends(s,mt));if(!ms.length||!res[s.id])continue;const v=res[s.id][d];if(!v||isWork(v.c)||v.lock||(rq[s.id]||{})[d]||['休職','対象外','定休'].includes(v.c))continue;
+  for(const k of [1,-1,2,-2,3,-3,4,-4]){const e=d+k;if(e<1||e>n)continue;const u=res[s.id][e];const w=dowOf(y,m,e);if(!u||!isWork(u.c)||u.lock||(rq[s.id]||{})[e]||w===0||w===6||(md[e]||[]).some(mt=>attends(s,mt)))continue;
+   res[s.id][d]=u;res[s.id][e]=v;u.n=ms.map(x=>x.name).join('・');break;}}}
+ return res;};}
 /* ===== v11：事業所ごとの調整（選ぶ・この事業所だけ作り直す・確定） ===== */
 let FOCUS_ON=false;
 const DST=['未調整','調整中','確定'];
@@ -1074,6 +1091,45 @@ function applyDeptImport(o){if(!o||o.kind!=='shift-dept')return false;const mo=m
  setDStat(o.dept.id,o.status==='確定'?'確定':'調整中',mo);ST.cur={y:o.y,m:o.m};save();render();toast(`${o.dept.name}を取り込みました（${ok.length}人）`);return true;}
 {const f=importJson;importJson=function(inp){const fl=inp&&inp.files&&inp.files[0];if(!fl)return f(inp);const r=new FileReader();r.onload=()=>{let o=null;try{o=JSON.parse(r.result);}catch(e){}if(o&&o.kind==='shift-dept'){applyDeptImport(o);inp.value='';}else f(inp);};r.readAsText(fl);};}
 {const f=buildPrintAll;buildPrintAll=function(y,m){return f(y,m).replace('研＝研修','生ホ＝ホームから生活介護へ応援　研＝研修');};}
+/* ===== v14：法人の会議（業務会議・施設長会議）と事業所の会議／月ごとの日付指定 ===== */
+const CORP_MEET=['業務会議','施設長会議'];
+function mKey(mt){return mt.name+'@'+(mt.target||'');}
+function isCorpMeet(mt){return CORP_MEET.includes(mt.name);}
+function meetMigrate(){if(!ST||!Array.isArray(ST.meetings)||ST.meetV14)return;
+ for(const mt of ST.meetings)if(mt.name==='施設長会議'&&mt.week==='last'&&+mt.dow===4)mt.week='3';
+ if(!ST.meetings.some(mt=>mt.name==='施設長会議'))ST.meetings.push({name:'施設長会議',week:'3',dow:4,target:'施設長'});
+ if(!ST.meetings.some(mt=>mt.name==='業務会議'))ST.meetings.push({name:'業務会議',week:'2',dow:3,target:'施設長'});
+ ST.meetV14=1;}
+{const _m=migrate;migrate=function(){_m();meetMigrate();};}
+{const _d=defaultMeetings;defaultMeetings=function(){return _d().map(mt=>mt.name==='施設長会議'&&mt.week==='last'?Object.assign({},mt,{week:'3'}):mt);};}
+/* 月ごとの指定：mo.mtgDate[key]=日（0＝この月はなし）、mo.mtgExtra=[{name,d,target}] */
+{const f=meetingDays;meetingDays=function(y,m){const base=f(y,m),mo=monthObj(y,m),ov=mo.mtgDate||{},n=dim(y,m),out={};
+ const lost=(MEET_LOST[key(y,m)]||[]).filter(nm=>!(ST.meetings||[]).some(mt=>mt.name===nm&&mKey(mt) in ov));
+ for(const d in base)for(const mt of base[d])if(!(mKey(mt) in ov))(out[d]=out[d]||[]).push(mt);
+ for(const mt of ST.meetings||[]){const k=mKey(mt);if(!(k in ov))continue;const d=+ov[k];if(d>=1&&d<=n)(out[d]=out[d]||[]).push(mt);}
+ for(const x of mo.mtgExtra||[]){if(x.d>=1&&x.d<=n)(out[x.d]=out[x.d]||[]).push({name:x.name,target:x.target,extra:1});}
+ MEET_LOST[key(y,m)]=lost;return out;};}
+{const f=attends;attends=function(s,mt){if(mt.extra)return s.dept===mt.target||(s.meet||[]).includes(mt.name);if(mt.name==='施設長会議'&&String(s.title||'').trim()==='施設長')return true;return f(s,mt);};}
+function meetDayOf(y,m,mt){const md=meetingDays(y,m);for(const d in md)if(md[d].some(x=>mKey(x)===mKey(mt)))return +d;return 0;}
+function reNote(y,m){const mo=monthObj(y,m);if(!mo.res)return;const md=meetingDays(y,m),names=new Set([...(ST.meetings||[]).map(x=>x.name),...(mo.mtgExtra||[]).map(x=>x.name)]);
+ for(const s of ST.staff){const r=mo.res[s.id];if(!r)continue;for(const d in r){const v=r[d];if(!v)continue;if(v.n){const a=String(v.n).split('・').filter(x=>!names.has(x));if(a.length)v.n=a.join('・');else delete v.n;}
+   const ms=(md[d]||[]).filter(mt=>attends(s,mt));if(ms.length&&isWork(v.c))v.n=[...(v.n?[v.n]:[]),...ms.map(x=>x.name)].join('・');}}}
+function setMeetDay(i,val){const{y,m}=ST.cur,mo=curMo(),mt=ST.meetings[i];if(!mt)return;pushHist(mo,`${mt.name}の日付を変える前`);mo.mtgDate=mo.mtgDate||{};
+ if(val==='auto')delete mo.mtgDate[mKey(mt)];else mo.mtgDate[mKey(mt)]=+val;reNote(y,m);save();render();toast(`${m}月の${mt.name}：${val==='auto'?'自動':(+val?val+'日':'なし')}`);}
+function addMeet(dep){const{y,m}=ST.cur,mo=curMo();const nm=($('#am_name')||{}).value,d=+(($('#am_day')||{}).value||0);if(!nm||!d)return alert('会議名と日にちを入れてください');
+ pushHist(mo,`${nm}を追加する前`);(mo.mtgExtra=mo.mtgExtra||[]).push({name:nm.trim(),d,target:dep});reNote(y,m);save();render();toast(`${m}月${d}日に${nm}を追加しました`);}
+function moveExtra(i,val){const{y,m}=ST.cur,mo=curMo();const x=(mo.mtgExtra||[])[i];if(!x)return;pushHist(mo,`${x.name}を変える前`);if(+val)x.d=+val;else mo.mtgExtra.splice(i,1);reNote(y,m);save();render();}
+function daySel(y,m,cur,on,withAuto){const n=dim(y,m);let o=withAuto?`<option value="auto">自動</option>`:'';o+=`<option value="0" ${cur===0&&!withAuto?'selected':''}>なし（削除）</option>`;
+ for(let d=1;d<=n;d++)o+=`<option value="${d}" ${cur===d?'selected':''}>${d}日（${'日月火水木金土'[dowOf(y,m,d)]}）</option>`;return `<select onchange="${on}" style="min-height:44px">${o}</select>`;}
+function meetRows(filter,depForAdd){const{y,m}=ST.cur,mo=curMo(),ov=mo.mtgDate||{};let h='';
+ (ST.meetings||[]).forEach((mt,i)=>{if(!filter(mt))return;const d=meetDayOf(y,m,mt),pin=mKey(mt) in ov;
+  h+=`<div class="mrow"><b>${esc(mt.name)}</b><span class="hint">${isCorpMeet(mt)?'法人':'事業所'}・${pin?'この月だけ指定':'自動'}</span>${daySel(y,m,d,`setMeetDay(${i},this.value)`,false)}${pin?`<button onclick="setMeetDay(${i},'auto')">自動に戻す</button>`:''}${!d?'<span style="color:#c00">⚠ 日付なし</span>':''}</div>`;});
+ (mo.mtgExtra||[]).forEach((x,i)=>{if(depForAdd&&x.target!==depForAdd)return;h+=`<div class="mrow"><b>${esc(x.name)}</b><span class="hint">追加分</span>${daySel(y,m,x.d,`moveExtra(${i},this.value)`,false)}</div>`;});
+ if(depForAdd)h+=`<div class="mrow"><input id="am_name" placeholder="会議名（例：ケース会議）" style="min-height:44px"><select id="am_day" style="min-height:44px">${Array.from({length:dim(y,m)},(_,k)=>`<option value="${k+1}">${k+1}日（${'日月火水木金土'[dowOf(y,m,k+1)]}）</option>`).join('')}</select><button onclick="addMeet('${depForAdd}')">＋ 会議を追加</button></div>`;
+ return h;}
+function deptMeetFilter(dep){return mt=>!isCorpMeet(mt)&&(mt.target===dep||ST.staff.some(s=>s.dept===dep&&attends(s,mt)));}
+{const f=deptPanel;deptPanel=function(){const h=f();const fd=focusDept();if(!fd)return h;const box=`<details class="mbox" open><summary>📅 ${ST.cur.m}月の事業所の会議（日付の変更・追加・削除）</summary>${meetRows(deptMeetFilter(fd),fd)}<p class="hint">法人の会議（業務会議・施設長会議）は「月の設定」で日付を指定できます。</p></details>`;return h.replace(/<\/div>$/,box+'</div>');};}
+{const f=rMonth;rMonth=function(){const h=f();return h+`<div class="card mbox"><h3>📅 ${ST.cur.y}年${ST.cur.m}月の会議の日付</h3><p class="hint">この月だけ日付を決めたい会議は、ここで日にちを選んでください（あとから変更・自動に戻すこともできます）。</p>${meetRows(()=>true,null)}</div>`;};}
 /* ===== PWA（アプリとして追加） ===== */
 let _bip=null;
 function isStandalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;}
