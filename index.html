@@ -1253,6 +1253,10 @@ function autoMeetLab(y,m,mt,d){const n=nomMeetDay(y,m,mt);return n&&d&&n!==d?`�
  for(const k in g){const o=g[k];const alt=freeMeetDay(y,m,o.ms[o.ms.length-1],o.d);
   c.list.push({lv:'warn',msg:`${o.d}日に会議が重なっています（${o.nm}）：${o.ps.map(s=>s.name).join('・')}（${o.ps.length}人）${alt?`。${alt}日なら重なりません`:''}`,sid:o.ps[0].id,d:o.d});c.warn++;}
  return c;};}
+/* ===== v17：法人の会議（業務会議など）は、だれの会議リストにも書かれていなければ施設長全員が出る ===== */
+{const f=attends;attends=function(s,mt){if(mt&&!mt.extra&&mt.target==='施設長'&&CORP_MEET.includes(mt.name)&&!ST.staff.some(x=>(x.meet||[]).includes(mt.name)))return String(s.title||'').trim()==='施設長';return f(s,mt);};}
+/* 保存済みデータの法人名から固有名を外す */
+{const _m=migrate;migrate=function(){_m();if(ST&&typeof ST.corp==='string'&&/\u72ec\u6b69/.test(ST.corp))ST.corp=ST.corp.replace(/\u72ec\u6b69/g,'').trim()||'社会福祉法人';};}
 /* ===== PWA（アプリとして追加） ===== */
 let _bip=null;
 function isStandalone(){return (window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;}
